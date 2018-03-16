@@ -13,5 +13,6 @@ public class Rider {
     public String fristName;
     public String lastName;
     public String teamName;
+    public String age;
 
 }
