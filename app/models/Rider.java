@@ -10,7 +10,7 @@ public class Rider {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long id;
-    public String fristName;
+    public String firstName;
     public String lastName;
     public String teamName;
     public String age;
