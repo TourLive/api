@@ -12,6 +12,9 @@ public class JudgmentRiderConnection {
     @ManyToOne(cascade=CascadeType.PERSIST)
     public Rider rider;
 
+    @ManyToOne(cascade=CascadeType.PERSIST)
+    public Judgment judgment;
+
     public Long getId() {
         return id;
     }
