@@ -17,8 +17,11 @@ public class Rider {
     public String teamShortName;
     public boolean isUnkown;
 
-    @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     public List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
+
+    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
+    public List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
 
     public Long getId() {
         return id;
