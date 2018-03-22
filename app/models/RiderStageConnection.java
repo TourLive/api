@@ -26,6 +26,8 @@ public class RiderStageConnection {
     public Stage stage;
     @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL)
     public List<RiderRanking> riderRankings = new ArrayList<RiderRanking>();
+    @ManyToOne(cascade=CascadeType.PERSIST)
+    public Rider rider;
 
     public Long getId() {
         return id;
