@@ -23,6 +23,9 @@ public class Rider {
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     public List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
 
+    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
+    public List<RiderRaceGroup> riderRaceGroups = new ArrayList<RiderRaceGroup>();
+
     public Long getId() {
         return id;
     }
@@ -89,5 +92,21 @@ public class Rider {
 
     public void setRiderStageConnections(List<RiderStageConnection> riderStageConnections) {
         this.riderStageConnections = riderStageConnections;
+    }
+
+    public List<JudgmentRiderConnection> getJudgmentRiderConnections() {
+        return judgmentRiderConnections;
+    }
+
+    public void setJudgmentRiderConnections(List<JudgmentRiderConnection> judgmentRiderConnections) {
+        this.judgmentRiderConnections = judgmentRiderConnections;
+    }
+
+    public List<RiderRaceGroup> getRiderRaceGroups() {
+        return riderRaceGroups;
+    }
+
+    public void setRiderRaceGroups(List<RiderRaceGroup> riderRaceGroups) {
+        this.riderRaceGroups = riderRaceGroups;
     }
 }
