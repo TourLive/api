@@ -4,6 +4,8 @@ import models.enums.StageType;
 import models.enums.TypeState;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Access(AccessType.PROPERTY)
 public class RiderStageConnection {
@@ -22,6 +24,8 @@ public class RiderStageConnection {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     public Stage stage;
+    @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL)
+    public List<RiderRanking> riderRankings = new ArrayList<RiderRanking>();
 
     public Long getId() {
         return id;
@@ -105,5 +109,13 @@ public class RiderStageConnection {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public List<RiderRanking> getRiderRankings() {
+        return riderRankings;
+    }
+
+    public void setRiderRankings(List<RiderRanking> riderRankings) {
+        this.riderRankings = riderRankings;
     }
 }

@@ -5,8 +5,7 @@ import models.enums.NotificationType;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-@Entity
-@Access(AccessType.PROPERTY)
+@Entity @Access(AccessType.PROPERTY)
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
