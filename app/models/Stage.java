@@ -26,9 +26,10 @@ public class Stage {
     public Race race;
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     public List<Stage> riderStageConnections = new ArrayList<Stage>();
-
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     public List<Maillot> mailllots = new ArrayList<Maillot>();
+    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    public List<Notification> notifications = new ArrayList<Notification>();
 
     public Long getId() {
         return id;
@@ -120,5 +121,21 @@ public class Stage {
 
     public void setRiderStageConnections(List<Stage> riderStageConnections) {
         this.riderStageConnections = riderStageConnections;
+    }
+
+    public List<Maillot> getMailllots() {
+        return mailllots;
+    }
+
+    public void setMailllots(List<Maillot> mailllots) {
+        this.mailllots = mailllots;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
     }
 }
