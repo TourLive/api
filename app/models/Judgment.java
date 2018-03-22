@@ -15,6 +15,9 @@ public class Judgment {
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
     public List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
 
+    @ManyToOne(cascade=CascadeType.PERSIST)
+    public Judgment judgment;
+
     public Long getId() {
         return id;
     }
@@ -41,5 +44,13 @@ public class Judgment {
 
     public void setJudgmentRiderConnections(List<JudgmentRiderConnection> judgmentRiderConnections) {
         this.judgmentRiderConnections = judgmentRiderConnections;
+    }
+
+    public Judgment getJudgment() {
+        return judgment;
+    }
+
+    public void setJudgment(Judgment judgment) {
+        this.judgment = judgment;
     }
 }
