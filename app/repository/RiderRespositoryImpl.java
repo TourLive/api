@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
-public class RiderRespositoryImpl implements RiderRepository {
+public class RiderRespositoryImpl /*implements RiderRepository*/ {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
 
@@ -23,7 +23,7 @@ public class RiderRespositoryImpl implements RiderRepository {
         this.databaseExecutionContext = databaseExecutionContext;
     }
 
-    @Override
+    //@Override
     public CompletionStage<Stream<Rider>> list() {
         return supplyAsync(() -> wrap (this::list), databaseExecutionContext);
     }

@@ -7,7 +7,7 @@ import repository.RiderRespositoryImpl;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Stream;
 
-@ImplementedBy(RiderRespositoryImpl.class)
+//@ImplementedBy(RiderRespositoryImpl.class)
 public interface RiderRepository {
     CompletionStage<Stream<Rider>> getAllRiders();
     void addRider(CompletionStage<Rider> rider);
