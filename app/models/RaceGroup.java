@@ -18,8 +18,12 @@ public class RaceGroup {
     public int position;
     public Timestamp timestamp;
 
-    @OneToMany(mappedBy="raceGroup", cascade= CascadeType.ALL)
-    public List<RiderRaceGroup> riderRaceGroups = new ArrayList<RiderRaceGroup>();
+    @ManyToMany
+    @JoinTable(
+            name="RiderInRaceGroup",
+            joinColumns=@JoinColumn(name="RiderId", referencedColumnName="id"),
+            inverseJoinColumns=@JoinColumn(name="RaceGroupsId", referencedColumnName="id"))
+    private List<Rider> riders;
 
     public Long getId() {
         return id;
@@ -65,11 +69,11 @@ public class RaceGroup {
         this.timestamp = timestamp;
     }
 
-    public List<RiderRaceGroup> getRiderRaceGroups() {
-        return riderRaceGroups;
+    public List<Rider> getRiders() {
+        return riders;
     }
 
-    public void setRiderRaceGroups(List<RiderRaceGroup> riderRaceGroups) {
-        this.riderRaceGroups = riderRaceGroups;
+    public void setRiders(List<Rider> riders) {
+        this.riders = riders;
     }
 }
