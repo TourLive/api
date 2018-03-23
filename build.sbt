@@ -1,4 +1,4 @@
-name := """play-java-starter-example"""
+name := """tourlive-api"""
 
 version := "1.0-SNAPSHOT"
 
@@ -9,6 +9,9 @@ scalaVersion := "2.12.4"
 crossScalaVersions := Seq("2.11.12", "2.12.4")
 
 libraryDependencies += guice
+libraryDependencies += javaJpa
+libraryDependencies += "org.hibernate" % "hibernate-core" % "5.2.15.Final"
+libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
 
 // Test Database
 libraryDependencies += "com.h2database" % "h2" % "1.4.196"
