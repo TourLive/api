@@ -1,6 +1,5 @@
 package repository.interfaces;
 
-import models.Maillot;
 import models.RaceGroup;
 
 import java.sql.Timestamp;
