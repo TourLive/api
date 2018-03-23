@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity @Access(AccessType.PROPERTY)
+@Entity
 public class Rider {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,7 +23,7 @@ public class Rider {
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     public List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
 
-    @ManyToMany(mappedBy="raceGroups")
+    @ManyToMany(mappedBy="riders")
     public List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
 
     public Long getId() {

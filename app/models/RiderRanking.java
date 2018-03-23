@@ -4,7 +4,7 @@ import models.enums.RankingType;
 
 import javax.persistence.*;
 
-@Entity @Access(AccessType.PROPERTY)
+@Entity
 public class RiderRanking {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

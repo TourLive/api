@@ -2,7 +2,7 @@ package models;
 
 import javax.persistence.*;
 
-@Entity @Access(AccessType.PROPERTY)
+@Entity
 public class Maillot {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
