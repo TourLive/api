@@ -19,13 +19,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
 
     @Inject
-    public RaceGroupRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public RaceGroupRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -51,30 +49,30 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
 
     @Override
     public void addRaceGroup(RaceGroup raceGroup) {
-        em.getTransaction().begin();
-        em.persist(raceGroup);
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().begin();
+        jpaApi.em().persist(raceGroup);
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void updateRaceGroup(RaceGroup raceGroup) {
-        RaceGroup rG = em.find(RaceGroup.class, raceGroup.id);
+        RaceGroup rG = jpaApi.em().find(RaceGroup.class, raceGroup.id);
         rG = raceGroup;
     }
 
     @Override
     public void deleteAllRaceGroups() {
-        List<RaceGroup> raceGroups = em.createQuery("select rG from RaceGroup rG", RaceGroup.class).getResultList();
-        em.remove(raceGroups);
+        List<RaceGroup> raceGroups = jpaApi.em().createQuery("select rG from RaceGroup rG", RaceGroup.class).getResultList();
+        jpaApi.em().remove(raceGroups);
     }
 
     @Override
     public void deleteRaceGroupByPosition(int position) {
-        TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.position = :position", RaceGroup.class);
+        TypedQuery<RaceGroup> query = jpaApi.em().createQuery("select rG from RaceGroup rG where rG.position = :position", RaceGroup.class);
         query.setParameter("position", position);
         RaceGroup rG = query.getResultList().get(0);
         if (rG != null) {
-            em.remove(rG);
+            jpaApi.em().remove(rG);
         }
     }
     

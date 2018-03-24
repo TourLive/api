@@ -19,13 +19,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class NotificationRepositoryImpl implements NotificationRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
 
     @Inject
-    public NotificationRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public NotificationRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -51,17 +49,17 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 
     @Override
     public void addNotifications(ArrayList<Notification> notifications) {
-        em.getTransaction().begin();
+        jpaApi.em().getTransaction().begin();
         for(Notification n : notifications){
-            em.persist(n);
+            jpaApi.em().persist(n);
         }
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void deleteAllNotification() {
-        List<Notification> notifications = em.createQuery("select n from Notification n", Notification.class).getResultList();
-        em.remove(notifications);
+        List<Notification> notifications = jpaApi.em().createQuery("select n from Notification n", Notification.class).getResultList();
+        jpaApi.em().remove(notifications);
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

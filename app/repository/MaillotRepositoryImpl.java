@@ -16,13 +16,10 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class MaillotRepositoryImpl implements MaillotRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
-
     @Inject
-    public MaillotRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public MaillotRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -47,22 +44,22 @@ public class MaillotRepositoryImpl implements MaillotRepository {
 
     @Override
     public void addMaillot(CompletionStage<Maillot> maillot) {
-        em.getTransaction().begin();
-        em.persist(maillot);
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().begin();
+        jpaApi.em().persist(maillot);
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void deleteAllMaillots() {
-        List<Maillot> maillots = em.createQuery("select m from Maillot m", Maillot.class).getResultList();
-        em.remove(maillots);
+        List<Maillot> maillots = jpaApi.em().createQuery("select m from Maillot m", Maillot.class).getResultList();
+        jpaApi.em().remove(maillots);
     }
 
     @Override
     public void deleteMaillot(int maillotId) {
-        Maillot m = em.find(Maillot.class, maillotId);
+        Maillot m = jpaApi.em().find(Maillot.class, maillotId);
         if(m!= null){
-            em.remove(m);
+            jpaApi.em().remove(m);
         }
     }
 

@@ -17,13 +17,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class JudgmentRepositoryImpl implements JudgmentRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
 
     @Inject
-    public JudgmentRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public JudgmentRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -49,24 +47,24 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
 
     @Override
     public void addJudgment(Judgment judgment) {
-        em.getTransaction().begin();
-        em.persist(judgment);
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().begin();
+        jpaApi.em().persist(judgment);
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void deleteAllJudgment() {
-        List<Judgment> judgments = em.createQuery("select j from Judgment j", Judgment.class).getResultList();
-        em.remove(judgments);
+        List<Judgment> judgments = jpaApi.em().createQuery("select j from Judgment j", Judgment.class).getResultList();
+        jpaApi.em().remove(judgments);
     }
 
     @Override
     public void deleteJudgmentByJudgmentName(String judgmentName) {
-        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j where j.name = :judgmentName", Judgment.class);
+        TypedQuery<Judgment> query = jpaApi.em().createQuery("select j from Judgment j where j.name = :judgmentName", Judgment.class);
         query.setParameter("judgmentName", judgmentName);
         Judgment j = query.getResultList().get(0);
         if (j != null) {
-            em.remove(j);
+            jpaApi.em().remove(j);
         }
     }
 

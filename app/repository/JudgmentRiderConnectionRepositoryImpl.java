@@ -18,13 +18,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConnectionRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
 
     @Inject
-    public JudgmentRiderConnectionRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public JudgmentRiderConnectionRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -50,25 +48,25 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
 
     @Override
     public void addJudgmentRiderConnection(JudgmentRiderConnection judgmentRiderConnection) {
-        em.getTransaction().begin();
-        em.persist(judgmentRiderConnection);
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().begin();
+        jpaApi.em().persist(judgmentRiderConnection);
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void deleteAllJudgmentRiderConnections() {
-        List<JudgmentRiderConnection> judgmentRiderConnections = em.createQuery("select jRC from JudgmentRiderConnection jRC", JudgmentRiderConnection.class).getResultList();
-        em.remove(judgmentRiderConnections);
+        List<JudgmentRiderConnection> judgmentRiderConnections = jpaApi.em().createQuery("select jRC from JudgmentRiderConnection jRC", JudgmentRiderConnection.class).getResultList();
+        jpaApi.em().remove(judgmentRiderConnections);
     }
 
     @Override
     public void deleteJudgmentRiderConnectionByRiderAndJudgmentName(int riderId, String judgmentName) {
-        TypedQuery<JudgmentRiderConnection> query = em.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.rider.riderId = :riderId and rSC.judgment.name = :judgmentName" , JudgmentRiderConnection.class);
+        TypedQuery<JudgmentRiderConnection> query = jpaApi.em().createQuery("select rSC from JudgmentRiderConnection rSC where rSC.rider.riderId = :riderId and rSC.judgment.name = :judgmentName" , JudgmentRiderConnection.class);
         query.setParameter("riderId", riderId);
         query.setParameter("judgmentName", judgmentName);
         JudgmentRiderConnection jRC = query.getResultList().get(0);
         if(jRC != null){
-            em.remove(jRC);
+            jpaApi.em().remove(jRC);
         }
     }
 

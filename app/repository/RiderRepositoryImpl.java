@@ -16,13 +16,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class RiderRepositoryImpl implements RiderRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
 
     @Inject
-    public RiderRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public RiderRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -47,22 +45,22 @@ public class RiderRepositoryImpl implements RiderRepository {
 
     @Override
     public void addRider(CompletionStage<Rider> rider) {
-        em.getTransaction().begin();
-        em.persist(rider);
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().begin();
+        jpaApi.em().persist(rider);
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void deleteAllRiders() {
-        List<Rider> riders = em.createQuery("select r from Rider r", Rider.class).getResultList();
-        em.remove(riders);
+        List<Rider> riders = jpaApi.em().createQuery("select r from Rider r", Rider.class).getResultList();
+        jpaApi.em().remove(riders);
     }
 
     @Override
     public void deleteRider(int riderId) {
-        Rider pRider = em.find(Rider.class, riderId);
+        Rider pRider = jpaApi.em().find(Rider.class, riderId);
         if(pRider != null){
-            em.remove(pRider);
+            jpaApi.em().remove(pRider);
         }
     }
 

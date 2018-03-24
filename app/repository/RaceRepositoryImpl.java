@@ -15,13 +15,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class RaceRepositoryImpl implements RaceRepository{
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
 
     @Inject
-    public RaceRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public RaceRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -37,22 +35,22 @@ public class RaceRepositoryImpl implements RaceRepository{
     @Override
     public void setRace(Race race) {
         deleteAllRaces();
-        em.getTransaction().begin();
-        em.persist(race);
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().begin();
+        jpaApi.em().persist(race);
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void deleteAllRaces() {
-        List<Race> races = em.createQuery("select r from Race r", Race.class).getResultList();
-        em.remove(races);
+        List<Race> races = jpaApi.em().createQuery("select r from Race r", Race.class).getResultList();
+        jpaApi.em().remove(races);
     }
 
     @Override
     public void deleteRace(String name) {
-        Race race = em.find(Race.class, name);
+        Race race = jpaApi.em().find(Race.class, name);
         if(race != null){
-            em.remove(race);
+            jpaApi.em().remove(race);
         }
     }
 

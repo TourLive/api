@@ -17,13 +17,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
 
     @Inject
-    public RiderStageConnectionRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public RiderStageConnectionRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -50,31 +48,31 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
 
     @Override
     public void addRiderStageConnection(RiderStageConnection riderStageConnection) {
-        em.getTransaction().begin();
-        em.persist(riderStageConnection);
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().begin();
+        jpaApi.em().persist(riderStageConnection);
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void updateRiderStageConnection(RiderStageConnection riderStageConnection) {
-        RiderStageConnection pRSC = em.find(RiderStageConnection.class, riderStageConnection.id);
+        RiderStageConnection pRSC = jpaApi.em().find(RiderStageConnection.class, riderStageConnection.id);
         pRSC = riderStageConnection;
     }
 
     @Override
     public void deleteAllRiderStageConnections() {
-        List<RiderStageConnection> riderStageConnections = em.createQuery("select rSC from RiderStageConnection rSC", RiderStageConnection.class).getResultList();
-        em.remove(riderStageConnections);
+        List<RiderStageConnection> riderStageConnections = jpaApi.em().createQuery("select rSC from RiderStageConnection rSC", RiderStageConnection.class).getResultList();
+        jpaApi.em().remove(riderStageConnections);
     }
 
     @Override
     public void deleteRiderStageConnection(int riderId, int stageId) {
-        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.riderId = :riderId and rSC.stage.stageId = :stageId" , RiderStageConnection.class);
+        TypedQuery<RiderStageConnection> query = jpaApi.em().createQuery("select rSC from RiderStageConnection rSC where rSC.rider.riderId = :riderId and rSC.stage.stageId = :stageId" , RiderStageConnection.class);
         query.setParameter("riderId", riderId);
         query.setParameter("stageId", stageId);
         RiderStageConnection rSC = query.getResultList().get(0);
         if(rSC!= null){
-            em.remove(rSC);
+            jpaApi.em().remove(rSC);
         }
     }
 

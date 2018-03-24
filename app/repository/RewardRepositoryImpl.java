@@ -16,13 +16,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class RewardRepositoryImpl implements RewardRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
 
     @Inject
-    public RewardRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public RewardRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -37,15 +35,15 @@ public class RewardRepositoryImpl implements RewardRepository {
 
     @Override
     public void addReward(Reward reward) {
-        em.getTransaction().begin();
-        em.persist(reward);
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().begin();
+        jpaApi.em().persist(reward);
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void deleteAllRewards() {
-        List<Reward> rewards = em.createQuery("select r from Reward r", Reward.class).getResultList();
-        em.remove(rewards);
+        List<Reward> rewards = jpaApi.em().createQuery("select r from Reward r", Reward.class).getResultList();
+        jpaApi.em().remove(rewards);
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

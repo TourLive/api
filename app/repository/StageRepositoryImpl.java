@@ -16,13 +16,11 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class StageRepositoryImpl implements StageRepository{
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
-    private final EntityManager em;
 
     @Inject
-    public StageRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, EntityManager em) {
+    public StageRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
-        this.em = em;
     }
 
     @Override
@@ -47,22 +45,22 @@ public class StageRepositoryImpl implements StageRepository{
 
     @Override
     public void addStage(CompletionStage<Stage> stage) {
-        em.getTransaction().begin();
-        em.persist(stage);
-        em.getTransaction().commit();
+        jpaApi.em().getTransaction().begin();
+        jpaApi.em().persist(stage);
+        jpaApi.em().getTransaction().commit();
     }
 
     @Override
     public void deleteAllStage() {
-        List<Stage> stages = em.createQuery("select s from Stage s", Stage.class).getResultList();
-        em.remove(stages);
+        List<Stage> stages = jpaApi.em().createQuery("select s from Stage s", Stage.class).getResultList();
+        jpaApi.em().remove(stages);
     }
 
     @Override
     public void deleteStage(int stageId) {
-        Stage pStage = em.find(Stage.class, stageId);
+        Stage pStage = jpaApi.em().find(Stage.class, stageId);
         if(pStage != null){
-            em.remove(pStage);
+            jpaApi.em().remove(pStage);
         }
     }
 
