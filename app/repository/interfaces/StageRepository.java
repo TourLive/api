@@ -1,7 +1,6 @@
 package repository.interfaces;
 
 import com.google.inject.ImplementedBy;
-import models.RiderStageConnection;
 import models.Stage;
 import repository.StageRepositoryImpl;
 
