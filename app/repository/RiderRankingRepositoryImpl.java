@@ -92,7 +92,7 @@ public class RiderRankingRepositoryImpl implements RiderRankingRepository {
             em.remove(riderRanking);
         }
     }
-    
+
     private <T> T wrap(Function<EntityManager, T> function) {
         return jpaApi.withTransaction(function);
     }

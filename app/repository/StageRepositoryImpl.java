@@ -61,7 +61,9 @@ public class StageRepositoryImpl implements StageRepository{
     @Override
     public void deleteStage(int stageId) {
         Stage pStage = em.find(Stage.class, stageId);
-        em.remove(pStage);
+        if(pStage != null){
+            em.remove(pStage);
+        }
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {
