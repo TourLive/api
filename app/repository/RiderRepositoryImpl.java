@@ -37,7 +37,12 @@ public class RiderRepositoryImpl implements RiderRepository {
 
     @Override
     public CompletionStage<Rider> getRider(int riderId) {
-        return null;
+        return supplyAsync(() -> wrap (em -> getRider(em, riderId)), databaseExecutionContext);
+    }
+
+    private Rider getRider(EntityManager em, int riderId){
+        Rider rider = em.find(Rider.class, riderId);
+        return rider;
     }
 
     @Override
