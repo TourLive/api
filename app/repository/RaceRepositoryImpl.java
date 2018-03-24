@@ -5,12 +5,10 @@ import play.db.jpa.JPAApi;
 import repository.interfaces.RaceRepository;
 
 import javax.inject.Inject;
-import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
