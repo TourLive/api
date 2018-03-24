@@ -24,9 +24,9 @@ public class Stage {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     public Race race;
-    @OneToMany(mappedBy="stageRSC", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     public List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
-    @OneToMany(mappedBy="stageM", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     public List<Maillot> mailllots = new ArrayList<Maillot>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     public List<Notification> notifications = new ArrayList<Notification>();
