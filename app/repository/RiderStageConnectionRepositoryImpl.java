@@ -56,6 +56,12 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     @Override
+    public void updateRiderStageConnection(RiderStageConnection riderStageConnection) {
+        RiderStageConnection pRSC = em.find(RiderStageConnection.class, riderStageConnection.id);
+        pRSC = riderStageConnection;
+    }
+
+    @Override
     public void deleteAllRiderStageConnections() {
         List<RiderStageConnection> riderStageConnections = em.createQuery("select rSC from RiderStageConnection rSC", RiderStageConnection.class).getResultList();
         em.remove(riderStageConnections);

@@ -12,6 +12,7 @@ public interface RiderStageConnectionRepository {
     CompletionStage<Stream<RiderStageConnection>> getAllRiderStageConnections();
     CompletionStage<RiderStageConnection> getRiderStageConnectionByRiderAndStage(int riderId, int stageId);
     void addRiderStageConnection(RiderStageConnection riderStageConnection);
+    void updateRiderStageConnection(RiderStageConnection riderStageConnection);
     void deleteAllRiderStageConnections();
     void deleteRiderStageConnection(int riderId, int stageId);
 }

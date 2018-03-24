@@ -53,12 +53,6 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     @Override
-    public void updateStage(Stage stage) {
-        Stage pStage = em.find(Stage.class, stage.stageId);
-        pStage = stage;
-    }
-
-    @Override
     public void deleteAllStage() {
         List<Stage> stages = em.createQuery("select s from Stage s", Stage.class).getResultList();
         em.remove(stages);

@@ -14,7 +14,6 @@ public interface StageRepository {
     CompletionStage<Stream<Stage>> getAllStages();
     CompletionStage<Stage> getStage(int stageId);
     void addStage(CompletionStage<Stage> stage);
-    void updateStage(Stage riderStageConnection);
     void deleteAllStage();
     void deleteStage(int stageId);
 }
