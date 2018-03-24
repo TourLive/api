@@ -19,14 +19,14 @@ public class Stage {
     public Date endTime;
     public int distance;
     public StageType stageType;
-    public String from;
-    public String to;
+    public String from2;
+    public String to2;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     public Race race;
-    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="stageRSC", cascade= CascadeType.ALL)
     public List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
-    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="stageM", cascade= CascadeType.ALL)
     public List<Maillot> mailllots = new ArrayList<Maillot>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     public List<Notification> notifications = new ArrayList<Notification>();
@@ -92,19 +92,19 @@ public class Stage {
     }
 
     public String getFrom() {
-        return from;
+        return from2;
     }
 
     public void setFrom(String from) {
-        this.from = from;
+        this.from2 = from;
     }
 
     public String getTo() {
-        return to;
+        return to2;
     }
 
     public void setTo(String to) {
-        this.to = to;
+        this.to2 = to;
     }
 
     public Race getRace() {
