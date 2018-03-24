@@ -6,9 +6,11 @@ import repository.interfaces.RaceRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
@@ -33,24 +35,42 @@ public class RaceRepositoryImpl implements RaceRepository{
     }
 
     @Override
-    public void setRace(Race race) {
-        deleteAllRaces();
-        jpaApi.em().getTransaction().begin();
-        jpaApi.em().persist(race);
-        jpaApi.em().getTransaction().commit();
+    public CompletionStage<Race> setRace(Race race) {
+        return supplyAsync(() -> wrap (em -> setRace(em, race)), databaseExecutionContext);
+    }
+
+    private Race setRace(EntityManager em, Race race){
+        em.persist(race);
+        return race;
     }
 
     @Override
-    public void deleteAllRaces() {
-        List<Race> races = jpaApi.em().createQuery("select r from Race r", Race.class).getResultList();
-        jpaApi.em().remove(races);
+    public CompletionStage<Stream<Race>> deleteAllRaces() {
+        return supplyAsync(() -> wrap(this::deleteAllRaces), databaseExecutionContext);
+    }
+
+    private Stream<Race> deleteAllRaces(EntityManager em){
+        List<Race> races = em.createQuery("select r from Race r", Race.class).getResultList();
+        for(Race r : races){
+            em.remove(r);
+        }
+        return races.stream();
     }
 
     @Override
-    public void deleteRace(String name) {
-        Race race = jpaApi.em().find(Race.class, name);
-        if(race != null){
-            jpaApi.em().remove(race);
+    public CompletionStage<Race> deleteRace(String name) {
+        return supplyAsync(() -> wrap(em -> deleteRace(em, name)), databaseExecutionContext);
+    }
+
+    private Race deleteRace(EntityManager em, String name){
+        TypedQuery<Race> query = em.createQuery("select r from Race r where r.name >= :name" , Race.class);
+        query.setParameter("name", name);
+        List<Race> races = query.getResultList();
+        if(races.size() != 0){
+            em.remove(races.get(0));
+            return races.get(0);
+        } else{
+            return null;
         }
     }
 
