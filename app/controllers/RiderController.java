@@ -45,7 +45,7 @@ public class RiderController extends Controller {
 
     public CompletionStage<Result> getRider(int riderId){
         return riderRepository.getRider(riderId).thenApplyAsync(rider -> {
-            return ok(toJson(rider));
+            return ok(rider);
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
@@ -62,8 +62,8 @@ public class RiderController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> addRider(){
         JsonNode json = request().body().asJson();
-        return parseRider(json).thenApply(rider -> riderRepository.addRider(rider)).thenApply(riderPersisted -> {
-            return ok("Rider has been added");
+        return parseRider(json).thenApply(rider -> riderRepository.addRider(rider)).thenApply(rider -> {
+            return ok(rider + " has been added");
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){

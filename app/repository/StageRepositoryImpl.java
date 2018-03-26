@@ -1,5 +1,6 @@
 package repository;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import models.Stage;
 import play.db.jpa.JPAApi;
 import repository.interfaces.StageRepository;
@@ -13,6 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static play.libs.Json.toJson;
 
 public class StageRepositoryImpl implements StageRepository{
     private final JPAApi jpaApi;
@@ -25,65 +27,63 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     @Override
-    public CompletionStage<Stream<Stage>> getAllStages() {
+    public CompletionStage<JsonNode> getAllStages() {
         return supplyAsync(() -> wrap (this::getAllStages), databaseExecutionContext);
     }
 
-    private Stream<Stage> getAllStages(EntityManager em){
+    private JsonNode getAllStages(EntityManager em){
         List<Stage> stages = em.createQuery("select s from Stage s", Stage.class).getResultList();
-        return stages.stream();
+        return toJson(stages.stream());
     }
 
     @Override
-    public CompletionStage<Stage> getStage(int stageId) {
+    public CompletionStage<JsonNode> getStage(int stageId) {
         return supplyAsync(() -> wrap (em -> getStage(em, stageId)), databaseExecutionContext);
     }
 
-    private Stage getStage(EntityManager em, int stageId){
+    private JsonNode getStage(EntityManager em, int stageId){
         TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
         query.setParameter("stageId", stageId);
-        return query.getSingleResult();
+        return toJson(query.getSingleResult());
     }
 
     @Override
-    public CompletionStage<Stage> addStage(Stage stage) {
+    public CompletionStage<JsonNode> addStage(Stage stage) {
         return supplyAsync(() -> wrap (em -> addStage(em, stage)), databaseExecutionContext);
     }
 
-    private Stage addStage(EntityManager em, Stage stage){
-        try{
-            stage.race = em.merge(stage.race);
-            em.persist(stage);
-        } catch (Exception ex){
-            String m = ex.getMessage();
-        }
-        return stage;
+    private JsonNode addStage(EntityManager em, Stage stage){
+        stage.race = em.merge(stage.race);
+        em.persist(stage);
+        return toJson(stage);
     }
 
     @Override
-    public CompletionStage<Stream<Stage>> deleteAllStages() {
+    public CompletionStage<JsonNode> deleteAllStages() {
         return supplyAsync(() -> wrap(this::deleteAllStages), databaseExecutionContext);
     }
 
-    private Stream<Stage> deleteAllStages(EntityManager em){
+    private JsonNode deleteAllStages(EntityManager em){
         List<Stage> stages = em.createQuery("select s from Stage s", Stage.class).getResultList();
         for(Stage s : stages){
             em.remove(s);
         }
-        return stages.stream();
+        return toJson(stages.stream());
     }
 
     @Override
-    public CompletionStage<Stage> deleteStage(int stageId) {
+    public CompletionStage<JsonNode> deleteStage(int stageId) {
         return supplyAsync(() -> wrap(em -> deleteStage(em, stageId)), databaseExecutionContext);
     }
 
-    private Stage deleteStage(EntityManager em, int stageId){
+    private JsonNode deleteStage(EntityManager em, int stageId){
         TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
         query.setParameter("stageId", stageId);
-        List<Stage> stages = query.getResultList();
-        em.remove(stages.get(0));
-        return stages.get(0);
+        Stage stage = query.getSingleResult();
+        if(stage != null){
+            em.remove(stage);
+        }
+        return toJson(stage);
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

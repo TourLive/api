@@ -28,9 +28,9 @@ public class RaceController extends Controller {
         this.raceRepository = raceRepository;
     }
 
-    public CompletionStage<Result> getRace() {
-        return raceRepository.getRace().thenApplyAsync(race -> {
-           return ok(toJson("The actual race is: " + race.name));
+    public CompletionStage<Result> getRace(int raceId) {
+        return raceRepository.getRace(raceId).thenApplyAsync(race -> {
+           return ok(race);
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
@@ -52,25 +52,20 @@ public class RaceController extends Controller {
         race.setRaceId(json.findPath("raceId").intValue());
 
         return raceRepository.setRace(race).thenApplyAsync(racePersisted -> {
-            return ok(racePersisted.name + " has been added");
+            return ok(racePersisted + " has been added");
         }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
     }
 
     public CompletionStage<Result> deleteAllRaces() {
-        return raceRepository.deleteAllRaces().thenApply(raceStream -> {
-            List<Race> races = raceStream.collect(Collectors.toList());
-            String message = "Following Races have beend deleted: ";
-            for(Race r : races){
-                message += r.name + ", ";
-            }
-            return ok(toJson(message +  "has/have been deleted"));
+        return raceRepository.deleteAllRaces().thenApply(races -> {
+            return ok(races +  "have been deleted");
 
         }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
     }
 
     public CompletionStage<Result> deleteRace (String name) {
-        return raceRepository.deleteRace(name).thenApplyAsync(raceStream -> {
-                return ok(toJson(raceStream.name + " has been deleted"));
+        return raceRepository.deleteRace(name).thenApplyAsync(race -> {
+                return ok(toJson(race + " has been deleted"));
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){

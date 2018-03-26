@@ -12,6 +12,7 @@ import repository.interfaces.RaceRepository;
 import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -34,11 +35,7 @@ public class StageController extends Controller {
 
     public CompletionStage<Result> getStages() {
         return stageRepository.getAllStages().thenApplyAsync(stages -> {
-            String message = "";
-            for(Stage s : stages.collect(Collectors.toList())){
-                message += s.stageId + ", ";
-            }
-            return ok(toJson(message));
+            return ok(stages);
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
@@ -55,7 +52,7 @@ public class StageController extends Controller {
 
     public CompletionStage<Result> getStage(int stageId) {
         return stageRepository.getStage(stageId).thenApplyAsync(stage -> {
-           return ok(toJson(stage));
+           return ok(stage);
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
@@ -72,8 +69,8 @@ public class StageController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public CompletableFuture<Result> addStage() {
         JsonNode json = request().body().asJson();
-        return parseStage(json).thenApply(stage -> stageRepository.addStage(stage)).thenApply(stagePersisted -> {
-            return ok("Stage has been added");
+        return parseStage(json).thenApply(stage -> stageRepository.addStage(stage)).thenApply(stage -> {
+            return ok(stage + " has been added");
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
@@ -102,7 +99,8 @@ public class StageController extends Controller {
             stage.from2 = json.findPath("from").textValue();
             stage.to2 = json.findPath("to").textValue();
             final Race[] r = new Race[1];
-            raceRepository.getRace().thenApply(race -> {return r[0] = race;}).toCompletableFuture().join();
+            int raceId = json.findPath("raceId").intValue();
+            raceRepository.getDbRace(raceId).thenApply(race -> {return r[0] = race; }).toCompletableFuture().join();
             stage.race = r[0];
             completableFuture.complete(stage);
             return stage;
@@ -116,20 +114,14 @@ public class StageController extends Controller {
     }
 
     public CompletionStage<Result> deleteAllStages() {
-        return stageRepository.deleteAllStages().thenApply(stageStream -> {
-            List<Stage> stages = stageStream.collect(Collectors.toList());
-            String message = "Following Stages have beend deleted: ";
-            for(Stage s : stages){
-                message += s.stageId + ", ";
-            }
-            return ok(toJson(message +  "has/have been deleted"));
-
+        return stageRepository.deleteAllStages().thenApply(stages -> {
+            return ok(stages +  " have been deleted");
         }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
     }
 
     public CompletionStage<Result> deleteStage (int stageId) {
         return stageRepository.deleteStage(stageId).thenApplyAsync(stage -> {
-                return ok(toJson(stage.getStageId() + " has been deleted"));
+                return ok(stage + " has been deleted");
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){

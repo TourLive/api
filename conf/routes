@@ -6,6 +6,7 @@
 GET     /                           controllers.HomeController.index
 
 #Race Routes
+GET     /race                       controllers.RaceController.getAllRaces()
 GET     /race                       controllers.RaceController.getRace
 POST    /race                       controllers.RaceController.setRace
 DELETE  /race/deleteAllRaces        controllers.RaceController.deleteAllRaces
