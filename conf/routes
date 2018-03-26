@@ -7,11 +7,10 @@ GET     /                           controllers.HomeController.index
 GET     /riders                     controllers.RiderController.index
 GET     /riders/list                controllers.RiderController.getRiders
 
-GET     /race                       controllers.RaceController.index
-GET     /race/getRace               controllers.RaceController.getRace
-POST    /race/setRace               controllers.RaceController.setRace
-POST    /race/deleteAllRaces        controllers.RaceController.deleteAllRaces
-POST    /race/deleteRace/:name      controllers.RaceController.deleteRace(name: String)
+GET     /race                       controllers.RaceController.getRace
+POST    /race                       controllers.RaceController.setRace
+DELETE  /race/deleteAllRaces        controllers.RaceController.deleteAllRaces
+DELETE  /race/:name                 controllers.RaceController.deleteRace(name: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

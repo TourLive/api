@@ -66,12 +66,8 @@ public class RaceRepositoryImpl implements RaceRepository{
         TypedQuery<Race> query = em.createQuery("select r from Race r where r.name >= :name" , Race.class);
         query.setParameter("name", name);
         List<Race> races = query.getResultList();
-        if(races.size() != 0){
-            em.remove(races.get(0));
-            return races.get(0);
-        } else{
-            return null;
-        }
+        em.remove(races.get(0));
+        return races.get(0);
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {
