@@ -1,6 +1,7 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.StageType;
 
 import javax.persistence.*;
@@ -25,10 +26,13 @@ public class Stage {
     @JsonBackReference
     public Race race;
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @JsonManagedReference
     public List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @JsonManagedReference
     public List<Maillot> mailllots = new ArrayList<Maillot>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @JsonManagedReference
     public List<Notification> notifications = new ArrayList<Notification>();
 
     public Long getId() {

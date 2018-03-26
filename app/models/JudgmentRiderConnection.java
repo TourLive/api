@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -10,9 +12,11 @@ public class JudgmentRiderConnection {
     public int rank;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
+    @JsonBackReference
     public Rider rider;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
+    @JsonBackReference
     public Judgment judgment;
 
     public Long getId() {

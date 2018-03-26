@@ -1,5 +1,6 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import models.enums.RankingType;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ public class RiderRanking {
     public RankingType rankingType;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
+    @JsonBackReference
     public RiderStageConnection riderStageConnection;
 
     public Long getId() {

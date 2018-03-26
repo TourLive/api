@@ -1,5 +1,6 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import models.enums.NotificationType;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ public class Notification {
     public NotificationType notificationType;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
+    @JsonBackReference
     public Stage stage;
 
     public Long getId() {

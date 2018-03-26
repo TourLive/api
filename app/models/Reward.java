@@ -1,5 +1,6 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.RewardType;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ public class Reward {
     public ArrayList<Integer> money;
 
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
+    @JsonManagedReference
     public List<Judgment> judgmentRiderConnections = new ArrayList<Judgment>();
 
     public Long getId() {

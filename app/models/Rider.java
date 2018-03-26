@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,12 +20,13 @@ public class Rider {
     public boolean isUnkown;
 
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
+    @JsonManagedReference
     public List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
-
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
+    @JsonManagedReference
     public List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
-
     @ManyToMany(mappedBy="riders")
+    @JsonManagedReference
     public List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
 
     public Long getId() {

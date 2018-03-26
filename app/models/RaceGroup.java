@@ -1,5 +1,6 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.RaceGroupType;
 
 import javax.persistence.*;
@@ -23,6 +24,7 @@ public class RaceGroup {
             name="RiderInRaceGroup",
             joinColumns=@JoinColumn(name="RiderId", referencedColumnName="id"),
             inverseJoinColumns=@JoinColumn(name="RaceGroupsId", referencedColumnName="id"))
+    @JsonManagedReference
     private List<Rider> riders;
 
     public Long getId() {

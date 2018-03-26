@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -14,6 +16,7 @@ public class Maillot {
     public String partner;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
+    @JsonBackReference
     public Stage stage;
 
     public Long getId() {
