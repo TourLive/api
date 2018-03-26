@@ -14,9 +14,7 @@ public class Reward {
     public Long id;
     public int rewardId;
     public RewardType rewardType;
-    @ElementCollection
     public ArrayList<Integer> points;
-    @ElementCollection
     public ArrayList<Integer> money;
 
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
