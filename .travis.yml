@@ -5,6 +5,9 @@ scala: 2.12.4
 
 services:
  - docker
+branches:
+  only:
+  - master 
 cache:
   directories:
   - "$HOME/.ivy2/cache"
@@ -15,6 +18,8 @@ before_cache:
 deploy:
   provider: script
   script: bash docker_push
+  on:
+    branch: master
 cache:
   directories:
     - $HOME/.m2/repository
