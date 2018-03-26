@@ -49,6 +49,7 @@ public class RaceController extends Controller {
         JsonNode json = request().body().asJson();
         Race race = new Race();
         race.setName(json.findPath("name").textValue());
+        race.setRaceId(json.findPath("raceId").intValue());
 
         return raceRepository.setRace(race).thenApplyAsync(racePersisted -> {
             return ok(racePersisted.name + " has been added");

@@ -97,8 +97,6 @@ public class StageController extends Controller {
             stage.startTime = new Date(json.findPath("startTime").longValue());
             stage.from2 = json.findPath("from").textValue();
             stage.to2 = json.findPath("to").textValue();
-            stage.raceId = json.findPath("raceId").intValue();
-            stage.raceName = json.findParent("raceName").textValue();
             final Race[] r = new Race[1];
             raceRepository.getRace().thenApply(race -> {return r[0] = race;}).toCompletableFuture().join();
             stage.race = r[0];
@@ -118,7 +116,7 @@ public class StageController extends Controller {
             List<Stage> stages = stageStream.collect(Collectors.toList());
             String message = "Following Stages have beend deleted: ";
             for(Stage s : stages){
-                message += s.raceName + ", ";
+                message += s.stageId + ", ";
             }
             return ok(toJson(message +  "has/have been deleted"));
 
@@ -127,7 +125,7 @@ public class StageController extends Controller {
 
     public CompletionStage<Result> deleteStage (int stageId) {
         return stageRepository.deleteStage(stageId).thenApplyAsync(stage -> {
-                return ok(toJson(stage.getRaceName() + " has been deleted"));
+                return ok(toJson(stage.getStageId() + " has been deleted"));
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){

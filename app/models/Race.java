@@ -10,6 +10,7 @@ public class Race {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long id;
     public String name;
+    public int raceId;
 
     @OneToMany(mappedBy="race", cascade= CascadeType.ALL)
     public List<Stage> stages = new ArrayList<Stage>();
@@ -24,6 +25,14 @@ public class Race {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getRaceId() {
+        return raceId;
+    }
+
+    public void setRaceId(int raceId) {
+        this.raceId = raceId;
     }
 
     public List<Stage> getStages() {

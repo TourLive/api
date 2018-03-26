@@ -13,8 +13,6 @@ public class Stage {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long id;
     public int stageId;
-    public int raceId;
-    public String raceName;
     public Date startTime;
     public Date endTime;
     public int distance;
@@ -42,23 +40,7 @@ public class Stage {
     public void setStageId(int stageId) {
         this.stageId = stageId;
     }
-
-    public int getRaceId() {
-        return raceId;
-    }
-
-    public void setRaceId(int raceId) {
-        this.raceId = raceId;
-    }
-
-    public String getRaceName() {
-        return raceName;
-    }
-
-    public void setRaceName(String raceName) {
-        this.raceName = raceName;
-    }
-
+   
     public Date getStartTime() {
         return startTime;
     }

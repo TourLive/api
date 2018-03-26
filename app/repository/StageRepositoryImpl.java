@@ -52,7 +52,12 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     private Stage addStage(EntityManager em, Stage stage){
-        em.persist(stage);
+        try{
+            stage.race = em.merge(stage.race);
+            em.persist(stage);
+        } catch (Exception ex){
+            String m = ex.getMessage();
+        }
         return stage;
     }
 
