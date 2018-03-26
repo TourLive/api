@@ -10,6 +10,7 @@ import repository.interfaces.RaceRepository;
 import javax.inject.Inject;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,8 +30,8 @@ public class RaceController extends Controller {
 
     public CompletionStage<Result> getRace() {
         return raceRepository.getRace().thenApplyAsync(race -> {
-           return ok(toJson(race.name) + "actual");
-        });
+           return ok(toJson("The actual race is: " + race.name));
+        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
     }
 
     @BodyParser.Of(BodyParser.Json.class)
@@ -40,26 +41,23 @@ public class RaceController extends Controller {
         race.setName(json.findPath("name").textValue());
 
         CompletableFuture<Stream<Race>> delAllRaces = raceRepository.deleteAllRaces().toCompletableFuture();
+        //delAllRaces.exceptionally(ex -> {return throwException(ex.getMessage());});
         delAllRaces.join();
 
         return raceRepository.setRace(race).thenApplyAsync(racePersisted -> {
-            return ok(racePersisted.name + " added");
-        });
+            return ok(racePersisted.name + " has been added");
+        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
     }
 
     public CompletionStage<Result> deleteAllRaces() {
         return raceRepository.deleteAllRaces().thenApply(raceStream -> {
-            return ok(toJson(raceStream.collect(Collectors.toList())+  "deleted"));
-        });
+            return ok(toJson(raceStream.collect(Collectors.toList())+  " have been deleted"));
+        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
     }
 
     public CompletionStage<Result> deleteRace (String name) {
         return raceRepository.deleteRace(name).thenApplyAsync(raceStream -> {
-            if(raceStream != null){
-                return ok(toJson(raceStream.name + " deleted"));
-            } else {
-                return internalServerError(toJson("Race with name: " + name + " not found"));
-            }
-        });
+                return ok(toJson(raceStream.name + " has been deleted"));
+        }).exceptionally(ex -> {return internalServerError("race not found: " + ex.getMessage());});
     }
 }
