@@ -42,8 +42,7 @@ public class StageRepositoryImpl implements StageRepository{
     private Stage getStage(EntityManager em, int stageId){
         TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
         query.setParameter("stageId", stageId);
-        List<Stage> stages = query.getResultList();
-        return stages.get(0);
+        return query.getSingleResult();
     }
 
     @Override

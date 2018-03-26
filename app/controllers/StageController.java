@@ -34,7 +34,11 @@ public class StageController extends Controller {
 
     public CompletionStage<Result> getStages() {
         return stageRepository.getAllStages().thenApplyAsync(stages -> {
-            return ok(toJson(stages));
+            String message = "";
+            for(Stage s : stages.collect(Collectors.toList())){
+                message += s.stageId + ", ";
+            }
+            return ok(toJson(message));
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
@@ -55,7 +59,7 @@ public class StageController extends Controller {
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
+                case "NoResultException":
                     res = badRequest("No Stage with id: " + stageId + ", is available in DB.");
                     break;
                 default:
