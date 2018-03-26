@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public interface RiderRepository {
     CompletionStage<Stream<Rider>> getAllRiders();
     CompletionStage<Rider> getRider(int riderId);
-    void addRider(CompletionStage<Rider> rider);
-    void deleteAllRiders();
-    void deleteRider(int riderId);
+    CompletionStage<Rider>  addRider(Rider rider);
+    CompletionStage<Stream<Rider>>  deleteAllRiders();
+    CompletionStage<Rider>  deleteRider(int riderId);
 }

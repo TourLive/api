@@ -6,6 +6,7 @@ import repository.interfaces.RiderRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -39,29 +40,47 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private Rider getRider(EntityManager em, int riderId){
-        Rider rider = em.find(Rider.class, riderId);
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        query.setParameter("riderId", riderId);
+        return query.getSingleResult();
+    }
+
+    @Override
+    public CompletionStage<Rider> addRider(Rider rider) {
+        return supplyAsync(() -> wrap (em -> addRider(em, rider)), databaseExecutionContext);
+    }
+
+    private Rider addRider(EntityManager em, Rider rider){
+        em.persist(rider);
         return rider;
     }
 
     @Override
-    public void addRider(CompletionStage<Rider> rider) {
-        jpaApi.em().getTransaction().begin();
-        jpaApi.em().persist(rider);
-        jpaApi.em().getTransaction().commit();
+    public CompletionStage<Stream<Rider>> deleteAllRiders() {
+        return supplyAsync(() -> wrap (this::deleteAllRiders), databaseExecutionContext);
     }
 
-    @Override
-    public void deleteAllRiders() {
-        List<Rider> riders = jpaApi.em().createQuery("select r from Rider r", Rider.class).getResultList();
-        jpaApi.em().remove(riders);
-    }
-
-    @Override
-    public void deleteRider(int riderId) {
-        Rider pRider = jpaApi.em().find(Rider.class, riderId);
-        if(pRider != null){
-            jpaApi.em().remove(pRider);
+    private Stream<Rider> deleteAllRiders(EntityManager em){
+        List<Rider> riders = em.createQuery("select r from Rider r", Rider.class).getResultList();
+        for(Rider r : riders){
+            em.remove(r);
         }
+        return riders.stream();
+    }
+
+    @Override
+    public CompletionStage<Rider> deleteRider(int riderId) {
+        return supplyAsync(() -> wrap (em -> deleteRider(em, riderId)), databaseExecutionContext);
+    }
+
+    private Rider deleteRider(EntityManager em, int riderId){
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        query.setParameter("riderId", riderId);
+        Rider rider = query.getSingleResult();
+        if(rider != null){
+            em.remove(rider);
+        }
+        return rider;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {
