@@ -15,8 +15,6 @@ before_cache:
 deploy:
   provider: script
   script: bash docker_push
-  on:
-    branch: master
 cache:
   directories:
     - $HOME/.m2/repository
