@@ -4,8 +4,6 @@
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
-GET     /riders                     controllers.RiderController.index
-GET     /riders/list                controllers.RiderController.getRiders
 
 #Race Routes
 GET     /race                       controllers.RaceController.getRace
@@ -20,6 +18,12 @@ POST    /stage                      controllers.StageController.addStage
 DELETE  /stage/deleteAllStages      controllers.StageController.deleteAllStages
 DELETE  /stage/:stageId             controllers.StageController.deleteStage(stageId: Integer)
 
+#Rider Routes
+GET     /rider                      controllers.RiderController.getRiders
+GET     /rider/:riderId             controllers.RiderController.getRider(riderId : Integer)
+POST    /rider                      controllers.RiderController.addRider
+DELETE  /rider                      controllers.RiderController.deleteAllRiders
+DELETE  /rider/:riderId             controllers.RiderController.deleteRider(riderId : Integer)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

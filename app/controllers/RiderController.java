@@ -19,14 +19,26 @@ public class RiderController extends Controller {
         this.riderRepository = riderRepository;
     }
 
-    public Result index() {
-        return ok("RIDER REPO");
-    }
-
     public CompletionStage<Result> getRiders() {
         /*return riderRepository.list().thenApplyAsync(riderStream -> {
            return ok(toJson(riderStream.collect(Collectors.toList())));
         });*/
         return null;
+    }
+
+    public CompletionStage<Result> getRider(int riderId){
+        return  null;
+    }
+
+    public CompletionStage<Result> addRider(){
+        return  null;
+    }
+
+    public CompletionStage<Result> deleteAllRiders(){
+        return  null;
+    }
+
+    public CompletionStage<Result> deleteRider(int riderId){
+        return  null;
     }
 }
