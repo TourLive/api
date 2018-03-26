@@ -28,14 +28,30 @@ public class RaceController extends Controller {
         this.raceRepository = raceRepository;
     }
 
+    public CompletionStage<Result> getAllRaces() {
+        return raceRepository.getAllRaces().thenApplyAsync(races -> {
+            return ok(races);
+        }).exceptionally(ex -> {
+            Result res = null;
+            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
+                case "IndexOutOfBoundsException":
+                    res = badRequest("No races are set in DB.");
+                    break;
+                default:
+                    res = internalServerError(ex.getMessage());
+            }
+            return res;
+        });
+    }
+
     public CompletionStage<Result> getRace(int raceId) {
         return raceRepository.getRace(raceId).thenApplyAsync(race -> {
            return ok(race);
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No race is set in DB.");
+                case "NoResultException":
+                    res = badRequest("Race with id: " + raceId + " is not available in DB.");
                     break;
                 default:
                     res = internalServerError(ex.getMessage());
@@ -69,7 +85,7 @@ public class RaceController extends Controller {
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
+                case "NoResultException":
                     res = badRequest("Race " + name + " not found in DB.");
                     break;
                 default:

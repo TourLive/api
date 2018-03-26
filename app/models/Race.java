@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,7 @@ public class Race {
     public int raceId;
 
     @OneToMany(mappedBy="race", cascade= CascadeType.ALL)
+    @JsonManagedReference
     public List<Stage> stages = new ArrayList<Stage>();
 
     public Long getId() {

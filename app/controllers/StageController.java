@@ -77,6 +77,9 @@ public class StageController extends Controller {
                 case "NullPointerException":
                     res = badRequest("json format of stage was wrong");
                     break;
+                case "NoResultException":
+                    res = badRequest("race was not found");
+                    break;
                 default:
                     res = internalServerError(ex.getMessage());
             }
@@ -125,7 +128,7 @@ public class StageController extends Controller {
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
+                case "NoResultException":
                     res = badRequest("Stage with Id: " + stageId + " ,not found in DB.");
                     break;
                 default:
