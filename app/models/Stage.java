@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Entity @Access(AccessType.PROPERTY)
+@Entity
 public class Stage {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,7 +25,7 @@ public class Stage {
     @ManyToOne(cascade=CascadeType.PERSIST)
     public Race race;
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    public List<Stage> riderStageConnections = new ArrayList<Stage>();
+    public List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     public List<Maillot> mailllots = new ArrayList<Maillot>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
@@ -115,11 +115,11 @@ public class Stage {
         this.race = race;
     }
 
-    public List<Stage> getRiderStageConnections() {
+    public List<RiderStageConnection> getRiderStageConnections() {
         return riderStageConnections;
     }
 
-    public void setRiderStageConnections(List<Stage> riderStageConnections) {
+    public void setRiderStageConnections(List<RiderStageConnection> riderStageConnections) {
         this.riderStageConnections = riderStageConnections;
     }
 

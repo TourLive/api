@@ -24,8 +24,9 @@ public class RiderController extends Controller {
     }
 
     public CompletionStage<Result> getRiders() {
-        return riderRepository.list().thenApplyAsync(riderStream -> {
+        /*return riderRepository.list().thenApplyAsync(riderStream -> {
            return ok(toJson(riderStream.collect(Collectors.toList())));
-        });
+        });*/
+        return null;
     }
 }

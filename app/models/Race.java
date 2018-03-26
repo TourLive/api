@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity @Access(AccessType.PROPERTY)
+@Entity
 public class Race {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

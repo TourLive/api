@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity @Access(AccessType.PROPERTY)
+@Entity
 public class Reward {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

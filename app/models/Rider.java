@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity @Access(AccessType.PROPERTY)
+@Entity
 public class Rider {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,8 +23,8 @@ public class Rider {
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     public List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
 
-    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
-    public List<RiderRaceGroup> riderRaceGroups = new ArrayList<RiderRaceGroup>();
+    @ManyToMany(mappedBy="riders")
+    public List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
 
     public Long getId() {
         return id;
@@ -102,11 +102,11 @@ public class Rider {
         this.judgmentRiderConnections = judgmentRiderConnections;
     }
 
-    public List<RiderRaceGroup> getRiderRaceGroups() {
-        return riderRaceGroups;
+    public List<RaceGroup> getRaceGroups() {
+        return raceGroups;
     }
 
-    public void setRiderRaceGroups(List<RiderRaceGroup> riderRaceGroups) {
-        this.riderRaceGroups = riderRaceGroups;
+    public void setRaceGroups(List<RaceGroup> raceGroups) {
+        this.raceGroups = raceGroups;
     }
 }
