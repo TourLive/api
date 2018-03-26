@@ -21,7 +21,9 @@ addons:
     token:
       secure: "EcZjbUvI7Udjz+5S89EmAo/gd12iIl36Aes4Bjp5rfdYu8SzJVVkJMS7E1TxDKv3HYWxP/iY0zscOHLQUur5CbfkLTpS6yZMoBm9NTIhU7RHddMctf0nxnJwcLNZ7s27ZxG4IZXUbI4ieM59WRcME1EFoc3bvYw/m7CISedSMjjNPnxLAc4kQ0Zw/YyPoGtep58DMsGpip+1ABI0D65ffyaJkis0xIF01lOZvyHATkBszOcWSXgMHaoOxtERJ7J5dgeYJmHhOmBuHxcIkgnPH7HurmtESXmkHxN9ZKFNOpmiC4WUPZypOpJA9tpkF2jv2ziHQpRzfHi6yPmTP9F5AJlHVkNRwgIMTSr4SNIvFalaPOdVMF7r/GFk95qQc2rvjwEhdJjDFsB9ZnKUoJRJLS90u6K0VXS04YjE8YLVZ2Kf9qL/5yJLQAj4URZfbqJbHkc4qmwW1I7pA2lkfnUGx45YRMkItgNvlNJCZbZfT9PWgLl/q0QBshrNU/+BbTGeCZFHyXsOJSypXpqVFAUfnBtBSSZnT7Cf1qIYN9Qul07d1dwPJEseYZVZL77aVGU/Co+oS1GMoMyLO2KYFB02sV6jKztFk/LLSa4+cvt88FkKP5nWJAkHrkKEyi2fPoojPCUViaHKVHjQvwJqKpVO4vWC6KSRYJQbEi3+P1OBgRE="
 script:
+  - sbt test
   - sonar-scanner
+  - find $HOME/.sbt -name "*.lock" | xargs rm
 deploy:
   provider: script
   script: bash docker_push
