@@ -12,7 +12,7 @@ import java.util.concurrent.CompletionStage;
 public interface StageRepository {
     CompletionStage<Stream<Stage>> getAllStages();
     CompletionStage<Stage> getStage(int stageId);
-    void addStage(CompletionStage<Stage> stage);
-    void deleteAllStage();
-    void deleteStage(int stageId);
+    CompletionStage<Stage> addStage(Stage stage);
+    CompletionStage<Stream<Stage>> deleteAllStages();
+    CompletionStage<Stage> deleteStage(int stageId);
 }

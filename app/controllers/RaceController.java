@@ -28,10 +28,6 @@ public class RaceController extends Controller {
         this.raceRepository = raceRepository;
     }
 
-    public Result index() {
-        return ok("Race REPO");
-    }
-
     public CompletionStage<Result> getRace() {
         return raceRepository.getRace().thenApplyAsync(race -> {
            return ok(toJson("The actual race is: " + race.name));

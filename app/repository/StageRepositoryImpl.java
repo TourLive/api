@@ -6,6 +6,7 @@ import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -39,29 +40,46 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     private Stage getStage(EntityManager em, int stageId){
-        Stage stage = em.find(Stage.class, stageId);
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
+        query.setParameter("stageId", stageId);
+        List<Stage> stages = query.getResultList();
+        return stages.get(0);
+    }
+
+    @Override
+    public CompletionStage<Stage> addStage(Stage stage) {
+        return supplyAsync(() -> wrap (em -> addStage(em, stage)), databaseExecutionContext);
+    }
+
+    private Stage addStage(EntityManager em, Stage stage){
+        em.persist(stage);
         return stage;
     }
 
     @Override
-    public void addStage(CompletionStage<Stage> stage) {
-        jpaApi.em().getTransaction().begin();
-        jpaApi.em().persist(stage);
-        jpaApi.em().getTransaction().commit();
+    public CompletionStage<Stream<Stage>> deleteAllStages() {
+        return supplyAsync(() -> wrap(this::deleteAllStages), databaseExecutionContext);
     }
 
-    @Override
-    public void deleteAllStage() {
-        List<Stage> stages = jpaApi.em().createQuery("select s from Stage s", Stage.class).getResultList();
-        jpaApi.em().remove(stages);
-    }
-
-    @Override
-    public void deleteStage(int stageId) {
-        Stage pStage = jpaApi.em().find(Stage.class, stageId);
-        if(pStage != null){
-            jpaApi.em().remove(pStage);
+    private Stream<Stage> deleteAllStages(EntityManager em){
+        List<Stage> stages = em.createQuery("select s from Stage s", Stage.class).getResultList();
+        for(Stage s : stages){
+            em.remove(s);
         }
+        return stages.stream();
+    }
+
+    @Override
+    public CompletionStage<Stage> deleteStage(int stageId) {
+        return supplyAsync(() -> wrap(em -> deleteStage(em, stageId)), databaseExecutionContext);
+    }
+
+    private Stage deleteStage(EntityManager em, int stageId){
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
+        query.setParameter("stageId", stageId);
+        List<Stage> stages = query.getResultList();
+        em.remove(stages.get(0));
+        return stages.get(0);
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

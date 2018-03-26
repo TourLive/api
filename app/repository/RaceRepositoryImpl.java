@@ -31,7 +31,7 @@ public class RaceRepositoryImpl implements RaceRepository{
 
     private Race getRace(EntityManager em) {
         List<Race> races = em.createQuery("select r from Race r", Race.class).getResultList();
-        return races.get(0);
+        return races.get(races.size()-1);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class RaceRepositoryImpl implements RaceRepository{
     }
 
     private Race deleteRace(EntityManager em, String name){
-        TypedQuery<Race> query = em.createQuery("select r from Race r where r.name >= :name" , Race.class);
+        TypedQuery<Race> query = em.createQuery("select r from Race r where r.name = :name" , Race.class);
         query.setParameter("name", name);
         List<Race> races = query.getResultList();
         em.remove(races.get(0));
