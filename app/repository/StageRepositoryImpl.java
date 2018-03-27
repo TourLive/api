@@ -53,7 +53,7 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     private JsonNode addStage(EntityManager em, Stage stage){
-        stage.race = em.merge(stage.race);
+        stage.setRace(em.merge(stage.getRace()));
         em.persist(stage);
         return toJson(stage);
     }

@@ -70,7 +70,7 @@ public class RiderRankingRepositoryImpl implements RiderRankingRepository {
 
     @Override
     public void updateRiderRanking(RiderRanking riderRanking) {
-        RiderRanking rR = jpaApi.em().find(RiderRanking.class, riderRanking.id);
+        RiderRanking rR = jpaApi.em().find(RiderRanking.class, riderRanking.getId());
         rR = riderRanking;
     }
 

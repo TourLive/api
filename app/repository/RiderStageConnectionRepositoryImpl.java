@@ -55,7 +55,7 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
 
     @Override
     public void updateRiderStageConnection(RiderStageConnection riderStageConnection) {
-        RiderStageConnection pRSC = jpaApi.em().find(RiderStageConnection.class, riderStageConnection.id);
+        RiderStageConnection pRSC = jpaApi.em().find(RiderStageConnection.class, riderStageConnection.getId());
         pRSC = riderStageConnection;
     }
 
