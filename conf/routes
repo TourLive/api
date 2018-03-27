@@ -7,17 +7,17 @@ GET     /                           controllers.HomeController.index
 
 #Race Routes
 GET     /race                       controllers.RaceController.getAllRaces()
-GET     /race/:raceId               controllers.RaceController.getRace(raceId: Integer)
+GET     /race/:raceId               controllers.RaceController.getRace(raceId: Long)
 POST    /race                       controllers.RaceController.setRace
 DELETE  /race/deleteAllRaces        controllers.RaceController.deleteAllRaces
-DELETE  /race/:name                 controllers.RaceController.deleteRace(name: String)
+DELETE  /race/:raceId                 controllers.RaceController.deleteRace(raceId: Long)
 
 #Stage Routes
 GET     /stage                      controllers.StageController.getStages
-GET     /stage/:stageId             controllers.StageController.getStage(stageId : Integer)
+GET     /stage/:stageId             controllers.StageController.getStage(stageId : Long)
 POST    /stage                      controllers.StageController.addStage
 DELETE  /stage/deleteAllStages      controllers.StageController.deleteAllStages
-DELETE  /stage/:stageId             controllers.StageController.deleteStage(stageId: Integer)
+DELETE  /stage/:stageId             controllers.StageController.deleteStage(stageId: Long)
 
 #Rider Routes
 GET     /rider                      controllers.RiderController.getRiders
@@ -25,6 +25,13 @@ GET     /rider/:riderId             controllers.RiderController.getRider(riderId
 POST    /rider                      controllers.RiderController.addRider
 DELETE  /rider/deleteAllRiders      controllers.RiderController.deleteAllRiders
 DELETE  /rider/:riderId             controllers.RiderController.deleteRider(riderId : Integer)
+
+#Racegroup Routes
+GET     /racegroup                  controllers.RaceGroupController.getAllRaceGroups
+GET     /racegroup/:raceGroupId     controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
+POST    /racegroup                  controllers.RaceGroupController.addRaceGroup
+DELETE  /racegroup/deleteAlLRaceGroups  controllers.RaceGroupController.deleteAllRaceGroups
+DELETE  /racegroup/:raceGroupId     controllers.RaceGroupController.deleteRaceGroup(raceGroupId: Long)
 
 #Notifcation Routes
 GET     /notification               controllers.NotificationController.getNotifications

@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 public class Rider {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private int riderId;
     private int startNr;

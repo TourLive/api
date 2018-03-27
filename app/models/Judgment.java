@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 public class Judgment {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private String name;
     private int distance;
