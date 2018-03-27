@@ -7,7 +7,10 @@ import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.TypedQuery;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -52,10 +55,17 @@ public class StageRepositoryImpl implements StageRepository{
         return supplyAsync(() -> wrap (em -> addStage(em, stage)), databaseExecutionContext);
     }
 
-    private JsonNode addStage(EntityManager em, Stage stage){
-        stage.setRace(em.merge(stage.getRace()));
-        em.persist(stage);
-        return toJson(stage);
+    private JsonNode addStage(EntityManager em, Stage stage) {
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
+        query.setParameter("stageId", stage.getStageId());
+        try{
+            query.getSingleResult();
+            return toJson("stage with same id allready persisted in db");
+        } catch (NoResultException e){
+            stage.setRace(em.merge(stage.getRace()));
+            em.persist(stage);
+            return toJson(stage);
+        }
     }
 
     @Override

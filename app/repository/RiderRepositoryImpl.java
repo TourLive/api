@@ -8,6 +8,7 @@ import repository.interfaces.RiderRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -54,8 +55,15 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private JsonNode addRider(EntityManager em, Rider rider){
-        em.persist(rider);
-        return toJson(rider);
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        query.setParameter("riderId", rider.getRiderId());
+        try{
+            query.getSingleResult();
+            return toJson("rider with same id allready persisted in db");
+        } catch (NoResultException e){
+            em.persist(rider);
+            return toJson(rider);
+        }
     }
 
     @Override

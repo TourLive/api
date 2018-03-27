@@ -8,6 +8,7 @@ import repository.interfaces.RaceRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -43,7 +44,6 @@ public class RaceRepositoryImpl implements RaceRepository{
     }
 
     private JsonNode getRace(EntityManager em, int raceId) {
-        List<Race> races = em.createQuery("select r from Race r", Race.class).getResultList();
         TypedQuery<Race> query = em.createQuery("select r from Race r where r.raceId = :raceId" , Race.class);
         query.setParameter("raceId", raceId);
         return toJson(query.getSingleResult());
@@ -66,8 +66,15 @@ public class RaceRepositoryImpl implements RaceRepository{
     }
 
     private JsonNode setRace(EntityManager em, Race race){
-        em.persist(race);
-        return toJson(race);
+        TypedQuery<Race> query = em.createQuery("select r from Race r where r.raceId = :raceId" , Race.class);
+        query.setParameter("raceId", race.getRaceId());
+        try{
+            query.getSingleResult();
+            return toJson("race with same id allready persisted in db");
+        } catch (NoResultException e){
+            em.persist(race);
+            return toJson(race);
+        }
     }
 
     @Override

@@ -69,10 +69,11 @@ public class StageController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public CompletableFuture<Result> addStage() {
         JsonNode json = request().body().asJson();
-        return parseStage(json).thenApply(stage -> stageRepository.addStage(stage)).thenApply(stage -> {
-            return ok(stage + " has been added");
+        return parseStage(json).thenApply(stage -> stageRepository.addStage(stage)).thenApply(message -> {
+            return ok(message + " has been added");
         }).exceptionally(ex -> {
             Result res = null;
+            String name = ExceptionUtils.getRootCause(ex).getClass().getSimpleName();
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NullPointerException":
                     res = badRequest("json format of stage was wrong");

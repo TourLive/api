@@ -1,5 +1,6 @@
 package repository;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import models.Notification;
 import play.db.jpa.JPAApi;
 import repository.interfaces.NotificationRepository;
@@ -15,6 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static play.libs.Json.toJson;
 
 public class NotificationRepositoryImpl implements NotificationRepository {
     private final JPAApi jpaApi;
@@ -27,39 +29,47 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Notification>> getAllNotifications() {
+    public CompletionStage<JsonNode> getAllNotifications() {
         return supplyAsync(() -> wrap (this::getAllNotifications), databaseExecutionContext);
     }
 
-    private Stream<Notification> getAllNotifications(EntityManager em){
+    private JsonNode getAllNotifications(EntityManager em){
         List<Notification> notifications = em.createQuery("select n from Notification n", Notification.class).getResultList();
-        return notifications.stream();
+        return toJson(notifications.stream());
     }
 
     @Override
-    public CompletionStage<Stream<Notification>> getNotificationsByTimestamp(Timestamp timestamp) {
+    public CompletionStage<JsonNode> getNotificationsByTimestamp(Timestamp timestamp) {
         return supplyAsync(() -> wrap (em -> getAllNotificationsByTimestamp(em, timestamp)), databaseExecutionContext);
     }
 
-    private Stream<Notification> getAllNotificationsByTimestamp(EntityManager em, Timestamp timestamp){
+    private JsonNode getAllNotificationsByTimestamp(EntityManager em, Timestamp timestamp){
         TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.timestamp >= :timestamp" , Notification.class);
         query.setParameter("timestamp", timestamp);
-        return query.getResultList().stream();
+        return toJson(query.getResultList().stream());
     }
 
     @Override
-    public void addNotifications(ArrayList<Notification> notifications) {
-        jpaApi.em().getTransaction().begin();
+    public CompletionStage<JsonNode> addNotification(Notification notification) {
+        return supplyAsync(() -> wrap (em -> addNotification(em, notification)), databaseExecutionContext);
+    }
+
+    private JsonNode addNotification(EntityManager em, Notification notification){
+        em.persist(notification);
+        return toJson(notification);
+    }
+
+    @Override
+    public CompletionStage<JsonNode> deleteAllNotification() {
+        return supplyAsync(() -> wrap (this::deleteAllNotification), databaseExecutionContext);
+    }
+
+    private JsonNode deleteAllNotification(EntityManager em){
+        List<Notification> notifications = em.createQuery("select n from Notification n", Notification.class).getResultList();
         for(Notification n : notifications){
-            jpaApi.em().persist(n);
+            em.remove(n);
         }
-        jpaApi.em().getTransaction().commit();
-    }
-
-    @Override
-    public void deleteAllNotification() {
-        List<Notification> notifications = jpaApi.em().createQuery("select n from Notification n", Notification.class).getResultList();
-        jpaApi.em().remove(notifications);
+        return toJson(notifications.stream());
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {
