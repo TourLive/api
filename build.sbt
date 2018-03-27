@@ -33,3 +33,5 @@ jacocoReportSettings := JacocoReportSettings()
 jacocoExcludes := Seq("views*", "*Routes*")
 jacocoDirectory := baseDirectory.value /"target/jacoco"
 
+PlayKeys.externalizeResources := false
+
