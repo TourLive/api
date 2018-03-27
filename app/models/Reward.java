@@ -12,7 +12,6 @@ public class Reward {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private int rewardId;
     private RewardType rewardType;
     private ArrayList<Integer> points;
     private ArrayList<Integer> money;
@@ -23,14 +22,6 @@ public class Reward {
 
     public Long getId() {
         return id;
-    }
-
-    public int getRewardId() {
-        return rewardId;
-    }
-
-    public void setRewardId(int rewardId) {
-        this.rewardId = rewardId;
     }
 
     public RewardType getRewardType() {
