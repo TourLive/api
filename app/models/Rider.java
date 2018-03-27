@@ -11,13 +11,12 @@ public class Rider {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private int riderId;
     private int startNr;
     private String name;
     private String country;
     private String teamName;
     private String teamShortName;
-    private boolean isUnkown;
+    private boolean isUnknown;
 
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     @JsonManagedReference
@@ -31,14 +30,6 @@ public class Rider {
 
     public Long getId() {
         return id;
-    }
-
-    public int getRiderId() {
-        return riderId;
-    }
-
-    public void setRiderId(int riderId) {
-        this.riderId = riderId;
     }
 
     public int getStartNr() {
@@ -82,11 +73,11 @@ public class Rider {
     }
 
     public boolean isUnkown() {
-        return isUnkown;
+        return isUnknown;
     }
 
-    public void setUnkown(boolean unkown) {
-        isUnkown = unkown;
+    public void setUnkown(boolean unknown) {
+        isUnknown = unknown;
     }
 
     public List<RiderStageConnection> getRiderStageConnections() {

@@ -1,6 +1,5 @@
 package repository.interfaces;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.ImplementedBy;
 import models.Rider;
 import repository.RiderRepositoryImpl;
@@ -10,9 +9,9 @@ import java.util.stream.Stream;
 
 @ImplementedBy(RiderRepositoryImpl.class)
 public interface RiderRepository {
-    CompletionStage<JsonNode>  getAllRiders();
-    CompletionStage<JsonNode> getRider(int riderId);
-    CompletionStage<JsonNode>  addRider(Rider rider);
-    CompletionStage<JsonNode>  deleteAllRiders();
-    CompletionStage<JsonNode>  deleteRider(int riderId);
+    CompletionStage<Stream<Rider>>  getAllRiders();
+    CompletionStage<Rider> getRider(long riderId);
+    CompletionStage<Rider>  addRider(Rider rider);
+    CompletionStage<Stream<Rider>>  deleteAllRiders();
+    CompletionStage<Rider>  deleteRider(long riderId);
 }

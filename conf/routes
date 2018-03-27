@@ -21,10 +21,10 @@ DELETE  /stage/:stageId             controllers.StageController.deleteStage(stag
 
 #Rider Routes
 GET     /rider                      controllers.RiderController.getRiders
-GET     /rider/:riderId             controllers.RiderController.getRider(riderId : Integer)
+GET     /rider/:riderId             controllers.RiderController.getRider(riderId : Long)
 POST    /rider                      controllers.RiderController.addRider
 DELETE  /rider/deleteAllRiders      controllers.RiderController.deleteAllRiders
-DELETE  /rider/:riderId             controllers.RiderController.deleteRider(riderId : Integer)
+DELETE  /rider/:riderId             controllers.RiderController.deleteRider(riderId : Long)
 
 #Racegroup Routes
 GET     /racegroup                  controllers.RaceGroupController.getAllRaceGroups

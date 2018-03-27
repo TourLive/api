@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 
 @ImplementedBy(NotificationRepositoryImpl.class)
 public interface NotificationRepository {
-    CompletionStage<JsonNode>  getAllNotifications();
-    CompletionStage<JsonNode>  getNotificationsByTimestamp(Timestamp timestamp);
-    CompletionStage<JsonNode>  addNotification(Notification notifications);
-    CompletionStage<JsonNode>  deleteAllNotification();
+    CompletionStage<Stream<Notification>>  getAllNotifications();
+    CompletionStage<Stream<Notification>>  getNotificationsByTimestamp(Timestamp timestamp);
+    CompletionStage<Notification>  addNotification(Notification notifications);
+    CompletionStage<Stream<Notification>>  deleteAllNotification();
 }

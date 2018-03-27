@@ -8,6 +8,9 @@ import repository.interfaces.NotificationRepository;
 import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.concurrent.CompletionStage;
+import java.util.stream.Collectors;
+
+import static play.libs.Json.toJson;
 
 public class NotificationController extends Controller {
     private final NotificationRepository notificationRepository;
@@ -16,10 +19,8 @@ public class NotificationController extends Controller {
     public NotificationController(NotificationRepository notificationRepository) { this.notificationRepository = notificationRepository; }
 
     public CompletionStage<Result> getNotifications() {
-        return notificationRepository.getAllNotifications().thenApplyAsync(notifications -> {
-            return ok(notifications);
-        }).exceptionally(ex -> {
-            Result res = null;
+        return notificationRepository.getAllNotifications().thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
                     res = badRequest("No notifications are set in DB.");
@@ -32,10 +33,8 @@ public class NotificationController extends Controller {
     }
 
     public CompletionStage<Result> getNotificationsByTimestamp(Long timestamp) {
-        return notificationRepository.getNotificationsByTimestamp(new Timestamp(timestamp)).thenApplyAsync(notifications -> {
-            return ok(notifications);
-        }).exceptionally(ex -> {
-            Result res = null;
+        return notificationRepository.getNotificationsByTimestamp(new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
                     res = badRequest("No notifications are set in DB.");
@@ -49,8 +48,6 @@ public class NotificationController extends Controller {
 
 
     public CompletionStage<Result> deleteAllNotifications() {
-        return notificationRepository.deleteAllNotification().thenApply(notifications -> {
-            return ok(notifications +  " have been deleted");
-        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
+        return notificationRepository.deleteAllNotification().thenApply(notifications -> ok(toJson(notifications.collect(Collectors.toList())) +  " have been deleted")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 }
