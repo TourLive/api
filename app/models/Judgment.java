@@ -21,7 +21,7 @@ public class Judgment {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
-    private Judgment judgment;
+    private Reward reward;
 
     public Long getId() {
         return id;
@@ -51,11 +51,11 @@ public class Judgment {
         this.judgmentRiderConnections = judgmentRiderConnections;
     }
 
-    public Judgment getJudgment() {
-        return judgment;
+    public Reward getReward() {
+        return reward;
     }
 
-    public void setJudgment(Judgment judgment) {
-        this.judgment = judgment;
+    public void setReward(Reward reward) {
+        this.reward = reward;
     }
 }

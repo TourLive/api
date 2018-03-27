@@ -16,7 +16,7 @@ public class Reward {
     private ArrayList<Integer> points;
     private ArrayList<Integer> money;
 
-    @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="reward", cascade= CascadeType.ALL)
     @JsonManagedReference
     private List<Judgment> judgmentRiderConnections = new ArrayList<Judgment>();
 
