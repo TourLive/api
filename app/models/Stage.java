@@ -26,13 +26,13 @@ public class Stage {
     @JsonBackReference
     private Race race;
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     private List<Maillot> mailllots = new ArrayList<Maillot>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     private List<Notification> notifications = new ArrayList<Notification>();
 
     public Long getId() {
