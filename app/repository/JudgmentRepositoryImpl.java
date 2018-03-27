@@ -39,7 +39,7 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
         return supplyAsync(() -> wrap (em -> getJudgmentsByRider(em, id)), databaseExecutionContext);
     }
 
-    private Stream<Judgment> getJudgmentsByRider(EntityManager em, int id){
+    private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){
         TypedQuery<Judgment> query = em.createQuery("select j from Judgment j where j.judgmentRiderConnections.rider.id = :id" , Judgment.class);
         query.setParameter("id", id);
         return query.getResultList().stream();
