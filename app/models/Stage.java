@@ -13,27 +13,27 @@ import java.util.List;
 public class Stage {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public int stageId;
-    public Date startTime;
-    public Date endTime;
-    public int distance;
-    public StageType stageType;
-    public String from2;
-    public String to2;
+    private Long id;
+    private int stageId;
+    private Date startTime;
+    private Date endTime;
+    private int distance;
+    private StageType stageType;
+    private String start;
+    private String destination;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
-    public Race race;
+    private Race race;
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonManagedReference
-    public List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
+    private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonManagedReference
-    public List<Maillot> mailllots = new ArrayList<Maillot>();
+    private List<Maillot> mailllots = new ArrayList<Maillot>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonManagedReference
-    public List<Notification> notifications = new ArrayList<Notification>();
+    private List<Notification> notifications = new ArrayList<Notification>();
 
     public Long getId() {
         return id;
@@ -79,20 +79,20 @@ public class Stage {
         this.stageType = stageType;
     }
 
-    public String getFrom() {
-        return from2;
+    public String getStart() {
+        return start;
     }
 
-    public void setFrom(String from) {
-        this.from2 = from;
+    public void setStart(String start) {
+        this.start = start;
     }
 
-    public String getTo() {
-        return to2;
+    public String getDestination() {
+        return destination;
     }
 
-    public void setTo(String to) {
-        this.to2 = to;
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
     public Race getRace() {

@@ -11,17 +11,17 @@ import java.util.List;
 public class Judgment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public String name;
-    public int distance;
+    private Long id;
+    private String name;
+    private int distance;
 
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
     @JsonManagedReference
-    public List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
+    private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
-    public Judgment judgment;
+    private Judgment judgment;
 
     public Long getId() {
         return id;

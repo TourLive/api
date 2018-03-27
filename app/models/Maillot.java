@@ -8,16 +8,16 @@ import javax.persistence.*;
 public class Maillot {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public int maillotId;
-    public String type;
-    public String name;
-    public String color;
-    public String partner;
+    private Long id;
+    private int maillotId;
+    private String type;
+    private String name;
+    private String color;
+    private String partner;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
-    public Stage stage;
+    private Stage stage;
 
     public Long getId() {
         return id;

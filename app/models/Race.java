@@ -10,13 +10,13 @@ import java.util.List;
 public class Race {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public String name;
-    public int raceId;
+    private Long id;
+    private String name;
+    private int raceId;
 
     @OneToMany(mappedBy="race", cascade= CascadeType.ALL)
     @JsonManagedReference
-    public List<Stage> stages = new ArrayList<Stage>();
+    private List<Stage> stages = new ArrayList<Stage>();
 
     public Long getId() {
         return id;

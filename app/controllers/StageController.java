@@ -99,8 +99,8 @@ public class StageController extends Controller {
             stage.distance = json.findPath("distance").intValue();
             stage.endTime = new Date(json.findPath("endTime").longValue());
             stage.startTime = new Date(json.findPath("startTime").longValue());
-            stage.from2 = json.findPath("from").textValue();
-            stage.to2 = json.findPath("to").textValue();
+            stage.start = json.findPath("start").textValue();
+            stage.destination = json.findPath("destination").textValue();
             final Race[] r = new Race[1];
             int raceId = json.findPath("raceId").intValue();
             raceRepository.getDbRace(raceId).thenApply(race -> {return r[0] = race; }).toCompletableFuture().join();

@@ -13,26 +13,26 @@ import java.util.List;
 public class RiderStageConnection {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public int bonusPoints;
-    public int mountainBonusPoints;
-    public int sprintBonusPoints;
-    public int bonusTime;
-    public int money;
-    public Long officialTime;
-    public Long officialGap;
-    public Long virtualGap;
-    public TypeState typeState;
+    private Long id;
+    private int bonusPoints;
+    private int mountainBonusPoints;
+    private int sprintBonusPoints;
+    private int bonusTime;
+    private int money;
+    private Long officialTime;
+    private Long officialGap;
+    private Long virtualGap;
+    private TypeState typeState;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
-    public Stage stage;
+    private Stage stage;
     @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL)
     @JsonManagedReference
-    public List<RiderRanking> riderRankings = new ArrayList<RiderRanking>();
+    private List<RiderRanking> riderRankings = new ArrayList<RiderRanking>();
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
-    public Rider rider;
+    private Rider rider;
 
     public Long getId() {
         return id;

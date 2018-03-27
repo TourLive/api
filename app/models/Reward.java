@@ -11,15 +11,15 @@ import java.util.List;
 public class Reward {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public int rewardId;
-    public RewardType rewardType;
-    public ArrayList<Integer> points;
-    public ArrayList<Integer> money;
+    private Long id;
+    private int rewardId;
+    private RewardType rewardType;
+    private ArrayList<Integer> points;
+    private ArrayList<Integer> money;
 
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
     @JsonManagedReference
-    public List<Judgment> judgmentRiderConnections = new ArrayList<Judgment>();
+    private List<Judgment> judgmentRiderConnections = new ArrayList<Judgment>();
 
     public Long getId() {
         return id;

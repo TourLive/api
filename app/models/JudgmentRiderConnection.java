@@ -8,16 +8,16 @@ import javax.persistence.*;
 public class JudgmentRiderConnection {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public int rank;
+    private Long id;
+    private int rank;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
-    public Rider rider;
+    private Rider rider;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
-    public Judgment judgment;
+    private Judgment judgment;
 
     public Long getId() {
         return id;

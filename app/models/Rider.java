@@ -10,24 +10,24 @@ import java.util.List;
 public class Rider {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public int riderId;
-    public int startNr;
-    public String name;
-    public String country;
-    public String teamName;
-    public String teamShortName;
-    public boolean isUnkown;
+    private Long id;
+    private int riderId;
+    private int startNr;
+    private String name;
+    private String country;
+    private String teamName;
+    private String teamShortName;
+    private boolean isUnkown;
 
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     @JsonManagedReference
-    public List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
+    private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     @JsonManagedReference
-    public List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
+    private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
     @ManyToMany(mappedBy="riders")
     @JsonManagedReference
-    public List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
+    private List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
 
     public Long getId() {
         return id;
