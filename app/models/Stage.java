@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.StageType;
 
 import javax.persistence.*;
@@ -11,25 +13,27 @@ import java.util.List;
 public class Stage {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public int stageId;
-    public int raceId;
-    public String raceName;
-    public Date startTime;
-    public Date endTime;
-    public int distance;
-    public StageType stageType;
-    public String from;
-    public String to;
+    private Long id;
+    private int stageId;
+    private Date startTime;
+    private Date endTime;
+    private int distance;
+    private StageType stageType;
+    private String start;
+    private String destination;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    public Race race;
+    @JsonBackReference
+    private Race race;
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    public List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
+    @JsonBackReference
+    private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    public List<Maillot> mailllots = new ArrayList<Maillot>();
+    @JsonBackReference
+    private List<Maillot> mailllots = new ArrayList<Maillot>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    public List<Notification> notifications = new ArrayList<Notification>();
+    @JsonBackReference
+    private List<Notification> notifications = new ArrayList<Notification>();
 
     public Long getId() {
         return id;
@@ -42,23 +46,7 @@ public class Stage {
     public void setStageId(int stageId) {
         this.stageId = stageId;
     }
-
-    public int getRaceId() {
-        return raceId;
-    }
-
-    public void setRaceId(int raceId) {
-        this.raceId = raceId;
-    }
-
-    public String getRaceName() {
-        return raceName;
-    }
-
-    public void setRaceName(String raceName) {
-        this.raceName = raceName;
-    }
-
+   
     public Date getStartTime() {
         return startTime;
     }
@@ -91,20 +79,20 @@ public class Stage {
         this.stageType = stageType;
     }
 
-    public String getFrom() {
-        return from;
+    public String getStart() {
+        return start;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public void setStart(String start) {
+        this.start = start;
     }
 
-    public String getTo() {
-        return to;
+    public String getDestination() {
+        return destination;
     }
 
-    public void setTo(String to) {
-        this.to = to;
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 
     public Race getRace() {

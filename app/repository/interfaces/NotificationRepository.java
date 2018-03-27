@@ -1,5 +1,6 @@
 package repository.interfaces;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.ImplementedBy;
 import models.Notification;
 import repository.NotificationRepositoryImpl;
@@ -11,8 +12,8 @@ import java.util.stream.Stream;
 
 @ImplementedBy(NotificationRepositoryImpl.class)
 public interface NotificationRepository {
-    CompletionStage<Stream<Notification>> getAllNotifications();
-    CompletionStage<Stream<Notification>> getNotificationsByTimestamp(Timestamp timestamp);
-    void addNotifications(ArrayList<Notification> notifications);
-    void deleteAllNotification();
+    CompletionStage<JsonNode>  getAllNotifications();
+    CompletionStage<JsonNode>  getNotificationsByTimestamp(Timestamp timestamp);
+    CompletionStage<JsonNode>  addNotification(Notification notifications);
+    CompletionStage<JsonNode>  deleteAllNotification();
 }

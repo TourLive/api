@@ -1,17 +1,22 @@
 package repository;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import models.Rider;
 import play.db.jpa.JPAApi;
+import play.libs.Json;
 import repository.interfaces.RiderRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static play.libs.Json.toJson;
 
 public class RiderRepositoryImpl implements RiderRepository {
     private final JPAApi jpaApi;
@@ -24,44 +29,69 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Rider>> getAllRiders() {
+    public CompletionStage<JsonNode> getAllRiders() {
         return supplyAsync(() -> wrap (this::getAllRiders), databaseExecutionContext);
     }
 
-    private Stream<Rider> getAllRiders(EntityManager em){
+    private JsonNode getAllRiders(EntityManager em){
         List<Rider> riders = em.createQuery("select r from Rider r", Rider.class).getResultList();
-        return riders.stream();
+        return toJson(riders.stream());
     }
 
     @Override
-    public CompletionStage<Rider> getRider(int riderId) {
+    public CompletionStage<JsonNode> getRider(int riderId) {
         return supplyAsync(() -> wrap (em -> getRider(em, riderId)), databaseExecutionContext);
     }
 
-    private Rider getRider(EntityManager em, int riderId){
-        Rider rider = em.find(Rider.class, riderId);
-        return rider;
+    private JsonNode getRider(EntityManager em, int riderId){
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        query.setParameter("riderId", riderId);
+        return toJson(query.getSingleResult());
     }
 
     @Override
-    public void addRider(CompletionStage<Rider> rider) {
-        jpaApi.em().getTransaction().begin();
-        jpaApi.em().persist(rider);
-        jpaApi.em().getTransaction().commit();
+    public CompletionStage<JsonNode> addRider(Rider rider) {
+        return supplyAsync(() -> wrap (em -> addRider(em, rider)), databaseExecutionContext);
     }
 
-    @Override
-    public void deleteAllRiders() {
-        List<Rider> riders = jpaApi.em().createQuery("select r from Rider r", Rider.class).getResultList();
-        jpaApi.em().remove(riders);
-    }
-
-    @Override
-    public void deleteRider(int riderId) {
-        Rider pRider = jpaApi.em().find(Rider.class, riderId);
-        if(pRider != null){
-            jpaApi.em().remove(pRider);
+    private JsonNode addRider(EntityManager em, Rider rider){
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        query.setParameter("riderId", rider.getRiderId());
+        try{
+            query.getSingleResult();
+            return toJson("rider with same id allready persisted in db");
+        } catch (NoResultException e){
+            em.persist(rider);
+            return toJson(rider);
         }
+    }
+
+    @Override
+    public CompletionStage<JsonNode> deleteAllRiders() {
+        return supplyAsync(() -> wrap (this::deleteAllRiders), databaseExecutionContext);
+    }
+
+    private JsonNode deleteAllRiders(EntityManager em){
+        List<Rider> riders = em.createQuery("select r from Rider r", Rider.class).getResultList();
+        for(Rider r : riders){
+            em.remove(r);
+        }
+        return toJson(riders.stream());
+    }
+
+    @Override
+    public CompletionStage<JsonNode> deleteRider(int riderId) {
+        return supplyAsync(() -> wrap (em -> deleteRider(em, riderId)), databaseExecutionContext);
+    }
+
+    private JsonNode deleteRider(EntityManager em, int riderId){
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        query.setParameter("riderId", riderId);
+        Rider rider = query.getSingleResult();
+        if(rider != null){
+            em.remove(rider);
+        }
+        return toJson(rider);
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

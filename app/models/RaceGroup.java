@@ -1,5 +1,6 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.RaceGroupType;
 
 import javax.persistence.*;
@@ -11,18 +12,19 @@ import java.util.List;
 public class RaceGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public RaceGroupType raceGroupType;
-    public long actualGapTime;
-    public long historyGapTime;
-    public int position;
-    public Timestamp timestamp;
+    private Long id;
+    private RaceGroupType raceGroupType;
+    private long actualGapTime;
+    private long historyGapTime;
+    private int position;
+    private Timestamp timestamp;
 
     @ManyToMany
     @JoinTable(
             name="RiderInRaceGroup",
             joinColumns=@JoinColumn(name="RiderId", referencedColumnName="id"),
             inverseJoinColumns=@JoinColumn(name="RaceGroupsId", referencedColumnName="id"))
+    @JsonManagedReference
     private List<Rider> riders;
 
     public Long getId() {

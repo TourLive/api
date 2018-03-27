@@ -56,7 +56,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
 
     @Override
     public void updateRaceGroup(RaceGroup raceGroup) {
-        RaceGroup rG = jpaApi.em().find(RaceGroup.class, raceGroup.id);
+        RaceGroup rG = jpaApi.em().find(RaceGroup.class, raceGroup.getId());
         rG = raceGroup;
     }
 

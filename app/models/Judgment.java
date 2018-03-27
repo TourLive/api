@@ -1,5 +1,8 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,15 +11,17 @@ import java.util.List;
 public class Judgment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public String name;
-    public int distance;
+    private Long id;
+    private String name;
+    private int distance;
 
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
-    public List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
+    @JsonManagedReference
+    private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    public Judgment judgment;
+    @JsonBackReference
+    private Judgment judgment;
 
     public Long getId() {
         return id;

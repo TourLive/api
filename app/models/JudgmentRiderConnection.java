@@ -1,19 +1,23 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
 public class JudgmentRiderConnection {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public int rank;
+    private Long id;
+    private int rank;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    public Rider rider;
+    @JsonBackReference
+    private Rider rider;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    public Judgment judgment;
+    @JsonBackReference
+    private Judgment judgment;
 
     public Long getId() {
         return id;

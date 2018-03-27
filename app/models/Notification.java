@@ -1,5 +1,6 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import models.enums.NotificationType;
 
 import javax.persistence.*;
@@ -9,13 +10,14 @@ import java.sql.Timestamp;
 public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public String message;
-    public Timestamp timestamp;
-    public NotificationType notificationType;
+    private Long id;
+    private String message;
+    private Timestamp timestamp;
+    private NotificationType notificationType;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    public Stage stage;
+    @JsonBackReference
+    private Stage stage;
 
     public Long getId() {
         return id;

@@ -1,20 +1,23 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 
 @Entity
 public class Maillot {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
-    public int maillotId;
-    public String type;
-    public String name;
-    public String color;
-    public String partner;
+    private Long id;
+    private int maillotId;
+    private String type;
+    private String name;
+    private String color;
+    private String partner;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    public Stage stage;
+    @JsonBackReference
+    private Stage stage;
 
     public Long getId() {
         return id;
