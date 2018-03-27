@@ -1,5 +1,6 @@
 package repository;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import models.RiderStageConnection;
 import play.db.jpa.JPAApi;
 import repository.interfaces.RiderStageConnectionRepository;
@@ -13,6 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
+import static play.libs.Json.toJson;
 
 public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionRepository {
     private final JPAApi jpaApi;
@@ -25,48 +27,51 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     @Override
-    public CompletionStage<Stream<RiderStageConnection>> getAllRiderStageConnections() {
+    public CompletionStage<JsonNode> getAllRiderStageConnections() {
         return supplyAsync(() -> wrap (this::getAllRiderStageConnections), databaseExecutionContext);
     }
 
-    private Stream<RiderStageConnection> getAllRiderStageConnections(EntityManager em){
+    private JsonNode getAllRiderStageConnections(EntityManager em){
         List<RiderStageConnection> riderStageConnections = em.createQuery("select rSC from RiderStageConnection rSC", RiderStageConnection.class).getResultList();
-        return riderStageConnections.stream();
+        return toJson(riderStageConnections.stream());
     }
 
     @Override
-    public CompletionStage<RiderStageConnection> getRiderStageConnectionByRiderAndStage(int riderId, int stageId) {
+    public CompletionStage<JsonNode> getRiderStageConnectionByRiderAndStage(int riderId, int stageId) {
         return supplyAsync(() -> wrap (em -> getRiderStageConnection(em, riderId, stageId)), databaseExecutionContext);
     }
 
-    private RiderStageConnection getRiderStageConnection(EntityManager em, int riderId, int stageId){
+    private JsonNode getRiderStageConnection(EntityManager em, int riderId, int stageId){
         TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.riderId = :riderId and rSC.stage.stageId = :stageId" , RiderStageConnection.class);
         query.setParameter("riderId", riderId);
         query.setParameter("stageId", stageId);
-        return query.getResultList().get(0);
+        return toJson(query.getSingleResult());
     }
 
     @Override
-    public void addRiderStageConnection(RiderStageConnection riderStageConnection) {
+    public CompletionStage<JsonNode> addRiderStageConnection(RiderStageConnection riderStageConnection) {
         jpaApi.em().getTransaction().begin();
         jpaApi.em().persist(riderStageConnection);
         jpaApi.em().getTransaction().commit();
+        return null;
     }
 
     @Override
-    public void updateRiderStageConnection(RiderStageConnection riderStageConnection) {
+    public CompletionStage<JsonNode> updateRiderStageConnection(RiderStageConnection riderStageConnection) {
         RiderStageConnection pRSC = jpaApi.em().find(RiderStageConnection.class, riderStageConnection.getId());
         pRSC = riderStageConnection;
+        return null;
     }
 
     @Override
-    public void deleteAllRiderStageConnections() {
+    public CompletionStage<JsonNode> deleteAllRiderStageConnections() {
         List<RiderStageConnection> riderStageConnections = jpaApi.em().createQuery("select rSC from RiderStageConnection rSC", RiderStageConnection.class).getResultList();
         jpaApi.em().remove(riderStageConnections);
+        return null;
     }
 
     @Override
-    public void deleteRiderStageConnection(int riderId, int stageId) {
+    public CompletionStage<JsonNode> deleteRiderStageConnection(int riderId, int stageId) {
         TypedQuery<RiderStageConnection> query = jpaApi.em().createQuery("select rSC from RiderStageConnection rSC where rSC.rider.riderId = :riderId and rSC.stage.stageId = :stageId" , RiderStageConnection.class);
         query.setParameter("riderId", riderId);
         query.setParameter("stageId", stageId);
@@ -74,6 +79,7 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
         if(rSC!= null){
             jpaApi.em().remove(rSC);
         }
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {
