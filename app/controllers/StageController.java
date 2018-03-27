@@ -94,17 +94,17 @@ public class StageController extends Controller {
         Executors.newCachedThreadPool().submit(() -> {
             try{
             Stage stage = new Stage();
-            stage.stageId = json.findPath("stageId").intValue();
-            stage.stageType = StageType.valueOf(json.findPath("type").textValue());
-            stage.distance = json.findPath("distance").intValue();
-            stage.endTime = new Date(json.findPath("endTime").longValue());
-            stage.startTime = new Date(json.findPath("startTime").longValue());
-            stage.start = json.findPath("start").textValue();
-            stage.destination = json.findPath("destination").textValue();
+            stage.setStageId(json.findPath("stageId").intValue());
+            stage.setStageType(StageType.valueOf(json.findPath("type").textValue()));
+            stage.setDistance(json.findPath("distance").intValue());
+            stage.setEndTime(new Date(json.findPath("endTime").longValue()));
+            stage.setStartTime(new Date(json.findPath("startTime").longValue()));
+            stage.setStart(json.findPath("start").textValue());
+            stage.setDestination(json.findPath("destination").textValue());
             final Race[] r = new Race[1];
             int raceId = json.findPath("raceId").intValue();
             raceRepository.getDbRace(raceId).thenApply(race -> {return r[0] = race; }).toCompletableFuture().join();
-            stage.race = r[0];
+            stage.setRace(r[0]);
             completableFuture.complete(stage);
             return stage;
             } catch (Exception e){

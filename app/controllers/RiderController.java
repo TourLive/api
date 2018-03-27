@@ -84,13 +84,13 @@ public class RiderController extends Controller {
         Executors.newCachedThreadPool().submit(() -> {
             try{
                 Rider rider = new Rider();
-                rider.country = json.findPath("country").textValue();
-                rider.isUnkown = json.findPath("isUnkown").booleanValue();
-                rider.name = json.findPath("name").textValue();
-                rider.riderId = json.findPath("riderId").intValue();
-                rider.startNr = json.findPath("startNr").intValue();
-                rider.teamName = json.findPath("teamName").textValue();
-                rider.teamShortName = json.findPath("teamShortName").textValue();
+                rider.setCountry(json.findPath("country").textValue());
+                rider.setUnkown(json.findPath("isUnkown").booleanValue());
+                rider.setName(json.findPath("name").textValue());
+                rider.setRiderId(json.findPath("riderId").intValue());
+                rider.setStartNr(json.findPath("startNr").intValue());
+                rider.setTeamName(json.findPath("teamName").textValue());
+                rider.setTeamShortName(json.findPath("teamShortName").textValue());
                 completableFuture.complete(rider);
                 return rider;
             } catch (Exception e){
