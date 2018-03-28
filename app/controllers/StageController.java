@@ -62,6 +62,7 @@ public class StageController extends Controller {
         });
     }
 
+    /*
     @BodyParser.Of(BodyParser.Json.class)
     public CompletableFuture<Result> addStage() {
         JsonNode json = request().body().asJson();
@@ -125,5 +126,5 @@ public class StageController extends Controller {
             }
             return res;
         });
-    }
+    }*/
 }
