@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 public class RiderRanking {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private int rank;
     private RankingType rankingType;

@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 @ImplementedBy(JudgmentRepositoryImpl.class)
 public interface JudgmentRepository {
     CompletionStage<Stream<Judgment>> getAllJudgments();
-    CompletionStage<Stream<Judgment>> getJudgmentsByRider(int riderId);
-    void addJudgment(Judgment judgment);
-    void deleteAllJudgment();
-    void deleteJudgmentByJudgmentName(String judgmentName);
+    CompletionStage<Stream<Judgment>> getJudgmentsByRider(long id);
+    CompletionStage<Judgment> addJudgment(Judgment judgment);
+    CompletionStage<Stream<Judgment>> deleteAllJudgment();
+    CompletionStage<Judgment> deleteJudgmentById(long id);
 }

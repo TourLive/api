@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 @ImplementedBy(RewardRepositoryImpl.class)
 public interface RewardRepository {
     CompletionStage<Stream<Reward>> getAllRewards();
-    void addReward(Reward reward);
-    void deleteAllRewards();
+    CompletionStage<Reward> getRewardById(long id);
+    CompletionStage<Reward> addReward(Reward reward);
+    CompletionStage<Stream<Reward>> deleteAllRewards();
 }

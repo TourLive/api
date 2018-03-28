@@ -29,47 +29,47 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public CompletionStage<JsonNode> getAllNotifications() {
+    public CompletionStage<Stream<Notification>> getAllNotifications() {
         return supplyAsync(() -> wrap (this::getAllNotifications), databaseExecutionContext);
     }
 
-    private JsonNode getAllNotifications(EntityManager em){
+    private Stream<Notification> getAllNotifications(EntityManager em){
         List<Notification> notifications = em.createQuery("select n from Notification n", Notification.class).getResultList();
-        return toJson(notifications.stream());
+        return notifications.stream();
     }
 
     @Override
-    public CompletionStage<JsonNode> getNotificationsByTimestamp(Timestamp timestamp) {
+    public CompletionStage<Stream<Notification>> getNotificationsByTimestamp(Timestamp timestamp) {
         return supplyAsync(() -> wrap (em -> getAllNotificationsByTimestamp(em, timestamp)), databaseExecutionContext);
     }
 
-    private JsonNode getAllNotificationsByTimestamp(EntityManager em, Timestamp timestamp){
+    private Stream<Notification> getAllNotificationsByTimestamp(EntityManager em, Timestamp timestamp){
         TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.timestamp >= :timestamp" , Notification.class);
         query.setParameter("timestamp", timestamp);
-        return toJson(query.getResultList().stream());
+        return query.getResultList().stream();
     }
 
     @Override
-    public CompletionStage<JsonNode> addNotification(Notification notification) {
+    public CompletionStage<Notification> addNotification(Notification notification) {
         return supplyAsync(() -> wrap (em -> addNotification(em, notification)), databaseExecutionContext);
     }
 
-    private JsonNode addNotification(EntityManager em, Notification notification){
+    private Notification addNotification(EntityManager em, Notification notification){
         em.persist(notification);
-        return toJson(notification);
+        return notification;
     }
 
     @Override
-    public CompletionStage<JsonNode> deleteAllNotification() {
+    public CompletionStage<Stream<Notification>> deleteAllNotification() {
         return supplyAsync(() -> wrap (this::deleteAllNotification), databaseExecutionContext);
     }
 
-    private JsonNode deleteAllNotification(EntityManager em){
+    private Stream<Notification> deleteAllNotification(EntityManager em){
         List<Notification> notifications = em.createQuery("select n from Notification n", Notification.class).getResultList();
         for(Notification n : notifications){
             em.remove(n);
         }
-        return toJson(notifications.stream());
+        return notifications.stream();
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

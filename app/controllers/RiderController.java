@@ -28,10 +28,8 @@ public class RiderController extends Controller {
     }
 
     public CompletionStage<Result> getRiders() {
-        return riderRepository.getAllRiders().thenApplyAsync(riders -> {
-            return ok(riders);
-        }).exceptionally(ex -> {
-            Result res = null;
+        return riderRepository.getAllRiders().thenApplyAsync(riders -> ok(toJson(riders.collect(Collectors.toList())))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
                     res = badRequest("No riders are set in DB.");
@@ -43,11 +41,9 @@ public class RiderController extends Controller {
         });
     }
 
-    public CompletionStage<Result> getRider(int riderId){
-        return riderRepository.getRider(riderId).thenApplyAsync(rider -> {
-            return ok(rider);
-        }).exceptionally(ex -> {
-            Result res = null;
+    public CompletionStage<Result> getRider(long riderId){
+        return riderRepository.getRider(riderId).thenApplyAsync(rider -> ok(toJson(rider))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NoResultException":
                     res = badRequest("No rider with id: " + riderId + " is available in DB.");
@@ -62,10 +58,8 @@ public class RiderController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> addRider(){
         JsonNode json = request().body().asJson();
-        return parseRider(json).thenApply(rider -> riderRepository.addRider(rider)).thenApply(rider -> {
-            return ok(rider + " has been added");
-        }).exceptionally(ex -> {
-            Result res = null;
+        return parseRider(json).thenApply(riderRepository::addRider).thenApply(rider -> ok(toJson(rider) + " has been added")).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NullPointerException":
                     res = badRequest("json format of rider was wrong");
@@ -85,9 +79,8 @@ public class RiderController extends Controller {
             try{
                 Rider rider = new Rider();
                 rider.setCountry(json.findPath("country").textValue());
-                rider.setUnkown(json.findPath("isUnkown").booleanValue());
+                rider.setUnkown(json.findPath("isUnknown").booleanValue());
                 rider.setName(json.findPath("name").textValue());
-                rider.setRiderId(json.findPath("riderId").intValue());
                 rider.setStartNr(json.findPath("startNr").intValue());
                 rider.setTeamName(json.findPath("teamName").textValue());
                 rider.setTeamShortName(json.findPath("teamShortName").textValue());
@@ -104,16 +97,12 @@ public class RiderController extends Controller {
 
 
     public CompletionStage<Result> deleteAllRiders(){
-        return riderRepository.deleteAllRiders().thenApply(riders -> {
-            return ok(riders + " have been deleted.");
-        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
+        return riderRepository.deleteAllRiders().thenApply(riders -> ok(toJson(riders.collect(Collectors.toList())) + " have been deleted.")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
-    public CompletionStage<Result> deleteRider(int riderId){
-        return riderRepository.deleteRider(riderId).thenApplyAsync(rider -> {
-            return ok(rider + " has been deleted");
-        }).exceptionally(ex -> {
-            Result res = null;
+    public CompletionStage<Result> deleteRider(long riderId){
+        return riderRepository.deleteRider(riderId).thenApplyAsync(rider -> ok(toJson(rider) + " has been deleted")).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NoResultException":
                     res = badRequest("Stage with Id: " + riderId + " not found in DB.");

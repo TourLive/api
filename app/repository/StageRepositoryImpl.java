@@ -12,6 +12,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.TypedQuery;
 import java.util.Calendar;
 import java.util.List;
+import java.util.SimpleTimeZone;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -30,70 +31,63 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     @Override
-    public CompletionStage<JsonNode> getAllStages() {
+    public CompletionStage<Stream<Stage>> getAllStages() {
         return supplyAsync(() -> wrap (this::getAllStages), databaseExecutionContext);
     }
 
-    private JsonNode getAllStages(EntityManager em){
+    private Stream<Stage> getAllStages(EntityManager em){
         List<Stage> stages = em.createQuery("select s from Stage s", Stage.class).getResultList();
-        return toJson(stages.stream());
+        return stages.stream();
     }
 
     @Override
-    public CompletionStage<JsonNode> getStage(int stageId) {
+    public CompletionStage<Stage> getStage(long stageId) {
         return supplyAsync(() -> wrap (em -> getStage(em, stageId)), databaseExecutionContext);
     }
 
-    private JsonNode getStage(EntityManager em, int stageId){
-        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
+    private Stage getStage(EntityManager em, long stageId){
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.id = :stageId" , Stage.class);
         query.setParameter("stageId", stageId);
-        return toJson(query.getSingleResult());
+        return query.getSingleResult();
     }
 
     @Override
-    public CompletionStage<JsonNode> addStage(Stage stage) {
+    public CompletionStage<Stage> addStage(Stage stage) {
         return supplyAsync(() -> wrap (em -> addStage(em, stage)), databaseExecutionContext);
     }
 
-    private JsonNode addStage(EntityManager em, Stage stage) {
-        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
-        query.setParameter("stageId", stage.getStageId());
-        try{
-            query.getSingleResult();
-            return toJson("stage with same id allready persisted in db");
-        } catch (NoResultException e){
-            stage.setRace(em.merge(stage.getRace()));
-            em.persist(stage);
-            return toJson(stage);
-        }
+    private Stage addStage(EntityManager em, Stage stage) {
+        stage.setRace(em.merge(stage.getRace()));
+        em.persist(stage);
+        return stage;
     }
 
     @Override
-    public CompletionStage<JsonNode> deleteAllStages() {
+    public CompletionStage<Stream<Stage>> deleteAllStages() {
         return supplyAsync(() -> wrap(this::deleteAllStages), databaseExecutionContext);
     }
 
-    private JsonNode deleteAllStages(EntityManager em){
+    private Stream<Stage> deleteAllStages(EntityManager em){
         List<Stage> stages = em.createQuery("select s from Stage s", Stage.class).getResultList();
         for(Stage s : stages){
             em.remove(s);
         }
-        return toJson(stages.stream());
+        return stages.stream();
     }
 
     @Override
-    public CompletionStage<JsonNode> deleteStage(int stageId) {
+    public CompletionStage<Stage> deleteStage(long stageId) {
         return supplyAsync(() -> wrap(em -> deleteStage(em, stageId)), databaseExecutionContext);
     }
 
-    private JsonNode deleteStage(EntityManager em, int stageId){
-        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
+    private Stage deleteStage(EntityManager em, long stageId){
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.id = :stageId" , Stage.class);
         query.setParameter("stageId", stageId);
         Stage stage = query.getSingleResult();
         if(stage != null){
             em.remove(stage);
         }
-        return toJson(stage);
+        return stage;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 public class RaceGroup {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private RaceGroupType raceGroupType;
     private long actualGapTime;

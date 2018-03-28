@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 public class RiderStageConnection {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private int bonusPoints;
     private int mountainBonusPoints;

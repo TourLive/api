@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 public class Maillot {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private int maillotId;
     private String type;
