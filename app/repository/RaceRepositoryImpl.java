@@ -46,18 +46,18 @@ public class RaceRepositoryImpl implements RaceRepository{
     }
 
     @Override
-    public CompletionStage<Race> setRace(Race race) {
-        return supplyAsync(() -> wrap (em -> setRace(em, race)), databaseExecutionContext);
+    public void addRace(Race race) {
+        wrap(entityManager -> addRace(entityManager, race));
     }
 
-    private Race setRace(EntityManager em, Race race){
+    private Race addRace(EntityManager em, Race race){
         em.persist(race);
-        return race;
+        return null;
     }
 
     @Override
-    public CompletionStage<Stream<Race>> deleteAllRaces() {
-        return supplyAsync(() -> wrap(this::deleteAllRaces), databaseExecutionContext);
+    public void deleteAllRaces() {
+        wrap(this::deleteAllRaces):
     }
 
     private Stream<Race> deleteAllRaces(EntityManager em){
@@ -65,12 +65,12 @@ public class RaceRepositoryImpl implements RaceRepository{
         for(Race r : races){
             em.remove(r);
         }
-        return races.stream();
+        return null;
     }
 
     @Override
-    public CompletionStage<Race> deleteRace(Long id) {
-        return supplyAsync(() -> wrap(em -> deleteRace(em, id)), databaseExecutionContext);
+    public void deleteRace(Long id) {
+        wrap(entityManager -> deleteRace(entityManager, id));
     }
 
     private Race deleteRace(EntityManager em, Long id){
@@ -80,7 +80,7 @@ public class RaceRepositoryImpl implements RaceRepository{
         if(race != null){
             em.remove(race);
         }
-        return race;
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

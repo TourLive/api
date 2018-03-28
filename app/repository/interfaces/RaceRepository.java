@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public interface RaceRepository {
     CompletionStage<Stream<Race>> getAllRaces();
     CompletionStage<Race> getRace(Long raceId);
-    CompletionStage<Race> setRace(Race race);
-    CompletionStage<Stream<Race>> deleteAllRaces();
-    CompletionStage<Race> deleteRace(Long id);
+    void addRace(Race race);
+    void deleteAllRaces();
+    void deleteRace(Long id);
 }

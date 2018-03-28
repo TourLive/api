@@ -8,35 +8,24 @@ GET     /                           controllers.HomeController.index
 #Race Routes
 GET     /race                       controllers.RaceController.getAllRaces()
 GET     /race/:raceId               controllers.RaceController.getRace(raceId: Long)
-POST    /race                       controllers.RaceController.setRace
-DELETE  /race/deleteAllRaces        controllers.RaceController.deleteAllRaces
-DELETE  /race/:raceId                 controllers.RaceController.deleteRace(raceId: Long)
 
 #Stage Routes
 GET     /stage                      controllers.StageController.getStages
 GET     /stage/:stageId             controllers.StageController.getStage(stageId : Long)
-POST    /stage                      controllers.StageController.addStage
-DELETE  /stage/deleteAllStages      controllers.StageController.deleteAllStages
-DELETE  /stage/:stageId             controllers.StageController.deleteStage(stageId: Long)
 
 #Rider Routes
-GET     /rider                      controllers.RiderController.getRiders
+GET     /:stageId/rider             controllers.RiderController.getRiders(stageId : Long)
 GET     /rider/:riderId             controllers.RiderController.getRider(riderId : Long)
-POST    /rider                      controllers.RiderController.addRider
-DELETE  /rider/deleteAllRiders      controllers.RiderController.deleteAllRiders
-DELETE  /rider/:riderId             controllers.RiderController.deleteRider(riderId : Long)
 
 #Racegroup Routes
-GET     /racegroup                  controllers.RaceGroupController.getAllRaceGroups
-GET     /racegroup/:raceGroupId     controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
-POST    /racegroup                  controllers.RaceGroupController.addRaceGroup
-DELETE  /racegroup/deleteAlLRaceGroups  controllers.RaceGroupController.deleteAllRaceGroups
-DELETE  /racegroup/:raceGroupId     controllers.RaceGroupController.deleteRaceGroup(raceGroupId: Long)
+GET     /:stageId/racegroup                  controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
+GET     /:stageId/racegroup/:raceGroupId     controllers.RaceGroupController.getRaceGroup(raceGroupId: Long, stageId : Long)
+POST    /:stageId/racegroup                  controllers.RaceGroupController.addRaceGroup(stageId : Long)
 
 #Notifcation Routes
-GET     /notification               controllers.NotificationController.getNotifications
-GET     /notification/:timestamp    controllers.NotificationController.getNotificationsByTimestamp(timestamp : Long)
-DELETE  /notification               controllers.NotificationController.deleteAllNotifications
+GET     /:stageId/notification               controllers.NotificationController.getNotifications(stageId : Long)
+GET     /:stageId/notification/:timestamp    controllers.NotificationController.getNotificationsByTimestamp(timestamp : Long, stageId : Long)
+DELETE  /:stageId/notification               controllers.NotificationController.deleteAllNotifications(stageId : Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

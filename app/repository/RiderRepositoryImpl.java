@@ -1,14 +1,11 @@
 package repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import models.Rider;
 import play.db.jpa.JPAApi;
-import play.libs.Json;
 import repository.interfaces.RiderRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -16,7 +13,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static play.libs.Json.toJson;
 
 public class RiderRepositoryImpl implements RiderRepository {
     private final JPAApi jpaApi;
@@ -29,52 +25,70 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Rider>> getAllRiders() {
-        return supplyAsync(() -> wrap (this::getAllRiders), databaseExecutionContext);
+    public List<Rider> getAllRiders() {
+        return wrap(this::getAllRiders);
     }
 
-    private Stream<Rider> getAllRiders(EntityManager em){
+    private List<Rider> getAllRiders(EntityManager em){
         List<Rider> riders = em.createQuery("select r from Rider r", Rider.class).getResultList();
-        return riders.stream();
+        return riders;
     }
 
     @Override
-    public CompletionStage<Rider> getRider(long riderId) {
-        return supplyAsync(() -> wrap (em -> getRider(em, riderId)), databaseExecutionContext);
+    public Rider getRider(long riderId) {
+        return wrap(entityManager -> getRider(entityManager, riderId));
     }
 
     private Rider getRider(EntityManager em, long riderId){
-        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id = :riderId" , Rider.class);
-        query.setParameter("riderId", riderId);
-        return query.getSingleResult();
+        return em.find(Rider.class, riderId);
     }
 
     @Override
-    public CompletionStage<Rider> addRider(Rider rider) {
-        return supplyAsync(() -> wrap (em -> addRider(em, rider)), databaseExecutionContext);
+    public CompletionStage<Stream<Rider>> getAllRiders(long stageid) {
+        return supplyAsync(() -> wrap(entityManager -> getAllRiders(entityManager, stageid)), databaseExecutionContext);
+    }
+
+    private Stream<Rider> getAllRiders(EntityManager entityManager, long stageid) {
+        TypedQuery<Rider> query = entityManager.createQuery("select r from Rider r where r.riderStageConnections.stage.id = :stageid" , Rider.class);
+        query.setParameter("stageid", stageid);
+        return query.getResultList().stream();
+    }
+
+    @Override
+    public CompletionStage<Rider> getRiderAsync(long riderId) {
+        return supplyAsync(() -> wrap(entityManager -> getRiderAsync(entityManager, riderId)), databaseExecutionContext);
+    }
+
+    private Rider getRiderAsync(EntityManager em, long riderId){
+        return em.find(Rider.class, riderId);
+    }
+
+    @Override
+    public void addRider(Rider rider) {
+        wrap(entityManager -> addRider(entityManager, rider));
     }
 
     private Rider addRider(EntityManager em, Rider rider){
         em.persist(rider);
-        return rider;
+        return null;
     }
 
     @Override
-    public CompletionStage<Stream<Rider>> deleteAllRiders() {
-        return supplyAsync(() -> wrap (this::deleteAllRiders), databaseExecutionContext);
+    public void deleteAllRiders() {
+        wrap(this::deleteAllRiders);
     }
 
-    private Stream<Rider> deleteAllRiders(EntityManager em){
+    private Rider deleteAllRiders(EntityManager em){
         List<Rider> riders = em.createQuery("select r from Rider r", Rider.class).getResultList();
         for(Rider r : riders){
             em.remove(r);
         }
-        return riders.stream();
+        return null;
     }
 
     @Override
-    public CompletionStage<Rider> deleteRider(long riderId) {
-        return supplyAsync(() -> wrap (em -> deleteRider(em, riderId)), databaseExecutionContext);
+    public void deleteRider(long riderId) {
+        wrap(entityManager -> deleteRider(entityManager, riderId));
     }
 
     private Rider deleteRider(EntityManager em, long riderId){
@@ -84,7 +98,7 @@ public class RiderRepositoryImpl implements RiderRepository {
         if(rider != null){
             em.remove(rider);
         }
-        return rider;
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

@@ -52,19 +52,19 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     @Override
-    public CompletionStage<Stage> addStage(Stage stage) {
-        return supplyAsync(() -> wrap (em -> addStage(em, stage)), databaseExecutionContext);
+    public void addStage(Stage stage) {
+        wrap(entityManager -> addStage(entityManager, stage));
     }
 
     private Stage addStage(EntityManager em, Stage stage) {
         stage.setRace(em.merge(stage.getRace()));
         em.persist(stage);
-        return stage;
+        return null;
     }
 
     @Override
-    public CompletionStage<Stream<Stage>> deleteAllStages() {
-        return supplyAsync(() -> wrap(this::deleteAllStages), databaseExecutionContext);
+    public void deleteAllStages() {
+        wrap(this::deleteAllStages);
     }
 
     private Stream<Stage> deleteAllStages(EntityManager em){
@@ -72,12 +72,12 @@ public class StageRepositoryImpl implements StageRepository{
         for(Stage s : stages){
             em.remove(s);
         }
-        return stages.stream();
+        return null;
     }
 
     @Override
-    public CompletionStage<Stage> deleteStage(long stageId) {
-        return supplyAsync(() -> wrap(em -> deleteStage(em, stageId)), databaseExecutionContext);
+    public void deleteStage(long stageId) {
+        wrap(entityManager -> deleteStage(entityManager, stageId));
     }
 
     private Stage deleteStage(EntityManager em, long stageId){
@@ -87,7 +87,7 @@ public class StageRepositoryImpl implements StageRepository{
         if(stage != null){
             em.remove(stage);
         }
-        return stage;
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {
