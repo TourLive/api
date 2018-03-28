@@ -41,8 +41,8 @@ public class RiderController extends Controller {
         });
     }
 
-    public CompletionStage<Result> getRider(long riderId, long stageId){
-        return riderRepository.getRider(riderId, stageId).thenApplyAsync(rider -> ok(toJson(rider))).exceptionally(ex -> {
+    public CompletionStage<Result> getRider(long riderId){
+        return riderRepository.getRiderAsync(riderId).thenApplyAsync(rider -> ok(toJson(rider))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NoResultException":
