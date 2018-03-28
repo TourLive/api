@@ -6,6 +6,7 @@ import repository.interfaces.MaillotRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -23,44 +24,65 @@ public class MaillotRepositoryImpl implements MaillotRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Maillot>> getAllMaillots() {
-        return supplyAsync(() -> wrap (this::getAllMaillots), databaseExecutionContext);
+    public CompletionStage<Stream<Maillot>> getAllMaillots(long stageId) {
+        return supplyAsync(() -> wrap (entityManager -> getAllMaillots(entityManager, stageId)), databaseExecutionContext);
     }
 
-    private Stream<Maillot> getAllMaillots(EntityManager em){
-        List<Maillot> maillots = em.createQuery("select m from Maillot m", Maillot.class).getResultList();
-        return maillots.stream();
-    }
-
-    @Override
-    public CompletionStage<Maillot> getMaillot(int maillotId) {
-        return supplyAsync(() -> wrap (em -> getMaillot(em, maillotId)), databaseExecutionContext);
-    }
-
-    private Maillot getMaillot(EntityManager em, int maillotId){
-        Maillot maillot = em.find(Maillot.class, maillotId);
-        return maillot;
+    private Stream<Maillot> getAllMaillots(EntityManager em, long stageId){
+        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.stage.id = :stageId" , Maillot.class);
+        query.setParameter("stageId", stageId);
+        return query.getResultList().stream();
     }
 
     @Override
-    public void addMaillot(CompletionStage<Maillot> maillot) {
-        jpaApi.em().getTransaction().begin();
-        jpaApi.em().persist(maillot);
-        jpaApi.em().getTransaction().commit();
+    public CompletionStage<Maillot> getMaillot(long stageId, long maillotId) {
+        return supplyAsync(() -> wrap (em -> getMaillot(em, stageId, maillotId)), databaseExecutionContext);
+    }
+
+    private Maillot getMaillot(EntityManager em, long stageId, long maillotId){
+        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.stage.id = :stageId and m.id = :maillotId" , Maillot.class);
+        query.setParameter("stageId", stageId);
+        query.setParameter("maillotId", maillotId);
+        return query.getSingleResult();
+    }
+
+    @Override
+    public void addMaillot(Maillot maillot) {
+        wrap(entityManager -> addRiderStageConnection(entityManager, maillot));
+    }
+
+    private Maillot addRiderStageConnection(EntityManager entityManager, Maillot maillot){
+        entityManager.persist(maillot);
+        return null;
     }
 
     @Override
     public void deleteAllMaillots() {
-        List<Maillot> maillots = jpaApi.em().createQuery("select m from Maillot m", Maillot.class).getResultList();
-        jpaApi.em().remove(maillots);
+        wrap(this::deleteAllRiderStageConnections);
+    }
+
+    private Stream<Maillot> deleteAllRiderStageConnections(EntityManager entityManager){
+        List<Maillot> maillots = entityManager.createQuery("select m from Maillot m", Maillot.class).getResultList();
+        for(Maillot m : maillots){
+            entityManager.remove(m);
+        }
+        return null;
     }
 
     @Override
-    public void deleteMaillot(int maillotId) {
-        Maillot m = jpaApi.em().find(Maillot.class, maillotId);
+    public void deleteMaillot(long stageId, long maillotId) {
+        wrap(entityManager -> deleteMaillot(entityManager, stageId, maillotId));
+    }
+
+    private Maillot deleteMaillot(EntityManager entityManager, long stageId, long maillotId) {
+        TypedQuery<Maillot> query = entityManager.createQuery("select m from Maillot m where m.stage.id = :stageId and m.id = :maillotId" , Maillot.class);
+        query.setParameter("maillotId", maillotId);
+        query.setParameter("stageId", stageId);
+        Maillot m = query.getSingleResult();
         if(m!= null){
-            jpaApi.em().remove(m);
+            entityManager.remove(m);
         }
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

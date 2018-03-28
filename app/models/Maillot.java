@@ -9,7 +9,6 @@ public class Maillot {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private int maillotId;
     private String type;
     private String name;
     private String color;
@@ -21,14 +20,6 @@ public class Maillot {
 
     public Long getId() {
         return id;
-    }
-
-    public int getMaillotId() {
-        return maillotId;
-    }
-
-    public void setMaillotId(int maillotId) {
-        this.maillotId = maillotId;
     }
 
     public String getType() {
