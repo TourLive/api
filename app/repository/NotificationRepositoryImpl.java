@@ -29,29 +29,31 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Notification>> getAllNotifications() {
-        return supplyAsync(() -> wrap (this::getAllNotifications), databaseExecutionContext);
+    public CompletionStage<Stream<Notification>> getAllNotifications(long stageId) {
+        return supplyAsync(() -> wrap (entityManager -> getAllNotifications(entityManager, stageId)), databaseExecutionContext);
     }
 
-    private Stream<Notification> getAllNotifications(EntityManager em){
-        List<Notification> notifications = em.createQuery("select n from Notification n", Notification.class).getResultList();
-        return notifications.stream();
+    private Stream<Notification> getAllNotifications(EntityManager em, long stageId){
+        TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.stage.id = :stageId" , Notification.class);
+        query.setParameter("stageId", stageId);
+        return em.createQuery("select n from Notification n", Notification.class).getResultList().stream();
     }
 
     @Override
-    public CompletionStage<Stream<Notification>> getNotificationsByTimestamp(Timestamp timestamp) {
-        return supplyAsync(() -> wrap (em -> getAllNotificationsByTimestamp(em, timestamp)), databaseExecutionContext);
+    public CompletionStage<Stream<Notification>> getNotificationsByTimestamp(long stageId, Timestamp timestamp) {
+        return supplyAsync(() -> wrap (em -> getAllNotificationsByTimestamp(em, stageId, timestamp)), databaseExecutionContext);
     }
 
-    private Stream<Notification> getAllNotificationsByTimestamp(EntityManager em, Timestamp timestamp){
-        TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.timestamp >= :timestamp" , Notification.class);
+    private Stream<Notification> getAllNotificationsByTimestamp(EntityManager em, long stageId, Timestamp timestamp){
+        TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.stage.id = :stageId and n.timestamp >= :timestamp" , Notification.class);
+        query.setParameter("stageId", stageId);
         query.setParameter("timestamp", timestamp);
         return query.getResultList().stream();
     }
 
     @Override
-    public CompletionStage<Notification> addNotification(Notification notification) {
-        return supplyAsync(() -> wrap (em -> addNotification(em, notification)), databaseExecutionContext);
+    public void addNotification(Notification notification) {
+        wrap(em -> addNotification(em, notification));
     }
 
     private Notification addNotification(EntityManager em, Notification notification){
@@ -60,8 +62,8 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Notification>> deleteAllNotification() {
-        return supplyAsync(() -> wrap (this::deleteAllNotification), databaseExecutionContext);
+    public void deleteAllNotification() {
+        wrap(this::deleteAllNotification);
     }
 
     private Stream<Notification> deleteAllNotification(EntityManager em){

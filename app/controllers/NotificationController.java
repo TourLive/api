@@ -18,8 +18,8 @@ public class NotificationController extends Controller {
     @Inject
     public NotificationController(NotificationRepository notificationRepository) { this.notificationRepository = notificationRepository; }
 
-    public CompletionStage<Result> getNotifications() {
-        return notificationRepository.getAllNotifications().thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
+    public CompletionStage<Result> getNotifications(long stageId) {
+        return notificationRepository.getAllNotifications(stageId).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
@@ -32,8 +32,8 @@ public class NotificationController extends Controller {
         });
     }
 
-    public CompletionStage<Result> getNotificationsByTimestamp(Long timestamp) {
-        return notificationRepository.getNotificationsByTimestamp(new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
+    public CompletionStage<Result> getNotificationsByTimestamp(Long stageId, Long timestamp) {
+        return notificationRepository.getNotificationsByTimestamp(stageId, new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
@@ -44,10 +44,5 @@ public class NotificationController extends Controller {
             }
             return res;
         });
-    }
-
-
-    public CompletionStage<Result> deleteAllNotifications() {
-        return notificationRepository.deleteAllNotification().thenApply(notifications -> ok(toJson(notifications.collect(Collectors.toList())) +  " have been deleted")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 }
