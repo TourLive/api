@@ -56,13 +56,14 @@ public class RaceController extends Controller {
         });
     }
 
+    /*
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> setRace() {
         JsonNode json = request().body().asJson();
         Race race = new Race();
         race.setName(json.findPath("name").textValue());
 
-        return raceRepository.setRace(race).thenApplyAsync(racePersisted -> ok(toJson(racePersisted) + " has been added")).exceptionally(ex -> internalServerError(ex.getMessage()));
+        return raceRepository.addRace(race).thenApplyAsync(racePersisted -> ok(toJson(racePersisted) + " has been added")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
     public CompletionStage<Result> deleteAllRaces() {
@@ -81,5 +82,5 @@ public class RaceController extends Controller {
             }
             return res;
         });
-    }
+    }*/
 }
