@@ -127,4 +127,12 @@ public class RiderStageConnection {
     public void setRiderRankings(List<RiderRanking> riderRankings) {
         this.riderRankings = riderRankings;
     }
+
+    public Rider getRider() {
+        return rider;
+    }
+
+    public void setRider(Rider rider) {
+        this.rider = rider;
+    }
 }
