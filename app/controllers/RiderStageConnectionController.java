@@ -2,8 +2,10 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import models.Race;
+import models.RiderStageConnection;
 import models.Stage;
 import models.enums.StageType;
+import models.enums.TypeState;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -19,6 +21,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 
+import static play.libs.Json.toJson;
+
 public class RiderStageConnectionController extends Controller {
     private final StageRepository stageRepository;
     private final RiderRepository riderRepository;
@@ -31,10 +35,10 @@ public class RiderStageConnectionController extends Controller {
         this.riderStageConnectionRepository = riderStageConnectionRepository;
     }
 
-    /*
-    public CompletionStage<Result> getRiderStageConnections() {
-        return riderStageConnectionRepository.getAllRiderStageConnections().thenApplyAsync(riderStageConnections -> {
-            return ok(riderStageConnections);
+
+    public CompletionStage<Result> getRiderStageConnections(long stageId) {
+        return riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> {
+            return ok(toJson(riderStageConnections));
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
@@ -48,15 +52,14 @@ public class RiderStageConnectionController extends Controller {
         });
     }
 
-
-    public CompletionStage<Result> getStage(int stageId) {
-        return stageRepository.getStage(stageId).thenApplyAsync(stage -> {
-           return ok(stage);
+    public CompletionStage<Result> getRiderStageConnection(long stageId, long riderId) {
+        return riderStageConnectionRepository.getRiderStageConnectionByRiderAndStage(stageId, riderId).thenApplyAsync(riderStageConnection -> {
+            return ok(toJson(riderStageConnection));
         }).exceptionally(ex -> {
             Result res = null;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "NoResultException":
-                    res = badRequest("No Stage with id: " + stageId + ", is available in DB.");
+                case "IndexOutOfBoundsException":
+                    res = badRequest("No stage are set in DB.");
                     break;
                 default:
                     res = internalServerError(ex.getMessage());
@@ -66,19 +69,15 @@ public class RiderStageConnectionController extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public CompletableFuture<Result> addStage() {
+    public CompletionStage<Result> updateRiderStageConnection(long riderStageConnectionId) {
         JsonNode json = request().body().asJson();
-        return parseStage(json).thenApply(stage -> stageRepository.addStage(stage)).thenApply(message -> {
-            return ok(message + " has been added");
+        return parseRiderStageConnection(json, riderStageConnectionId).thenApply(riderStageConnectionRepository::updateRiderStageConnection).thenApplyAsync(rSC -> {
+            return ok("success");
         }).exceptionally(ex -> {
             Result res = null;
-            String name = ExceptionUtils.getRootCause(ex).getClass().getSimpleName();
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "NullPointerException":
-                    res = badRequest("json format of stage was wrong");
-                    break;
-                case "NoResultException":
-                    res = badRequest("race was not found");
+                case "IndexOutOfBoundsException":
+                    res = badRequest("No stage are set in DB.");
                     break;
                 default:
                     res = internalServerError(ex.getMessage());
@@ -87,26 +86,25 @@ public class RiderStageConnectionController extends Controller {
         });
     }
 
-    private CompletableFuture<Stage> parseStage(JsonNode json){
-        CompletableFuture<Stage> completableFuture
+    private CompletableFuture<RiderStageConnection> parseRiderStageConnection(JsonNode json, Long riderStageConnectionId){
+        CompletableFuture<RiderStageConnection> completableFuture
                 = new CompletableFuture<>();
 
         Executors.newCachedThreadPool().submit(() -> {
             try{
-            Stage stage = new Stage();
-            stage.setStageId(json.findPath("stageId").intValue());
-            stage.setStageType(StageType.valueOf(json.findPath("type").textValue()));
-            stage.setDistance(json.findPath("distance").intValue());
-            stage.setEndTime(new Date(json.findPath("endTime").longValue()));
-            stage.setStartTime(new Date(json.findPath("startTime").longValue()));
-            stage.setStart(json.findPath("start").textValue());
-            stage.setDestination(json.findPath("destination").textValue());
-            final Race[] r = new Race[1];
-            int raceId = json.findPath("raceId").intValue();
-            raceRepository.getDbRace(raceId).thenApply(race -> {return r[0] = race; }).toCompletableFuture().join();
-            stage.setRace(r[0]);
-            completableFuture.complete(stage);
-            return stage;
+                RiderStageConnection riderStageConnection = new RiderStageConnection();
+                riderStageConnection.setId(riderStageConnectionId);
+                riderStageConnection.setBonusPoints(json.findPath("bonusPoints").asInt());
+                riderStageConnection.setMountainBonusPoints(json.findPath("mountainBonusPoints").asInt());
+                riderStageConnection.setSprintBonusPoints(json.findPath("sprintBonusPoints").asInt());
+                riderStageConnection.setBonusTime(json.findPath("bonusTime").asInt());
+                riderStageConnection.setMoney(json.findPath("money").asInt());
+                riderStageConnection.setOfficialTime(json.findPath("officialTime").asLong());
+                riderStageConnection.setOfficialGap(json.findPath("officialGap").asLong());
+                riderStageConnection.setVirtualGap(json.findPath("virtualGap").asLong());
+                riderStageConnection.setTypeState(TypeState.valueOf(json.findPath("typeState").asText()));
+                completableFuture.complete(riderStageConnection);
+                return riderStageConnection;
             } catch (Exception e){
                 completableFuture.obtrudeException(e);
                 throw  e;
@@ -115,26 +113,4 @@ public class RiderStageConnectionController extends Controller {
 
         return completableFuture;
     }
-
-    public CompletionStage<Result> deleteAllStages() {
-        return stageRepository.deleteAllStages().thenApply(stages -> {
-            return ok(stages +  " have been deleted");
-        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
-    }
-
-    public CompletionStage<Result> deleteStage (int stageId) {
-        return stageRepository.deleteStage(stageId).thenApplyAsync(stage -> {
-                return ok(stage + " has been deleted");
-        }).exceptionally(ex -> {
-            Result res = null;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "NoResultException":
-                    res = badRequest("Stage with Id: " + stageId + " ,not found in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
-            }
-            return res;
-        });
-    }*/
 }

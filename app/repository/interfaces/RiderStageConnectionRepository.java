@@ -10,10 +10,10 @@ import java.util.stream.Stream;
 
 @ImplementedBy(RiderStageConnectionRepositoryImpl.class)
 public interface RiderStageConnectionRepository {
-    CompletionStage<Stream<RiderStageConnection>>  getAllRiderStageConnections();
-    CompletionStage<RiderStageConnection> getRiderStageConnectionByRiderAndStage(long stageId, int riderId);
+    CompletionStage<Stream<RiderStageConnection>>  getAllRiderStageConnections(long stageId);
+    CompletionStage<RiderStageConnection> getRiderStageConnectionByRiderAndStage(long stageId, long riderId);
     void addRiderStageConnection(RiderStageConnection riderStageConnection);
-    void updateRiderStageConnection(RiderStageConnection riderStageConnection);
+    CompletionStage<RiderStageConnection> updateRiderStageConnection(RiderStageConnection riderStageConnection);
     void deleteAllRiderStageConnections();
-    void deleteRiderStageConnection(long stageId, int riderId);
+    void deleteRiderStageConnection(long stageId, long riderId);
 }

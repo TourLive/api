@@ -27,5 +27,11 @@ GET     /:stageId/notification               controllers.NotificationController.
 GET     /:stageId/notification/:timestamp    controllers.NotificationController.getNotificationsByTimestamp(timestamp : Long, stageId : Long)
 DELETE  /:stageId/notification               controllers.NotificationController.deleteAllNotifications(stageId : Long)
 
+#RiderStageConnection Routes
+GET     /:stageId/riderStageConnection              controllers.RiderStageConnectionController.getRiderStageConnections(stageId : Long)
+GET     /:stageId/riderStageConnection/:riderId     controllers.RiderStageConnectionController.getRiderStageConnection(stageId : Long, riderId : Long)
+PUT     /riderStageConnection/:rSCId                controllers.RiderStageConnectionController.updateRiderStageConnection(rSCId : Long)
+
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
