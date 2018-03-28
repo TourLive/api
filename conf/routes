@@ -18,20 +18,28 @@ GET     /:stageId/rider             controllers.RiderController.getRiders(stageI
 GET     /rider/:riderId             controllers.RiderController.getRider(riderId : Long)
 
 #Racegroup Routes
-GET     /:stageId/racegroup                  controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
-GET     /:stageId/racegroup/:raceGroupId     controllers.RaceGroupController.getRaceGroup(raceGroupId: Long, stageId : Long)
-POST    /:stageId/racegroup                  controllers.RaceGroupController.addRaceGroup(stageId : Long)
+#GET     /:stageId/racegroup                  controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
+#GET     /:stageId/racegroup/:raceGroupId     controllers.RaceGroupController.getRaceGroup(raceGroupId: Long, stageId : Long)
+#POST    /:stageId/racegroup                  controllers.RaceGroupController.addRaceGroup(stageId : Long)
 
 #Notifcation Routes
 GET     /:stageId/notification               controllers.NotificationController.getNotifications(stageId : Long)
 GET     /:stageId/notification/:timestamp    controllers.NotificationController.getNotificationsByTimestamp(timestamp : Long, stageId : Long)
-DELETE  /:stageId/notification               controllers.NotificationController.deleteAllNotifications(stageId : Long)
 
 #RiderStageConnection Routes
 GET     /:stageId/riderStageConnection              controllers.RiderStageConnectionController.getRiderStageConnections(stageId : Long)
 GET     /:stageId/riderStageConnection/:riderId     controllers.RiderStageConnectionController.getRiderStageConnection(stageId : Long, riderId : Long)
 PUT     /riderStageConnection/:rSCId                controllers.RiderStageConnectionController.updateRiderStageConnection(rSCId : Long)
 
+#Maillot Routes
+GET     /:stageId/maillot                            controllers.MaillotController.getMaillots(stageId : Long)
+GET     /:stageId/maillot/:maillotId                 controllers.MaillotController.getMaillot(stageId : Long, maillotId : Long)
+
+#RiderRanking Routes
+GET     /riderRanking/:riderStageConnectionId                   controllers.RiderRankingConnectionController.getRiderRankings(riderStageConnectionId : Long)
+GET     /riderRanking/:riderStageConnectionId/:rankingType      controllers.RiderRankingConnectionController.getRiderRankingsByType(riderStageConnectionId : Long, rankingType : String)
+GET     /riderRanking/rider/:riderId/:rankingType               controllers.RiderRankingConnectionController.getRiderRankingByRiderAndType(riderId : Long, rankingType : String)
+PUT     /riderRanking/:riderRankingId                           controllers.RiderRankingConnectionController.updateRiderRanking(riderRankingId : Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
