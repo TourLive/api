@@ -57,7 +57,7 @@ public class RaceRepositoryImpl implements RaceRepository{
 
     @Override
     public void deleteAllRaces() {
-        wrap(this::deleteAllRaces):
+        wrap(this::deleteAllRaces);
     }
 
     private Stream<Race> deleteAllRaces(EntityManager em){
