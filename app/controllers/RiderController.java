@@ -27,8 +27,8 @@ public class RiderController extends Controller {
         this.riderRepository = riderRepository;
     }
 
-    public CompletionStage<Result> getRiders() {
-        return riderRepository.getAllRiders().thenApplyAsync(riders -> ok(toJson(riders.collect(Collectors.toList())))).exceptionally(ex -> {
+    public CompletionStage<Result> getRiders(long stageId) {
+        return riderRepository.getAllRiders(stageId).thenApplyAsync(riders -> ok(toJson(riders.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
@@ -41,8 +41,8 @@ public class RiderController extends Controller {
         });
     }
 
-    public CompletionStage<Result> getRider(long riderId){
-        return riderRepository.getRider(riderId).thenApplyAsync(rider -> ok(toJson(rider))).exceptionally(ex -> {
+    public CompletionStage<Result> getRider(long riderId, long stageId){
+        return riderRepository.getRider(riderId, stageId).thenApplyAsync(rider -> ok(toJson(rider))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NoResultException":
@@ -55,22 +55,7 @@ public class RiderController extends Controller {
         });
     }
 
-    @BodyParser.Of(BodyParser.Json.class)
-    public CompletionStage<Result> addRider(){
-        JsonNode json = request().body().asJson();
-        return parseRider(json).thenApply(riderRepository::addRider).thenApply(rider -> ok(toJson(rider) + " has been added")).exceptionally(ex -> {
-            Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "NullPointerException":
-                    res = badRequest("json format of rider was wrong");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
-            }
-            return res;
-        });
-    }
-
+    /*
     private CompletableFuture<Rider> parseRider(JsonNode json){
         CompletableFuture<Rider> completableFuture
                 = new CompletableFuture<>();
@@ -94,23 +79,5 @@ public class RiderController extends Controller {
 
         return completableFuture;
     }
-
-
-    public CompletionStage<Result> deleteAllRiders(){
-        return riderRepository.deleteAllRiders().thenApply(riders -> ok(toJson(riders.collect(Collectors.toList())) + " have been deleted.")).exceptionally(ex -> internalServerError(ex.getMessage()));
-    }
-
-    public CompletionStage<Result> deleteRider(long riderId){
-        return riderRepository.deleteRider(riderId).thenApplyAsync(rider -> ok(toJson(rider) + " has been deleted")).exceptionally(ex -> {
-            Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "NoResultException":
-                    res = badRequest("Stage with Id: " + riderId + " not found in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
-            }
-            return res;
-        });
-    }
+    */
 }
