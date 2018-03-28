@@ -21,6 +21,8 @@ public class RiderRanking {
         return id;
     }
 
+    public void setId(Long id) { this.id = id;}
+
     public int getRank() {
         return rank;
     }

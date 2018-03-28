@@ -24,14 +24,10 @@ import java.util.concurrent.Executors;
 import static play.libs.Json.toJson;
 
 public class RiderStageConnectionController extends Controller {
-    private final StageRepository stageRepository;
-    private final RiderRepository riderRepository;
     private final RiderStageConnectionRepository riderStageConnectionRepository;
 
     @Inject
-    public RiderStageConnectionController(StageRepository stageRepository, RiderRepository riderRepository, RiderStageConnectionRepository riderStageConnectionRepository) {
-        this.stageRepository = stageRepository;
-        this.riderRepository = riderRepository;
+    public RiderStageConnectionController(RiderStageConnectionRepository riderStageConnectionRepository) {
         this.riderStageConnectionRepository = riderStageConnectionRepository;
     }
 
