@@ -63,6 +63,10 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     private RiderStageConnection updateRiderStageConnection(EntityManager entityManager, RiderStageConnection riderStageConnection){
+        RiderStageConnection dbRSC = entityManager.find(RiderStageConnection.class, riderStageConnection.getId());
+        riderStageConnection.setStage(entityManager.merge(dbRSC.getStage()));
+        riderStageConnection.setRiderRankings(entityManager.merge(dbRSC.getRiderRankings()));
+        riderStageConnection.setRider(entityManager.merge(dbRSC.getRider()));
         entityManager.merge(riderStageConnection);
         return riderStageConnection;
     }
