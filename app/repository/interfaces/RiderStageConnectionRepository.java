@@ -1,6 +1,5 @@
 package repository.interfaces;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.ImplementedBy;
 import models.RiderStageConnection;
 import repository.RiderStageConnectionRepositoryImpl;

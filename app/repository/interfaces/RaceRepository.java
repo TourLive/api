@@ -1,9 +1,7 @@
 package repository.interfaces;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.ImplementedBy;
 import models.Race;
-import play.libs.Json;
 import repository.RaceRepositoryImpl;
 
 import java.util.concurrent.CompletionStage;

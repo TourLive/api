@@ -26,8 +26,8 @@ public class RaceGroupController extends Controller {
         this.raceGroupRepository = raceGroupRepository;
     }
 
-    public CompletionStage<Result> getAllRaceGroups() {
-        return raceGroupRepository.getAllRaceGroups().thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
+    public CompletionStage<Result> getAllRaceGroups(long stageid) {
+        return raceGroupRepository.getAllRaceGroups(stageid).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()) {
                 case "IndexOutOfBoundsException":
@@ -54,26 +54,8 @@ public class RaceGroupController extends Controller {
         });
     }
 
-    public CompletionStage<Result> deleteAllRaceGroups() {
-        return raceGroupRepository.deleteAllRaceGroups().thenApply(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())) + "have been deleted")).exceptionally(ex -> internalServerError(ex.getMessage()));
-    }
-
-    public CompletionStage<Result> deleteRaceGroup(long id) {
-        return raceGroupRepository.deleteRaceGroupById(id).thenApplyAsync(racegroup -> ok(toJson(racegroup) + "has been deleted")).exceptionally(ex -> {
-            Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()) {
-                case "NoResultException":
-                    res = badRequest("Racegroup with id" + id + " not found in DB");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
-            }
-            return res;
-        });
-    }
-
     @BodyParser.Of(BodyParser.Json.class)
-    public CompletionStage<Result> addRaceGroup() {
+    public CompletionStage<Result> addRaceGroup(long stageid) {
         JsonNode json = request().body().asJson();
         return parseRaceGroup(json).thenApply(raceGroupRepository::addRaceGroup).thenApply(raceGroup -> ok(toJson(raceGroup) + " has been added")).exceptionally(ex -> {
             Result res;

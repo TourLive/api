@@ -1,7 +1,6 @@
 package repository;
 
 import models.JudgmentRiderConnection;
-import models.Rider;
 import play.db.jpa.JPAApi;
 import repository.interfaces.JudgmentRiderConnectionRepository;
 
