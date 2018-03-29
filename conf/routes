@@ -19,8 +19,9 @@ GET     /rider/:riderId             controllers.RiderController.getRider(riderId
 
 #Racegroup Routes
 GET     /:stageId/racegroup                  controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
-GET     /racegroup/:raceGroupId     controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
-POST    /:stageId/racegroup                  controllers.RaceGroupController.addRaceGroup(stageId : Long)
+GET     /racegroup/:raceGroupId              controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
+POST    /racegroup                           controllers.RaceGroupController.addRaceGroup()
+PUT     /racegroup/:raceGroupId              controllers.RaceGroupController.updateRaceGroup(raceGroupId: Long)
 
 #Notifcation Routes
 GET     /:stageId/notification               controllers.NotificationController.getNotifications(stageId : Long)

@@ -61,7 +61,7 @@ public class RaceGroupController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> addRaceGroup() {
         JsonNode json = request().body().asJson();
-        return parseNewRaceGroup(json).thenApply(raceGroupRepository::addRaceGroup).thenApply(raceGroup -> ok(toJson(raceGroup) + " has been added")).exceptionally(ex -> {
+        return parseNewRaceGroup(json).thenApply(raceGroupRepository::addRaceGroup).thenApply(raceGroup -> ok("success")).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NullPointerException":
@@ -74,12 +74,57 @@ public class RaceGroupController extends Controller {
         });
     }
 
+    @BodyParser.Of(BodyParser.Json.class)
+    public CompletionStage<Result> updateRaceGroup(long raceGroupId) {
+        JsonNode json = request().body().asJson();
+        return parseUpdateRaceGroup(json, raceGroupId).thenApply(raceGroupRepository::updateRaceGroup).thenApply(raceGroup -> ok("success")).exceptionally(ex -> {
+            Result res;
+            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
+                case "NullPointerException":
+                    res = badRequest("json format of racegroup was wrong");
+                    break;
+                default:
+                    res = internalServerError(ex.getMessage());
+            }
+            return res;
+        });
+    }
+
+
     private CompletableFuture<RaceGroup> parseNewRaceGroup (JsonNode json) {
         CompletableFuture<RaceGroup> completableFuture = new CompletableFuture<>();
 
         Executors.newCachedThreadPool().submit(() -> {
             try {
                 RaceGroup raceGroup = new RaceGroup();
+                raceGroup.setTimestamp(Timestamp.valueOf(json.findPath("timestamp").textValue()));
+                String raceGroupType = json.findPath("type").textValue();
+                raceGroup.setRaceGroupType(RaceGroupType.valueOf(raceGroupType));
+                raceGroup.setHistoryGapTime(json.findPath("actualGapTime").longValue());
+                raceGroup.setActualGapTime(json.findPath("actualGapTime").longValue());
+                raceGroup.setPosition(json.findPath("actualGapTime").intValue());
+                raceGroup.setRiders(null);
+                final Stage[] st = new Stage[1];
+                long stageId = json.findPath("stageId").longValue();
+                stageRepository.getStage(stageId).thenApply(stage -> st[0] = stage).toCompletableFuture().join();
+                raceGroup.setStage(st[0]);
+                completableFuture.complete(raceGroup);
+            } catch (Exception e) {
+                completableFuture.obtrudeException(e);
+                throw e;
+            }
+        });
+
+        return completableFuture;
+    }
+
+    private CompletableFuture<RaceGroup> parseUpdateRaceGroup (JsonNode json, long raceGroupId) {
+        CompletableFuture<RaceGroup> completableFuture = new CompletableFuture<>();
+
+        Executors.newCachedThreadPool().submit(() -> {
+            try {
+                RaceGroup raceGroup = new RaceGroup();
+                raceGroup.setId(raceGroupId);
                 raceGroup.setTimestamp(Timestamp.valueOf(json.findPath("timestamp").textValue()));
                 String raceGroupType = json.findPath("type").textValue();
                 raceGroup.setRaceGroupType(RaceGroupType.valueOf(raceGroupType));
