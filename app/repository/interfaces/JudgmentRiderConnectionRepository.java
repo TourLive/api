@@ -9,9 +9,9 @@ import java.util.stream.Stream;
 
 @ImplementedBy(JudgmentRiderConnectionRepositoryImpl.class)
 public interface JudgmentRiderConnectionRepository {
-    CompletionStage<Stream<JudgmentRiderConnection>> getAllJudgmentRiderConnections();
     CompletionStage<Stream<JudgmentRiderConnection>> getJudgmentRiderConnectionsByRider(long id);
     CompletionStage<JudgmentRiderConnection> addJudgmentRiderConnection(JudgmentRiderConnection judgmentRiderConnection);
     void deleteAllJudgmentRiderConnections();
-    CompletionStage<JudgmentRiderConnection> deleteJudgmentRiderConnectionByRiderAndJudgmentName(long riderid, long judgementId);
+    CompletionStage<JudgmentRiderConnection> deleteJudgmentRiderConnectionByRiderAndJudgmentName(long riderId, long judgmentId);
+    Stream<JudgmentRiderConnection> getAllJudgmentRiderConnections();
 }

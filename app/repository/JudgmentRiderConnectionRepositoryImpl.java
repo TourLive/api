@@ -25,8 +25,8 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
     }
 
     @Override
-    public CompletionStage<Stream<JudgmentRiderConnection>> getAllJudgmentRiderConnections() {
-        return supplyAsync(() -> wrap (this::getAllJudgmentRiderConnections), databaseExecutionContext);
+    public Stream<JudgmentRiderConnection> getAllJudgmentRiderConnections() {
+        return wrap(this::getAllJudgmentRiderConnections);
     }
 
     private Stream<JudgmentRiderConnection> getAllJudgmentRiderConnections(EntityManager em){

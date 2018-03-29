@@ -33,6 +33,11 @@ GET     /:stageId/riderStageConnection              controllers.RiderStageConnec
 GET     /:stageId/riderStageConnection/:riderId     controllers.RiderStageConnectionController.getRiderStageConnection(stageId : Long, riderId : Long)
 PUT     /riderStageConnection/:rSCId                controllers.RiderStageConnectionController.updateRiderStageConnection(rSCId : Long)
 
+#RiderStageConnection Routes
+GET     /judgmentRiderConnection/:riderId           controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
+POST    /judgmentRiderConnection                    controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()
+
+
 #Maillot Routes
 GET     /:stageId/maillot                            controllers.MaillotController.getMaillots(stageId : Long)
 GET     /:stageId/maillot/:maillotId                 controllers.MaillotController.getMaillot(stageId : Long, maillotId : Long)

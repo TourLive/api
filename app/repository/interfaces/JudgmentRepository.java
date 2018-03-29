@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 public interface JudgmentRepository {
     Stream<Judgment> getAllJudgments();
     Stream<Judgment> getJudgmentsByRider(long id);
+    Judgment getJudgmentById(long id);
     void addJudgment(Judgment judgment);
     void deleteAllJudgment();
     void deleteJudgmentById(long id);
