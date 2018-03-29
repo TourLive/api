@@ -8,20 +8,15 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static java.util.concurrent.CompletableFuture.supplyAsync;
-
 public class JudgmentRepositoryImpl implements JudgmentRepository {
     private final JPAApi jpaApi;
-    private final DatabaseExecutionContext databaseExecutionContext;
 
     @Inject
-    public JudgmentRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
+    public JudgmentRepositoryImpl(JPAApi jpaApi) {
         this.jpaApi = jpaApi;
-        this.databaseExecutionContext = databaseExecutionContext;
     }
 
     @Override
@@ -78,7 +73,7 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
         if (j != null) {
             entityManager.remove(j);
         }
-        return j;
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {
