@@ -35,6 +35,10 @@ public class RaceGroup {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public RaceGroupType getRaceGroupType() {
         return raceGroupType;
     }

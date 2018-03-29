@@ -62,20 +62,13 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     }
 
     private RaceGroup updateRaceGroup(EntityManager entityManager, RaceGroup raceGroup) {
-        RaceGroup rG = entityManager.find(RaceGroup.class, raceGroup.getId());
-        rG.setActualGapTime(raceGroup.getActualGapTime());
-        rG.setHistoryGapTime(raceGroup.getHistoryGapTime());
-        rG.setPosition(raceGroup.getPosition());
-        rG.setRaceGroupType(raceGroup.getRaceGroupType());
-        rG.setTimestamp(raceGroup.getTimestamp());
-        rG.setRiders(raceGroup.getRiders());
-        entityManager.merge(rG);
-        return rG;
+        entityManager.merge(raceGroup);
+        return raceGroup;
     }
 
     @Override
     public void deleteAllRaceGroups() {
-        return wrap(this::deleteAllRaceGroups);
+        wrap(this::deleteAllRaceGroups);
     }
 
     private Stream<RaceGroup> deleteAllRaceGroups(EntityManager entityManager) {

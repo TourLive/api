@@ -2,12 +2,14 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import models.RaceGroup;
+import models.Stage;
 import models.enums.RaceGroupType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import repository.interfaces.RaceGroupRepository;
+import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
 import java.sql.Timestamp;
@@ -20,10 +22,12 @@ import static play.libs.Json.toJson;
 
 public class RaceGroupController extends Controller {
     private final RaceGroupRepository raceGroupRepository;
+    private final StageRepository stageRepository;
 
     @Inject
     public RaceGroupController(RaceGroupRepository raceGroupRepository) {
         this.raceGroupRepository = raceGroupRepository;
+        this.
     }
 
     public CompletionStage<Result> getAllRaceGroups(long stageid) {
@@ -55,9 +59,9 @@ public class RaceGroupController extends Controller {
     }
 
     @BodyParser.Of(BodyParser.Json.class)
-    public CompletionStage<Result> addRaceGroup(long stageid) {
+    public CompletionStage<Result> addRaceGroup() {
         JsonNode json = request().body().asJson();
-        return parseRaceGroup(json).thenApply(raceGroupRepository::addRaceGroup).thenApply(raceGroup -> ok(toJson(raceGroup) + " has been added")).exceptionally(ex -> {
+        return parseNewRaceGroup(json).thenApply(raceGroupRepository::addRaceGroup).thenApply(raceGroup -> ok(toJson(raceGroup) + " has been added")).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NullPointerException":
@@ -70,7 +74,7 @@ public class RaceGroupController extends Controller {
         });
     }
 
-    private CompletableFuture<RaceGroup> parseRaceGroup (JsonNode json) {
+    private CompletableFuture<RaceGroup> parseNewRaceGroup (JsonNode json) {
         CompletableFuture<RaceGroup> completableFuture = new CompletableFuture<>();
 
         Executors.newCachedThreadPool().submit(() -> {
@@ -83,6 +87,11 @@ public class RaceGroupController extends Controller {
                 raceGroup.setActualGapTime(json.findPath("actualGapTime").longValue());
                 raceGroup.setPosition(json.findPath("actualGapTime").intValue());
                 raceGroup.setRiders(null);
+                final Stage[] st = new Stage[1];
+                long stageId = json.findPath("stageId").longValue();
+                stageRepository.getStage(stageId).thenApply(stage -> st[0] = stage).toCompletableFuture().join();
+                raceGroup.setStage(st[0]);
+                completableFuture.complete(raceGroup);
             } catch (Exception e) {
                 completableFuture.obtrudeException(e);
                 throw e;
