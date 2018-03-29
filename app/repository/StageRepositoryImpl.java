@@ -1,24 +1,18 @@
 package repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import models.Stage;
 import play.db.jpa.JPAApi;
 import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.TypedQuery;
-import java.util.Calendar;
 import java.util.List;
-import java.util.SimpleTimeZone;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static play.libs.Json.toJson;
 
 public class StageRepositoryImpl implements StageRepository{
     private final JPAApi jpaApi;

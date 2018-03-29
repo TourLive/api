@@ -1,24 +1,13 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import models.Race;
-import models.Stage;
-import models.enums.StageType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import repository.interfaces.RaceRepository;
 import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;

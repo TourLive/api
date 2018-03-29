@@ -2,7 +2,6 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import models.enums.StageType;
 import models.enums.TypeState;
 
 import javax.persistence.*;

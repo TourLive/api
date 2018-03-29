@@ -8,25 +8,20 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static java.util.concurrent.CompletableFuture.supplyAsync;
-
 public class JudgmentRepositoryImpl implements JudgmentRepository {
     private final JPAApi jpaApi;
-    private final DatabaseExecutionContext databaseExecutionContext;
 
     @Inject
-    public JudgmentRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
+    public JudgmentRepositoryImpl(JPAApi jpaApi) {
         this.jpaApi = jpaApi;
-        this.databaseExecutionContext = databaseExecutionContext;
     }
 
     @Override
-    public CompletionStage<Stream<Judgment>> getAllJudgments() {
-        return supplyAsync(() -> wrap (this::getAllJudgments), databaseExecutionContext);
+    public Stream<Judgment> getAllJudgments() {
+        return wrap(this::getAllJudgments);
     }
 
     private Stream<Judgment> getAllJudgments(EntityManager em){
@@ -35,8 +30,18 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Judgment>> getJudgmentsByRider(long id) {
-        return supplyAsync(() -> wrap (em -> getJudgmentsByRider(em, id)), databaseExecutionContext);
+    public Stream<Judgment> getJudgmentsByRider(long id) {
+        return wrap(entityManager -> getJudgmentsByRider(entityManager, id));
+    }
+
+    @Override
+    public Judgment getJudgmentById(long id) {
+        return wrap(entityManager -> getJudgmentById(entityManager, id));
+    }
+
+    private Judgment getJudgmentById(EntityManager entityManager, long id) {
+        Judgment judgment = entityManager.find(Judgment.class, id);
+        return judgment;
     }
 
     private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){
@@ -46,29 +51,29 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     @Override
-    public CompletionStage<Judgment> addJudgment(Judgment judgment) {
-        return supplyAsync(() -> wrap(entityManager -> addJudgment(entityManager, judgment)), databaseExecutionContext);
+    public void addJudgment(Judgment judgment) {
+        wrap(entityManager -> addJudgment(entityManager, judgment));
     }
 
     private Judgment addJudgment(EntityManager entityManager, Judgment judgment) {
         entityManager.persist(judgment);
-        return judgment;
+        return null;
     }
 
     @Override
-    public CompletionStage<Stream<Judgment>> deleteAllJudgment() {
-        return supplyAsync(() -> wrap(this::deleteAllJudgment), databaseExecutionContext);
+    public void deleteAllJudgment() {
+        wrap(this::deleteAllJudgment);
     }
 
-    private Stream<Judgment> deleteAllJudgment(EntityManager entityManager) {
+    private Judgment deleteAllJudgment(EntityManager entityManager) {
         List<Judgment> judgments = entityManager.createQuery("select j from Judgment j", Judgment.class).getResultList();
         entityManager.remove(judgments);
-        return judgments.stream();
+        return null;
     }
 
     @Override
-    public CompletionStage<Judgment> deleteJudgmentById(long id) {
-        return supplyAsync(() -> wrap(entityManager -> deleteJudgmentById(entityManager, id)), databaseExecutionContext);
+    public void deleteJudgmentById(long id) {
+        wrap(entityManager -> deleteJudgmentById(entityManager, id));
     }
 
     private Judgment deleteJudgmentById(EntityManager entityManager, long id) {
@@ -78,7 +83,7 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
         if (j != null) {
             entityManager.remove(j);
         }
-        return j;
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {
