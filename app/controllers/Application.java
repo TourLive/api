@@ -10,6 +10,6 @@ public class Application extends Controller {
     }
 
     public Result redirectDocs() {
-        return  redirect("/assets/lib/swagger-ui/index.html?baseUrl=/swagger.json");
+        return  redirect("/assets/lib/swagger-ui/index.html?url=http://localhost:9000/swagger.json");
     }
 }
