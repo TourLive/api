@@ -1,20 +1,12 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import models.Rider;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import play.core.j.HttpExecutionContext;
-import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import repository.interfaces.RiderRepository;
 
 import javax.inject.Inject;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;

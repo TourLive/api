@@ -38,4 +38,13 @@ public class JudgmentRiderConnection {
     public void setRider(Rider rider) {
         this.rider = rider;
     }
+
+    public Judgment getJudgment() {
+        return judgment;
+    }
+
+    public void setJudgment(Judgment judgment) {
+        this.judgment = judgment;
+    }
+
 }

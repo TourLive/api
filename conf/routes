@@ -18,9 +18,10 @@ GET     /:stageId/rider             controllers.RiderController.getRiders(stageI
 GET     /rider/:riderId             controllers.RiderController.getRider(riderId : Long)
 
 #Racegroup Routes
-#GET     /:stageId/racegroup                  controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
-#GET     /:stageId/racegroup/:raceGroupId     controllers.RaceGroupController.getRaceGroup(raceGroupId: Long, stageId : Long)
-#POST    /:stageId/racegroup                  controllers.RaceGroupController.addRaceGroup(stageId : Long)
+GET     /:stageId/racegroup                  controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
+GET     /racegroup/:raceGroupId              controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
+POST    /racegroup                           controllers.RaceGroupController.addRaceGroup()
+PUT     /racegroup/:raceGroupId              controllers.RaceGroupController.updateRaceGroup(raceGroupId: Long)
 
 #Notifcation Routes
 GET     /:stageId/notification               controllers.NotificationController.getNotifications(stageId : Long)
@@ -31,6 +32,11 @@ POST    /:stageId/notification               controllers.NotificationController.
 GET     /:stageId/riderStageConnection              controllers.RiderStageConnectionController.getRiderStageConnections(stageId : Long)
 GET     /:stageId/riderStageConnection/:riderId     controllers.RiderStageConnectionController.getRiderStageConnection(stageId : Long, riderId : Long)
 PUT     /riderStageConnection/:rSCId                controllers.RiderStageConnectionController.updateRiderStageConnection(rSCId : Long)
+
+#RiderStageConnection Routes
+GET     /judgmentRiderConnection/:riderId           controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
+POST    /judgmentRiderConnection                    controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()
+
 
 #Maillot Routes
 GET     /:stageId/maillot                            controllers.MaillotController.getMaillots(stageId : Long)

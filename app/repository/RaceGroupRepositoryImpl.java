@@ -1,13 +1,11 @@
 package repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import models.RaceGroup;
 import play.db.jpa.JPAApi;
 import repository.interfaces.RaceGroupRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -15,7 +13,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static play.libs.Json.toJson;
 
 public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     private final JPAApi jpaApi;
@@ -28,8 +25,8 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     }
 
     @Override
-    public CompletionStage<Stream<RaceGroup>> getAllRaceGroups() {
-        return supplyAsync(() -> wrap (this::getAllRaceGroups), databaseExecutionContext);
+    public CompletionStage<Stream<RaceGroup>> getAllRaceGroups(long stageId) {
+        return supplyAsync(() -> wrap (entityManager -> getAllRaceGroups(entityManager, stageId)), databaseExecutionContext);
     }
 
     @Override
@@ -43,9 +40,10 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
         return query.getSingleResult();
     }
 
-    private Stream<RaceGroup> getAllRaceGroups(EntityManager em){
-        List<RaceGroup> raceGroups = em.createQuery("select rG from RaceGroup rG", RaceGroup.class).getResultList();
-        return raceGroups.stream();
+    private Stream<RaceGroup> getAllRaceGroups(EntityManager em, long stageId){
+        TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.stage.id = :stageId" , RaceGroup.class);
+        query.setParameter("stageId", stageId);
+        return query.getResultList().stream();
     }
 
     @Override
@@ -64,31 +62,24 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     }
 
     private RaceGroup updateRaceGroup(EntityManager entityManager, RaceGroup raceGroup) {
-        RaceGroup rG = entityManager.find(RaceGroup.class, raceGroup.getId());
-        rG.setActualGapTime(raceGroup.getActualGapTime());
-        rG.setHistoryGapTime(raceGroup.getHistoryGapTime());
-        rG.setPosition(raceGroup.getPosition());
-        rG.setRaceGroupType(raceGroup.getRaceGroupType());
-        rG.setTimestamp(raceGroup.getTimestamp());
-        rG.setRiders(raceGroup.getRiders());
-        entityManager.merge(rG);
-        return rG;
+        entityManager.merge(raceGroup);
+        return raceGroup;
     }
 
     @Override
-    public CompletionStage<Stream<RaceGroup>> deleteAllRaceGroups() {
-        return supplyAsync(() -> wrap(this::deleteAllRaceGroups), databaseExecutionContext);
+    public void deleteAllRaceGroups() {
+        wrap(this::deleteAllRaceGroups);
     }
 
     private Stream<RaceGroup> deleteAllRaceGroups(EntityManager entityManager) {
         List<RaceGroup> raceGroups = entityManager.createQuery("select rG from RaceGroup rG", RaceGroup.class).getResultList();
         entityManager.remove(raceGroups);
-        return raceGroups.stream();
+        return null;
     }
 
     @Override
-    public CompletionStage<RaceGroup> deleteRaceGroupById(long id) {
-        return supplyAsync(() -> wrap(em -> deleteRaceGroupById(em, id)), databaseExecutionContext);
+    public void deleteRaceGroupById(long id) {
+        wrap(entityManager -> deleteRaceGroupById(entityManager, id));
     }
 
     private RaceGroup deleteRaceGroupById(EntityManager em, long id) {
@@ -98,7 +89,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
         if(raceGroup != null){
             em.remove(raceGroup);
         }
-        return raceGroup;
+        return null;
     }
     
     private <T> T wrap(Function<EntityManager, T> function) {
