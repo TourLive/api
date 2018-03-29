@@ -42,5 +42,8 @@ GET     /riderRanking/:riderStageConnectionId/:rankingType      controllers.Ride
 GET     /riderRanking/rider/:riderId/:rankingType               controllers.RiderRankingConnectionController.getRiderRankingByRiderAndType(riderId : Long, rankingType : String)
 PUT     /riderRanking/:riderRankingId                           controllers.RiderRankingConnectionController.updateRiderRanking(riderRankingId : Long)
 
+#Import Route
+GET     /import                             controllers.ImportController.importAllStaticData
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
