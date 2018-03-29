@@ -1,24 +1,13 @@
 package controllers;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import models.JudgmentRiderConnection;
-import models.Notification;
-import models.RiderStageConnection;
-import models.enums.NotificationType;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import repository.interfaces.*;
 
 import javax.inject.Inject;
-import java.sql.Timestamp;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
-import static play.libs.Json.toJson;
 
 public class ImportController extends Controller {
     private final JudgmentRepository judgmentRepository;
@@ -76,46 +65,43 @@ public class ImportController extends Controller {
         });
     }
 
-
-
-    private CompletionStage<Result> importRace(){
-        return (CompletionStage<Result>) ok();
+    private CompletionStage<String> importRace(){
+       return CompletableFuture.completedFuture("success");
     }
 
-
-    private CompletionStage<Result> importStages(){
-        return  (CompletionStage<Result>) ok();
+    private CompletionStage<String> importStages(){
+        return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<Result> importRiders(){
+    private CompletionStage<String> importRiders(){
         createRiderStageConnections();
-        return (CompletionStage<Result>) ok();
+        return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<Result>  createRiderStageConnections(){
+    private CompletionStage<String>  createRiderStageConnections(){
         createDefaultRaceGroup();
-        return (CompletionStage<Result>) ok();
+        return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<Result>  createDefaultRaceGroup(){
-        return (CompletionStage<Result>) ok();
+    private CompletionStage<String>  createDefaultRaceGroup(){
+        return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<Result> importMaillots(){
+    private CompletionStage<String> importMaillots(){
         importMaillotRiderConnections();
-        return (CompletionStage<Result>) ok();
+        return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<Result> importMaillotRiderConnections(){
-        return (CompletionStage<Result>) ok();
+    private CompletionStage<String> importMaillotRiderConnections(){
+        return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<Result> importJudgments(){
-        return  (CompletionStage<Result>) ok();
+    private CompletionStage<String> importJudgments(){
+        return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<Result> importRewards(){
-        return  (CompletionStage<Result>) ok();
+    private CompletionStage<String> importRewards(){
+        return CompletableFuture.completedFuture("success");
     }
 
 }
