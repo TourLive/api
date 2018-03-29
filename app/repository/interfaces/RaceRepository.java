@@ -11,10 +11,9 @@ import java.util.stream.Stream;
 
 @ImplementedBy(RaceRepositoryImpl.class)
 public interface RaceRepository {
-    CompletionStage<JsonNode> getAllRaces();
-    CompletionStage<JsonNode> getRace(int raceId);
-    CompletionStage<Race> getDbRace(int raceId);
-    CompletionStage<JsonNode> setRace(Race race);
-    CompletionStage<JsonNode> deleteAllRaces();
-    CompletionStage<JsonNode> deleteRace(String name);
+    CompletionStage<Stream<Race>> getAllRaces();
+    CompletionStage<Race> getRace(Long raceId);
+    void addRace(Race race);
+    void deleteAllRaces();
+    void deleteRace(Long id);
 }

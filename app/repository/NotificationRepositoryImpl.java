@@ -2,6 +2,8 @@ package repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import models.Notification;
+import models.Stage;
+import play.api.mvc.Handler;
 import play.db.jpa.JPAApi;
 import repository.interfaces.NotificationRepository;
 
@@ -29,47 +31,50 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public CompletionStage<JsonNode> getAllNotifications() {
-        return supplyAsync(() -> wrap (this::getAllNotifications), databaseExecutionContext);
+    public CompletionStage<Stream<Notification>> getAllNotifications(long stageId) {
+        return supplyAsync(() -> wrap (entityManager -> getAllNotifications(entityManager, stageId)), databaseExecutionContext);
     }
 
-    private JsonNode getAllNotifications(EntityManager em){
-        List<Notification> notifications = em.createQuery("select n from Notification n", Notification.class).getResultList();
-        return toJson(notifications.stream());
+    private Stream<Notification> getAllNotifications(EntityManager em, long stageId){
+        TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.stage.id = :stageId" , Notification.class);
+        query.setParameter("stageId", stageId);
+        return em.createQuery("select n from Notification n", Notification.class).getResultList().stream();
     }
 
     @Override
-    public CompletionStage<JsonNode> getNotificationsByTimestamp(Timestamp timestamp) {
-        return supplyAsync(() -> wrap (em -> getAllNotificationsByTimestamp(em, timestamp)), databaseExecutionContext);
+    public CompletionStage<Stream<Notification>> getNotificationsByTimestamp(long stageId, Timestamp timestamp) {
+        return supplyAsync(() -> wrap (em -> getAllNotificationsByTimestamp(em, stageId, timestamp)), databaseExecutionContext);
     }
 
-    private JsonNode getAllNotificationsByTimestamp(EntityManager em, Timestamp timestamp){
-        TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.timestamp >= :timestamp" , Notification.class);
+    private Stream<Notification> getAllNotificationsByTimestamp(EntityManager em, long stageId, Timestamp timestamp){
+        TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.stage.id = :stageId and n.timestamp >= :timestamp" , Notification.class);
+        query.setParameter("stageId", stageId);
         query.setParameter("timestamp", timestamp);
-        return toJson(query.getResultList().stream());
+        return query.getResultList().stream();
     }
 
     @Override
-    public CompletionStage<JsonNode> addNotification(Notification notification) {
-        return supplyAsync(() -> wrap (em -> addNotification(em, notification)), databaseExecutionContext);
+    public CompletionStage<Notification> addNotification(long stageId, Notification notification) {
+        return supplyAsync(() -> wrap(em -> addNotification(em, stageId, notification)), databaseExecutionContext);
     }
 
-    private JsonNode addNotification(EntityManager em, Notification notification){
+    private Notification addNotification(EntityManager em, long stageId, Notification notification){
+        notification.setStage(em.find(Stage.class, stageId));
         em.persist(notification);
-        return toJson(notification);
+        return notification;
     }
 
     @Override
-    public CompletionStage<JsonNode> deleteAllNotification() {
-        return supplyAsync(() -> wrap (this::deleteAllNotification), databaseExecutionContext);
+    public void deleteAllNotification() {
+        wrap(this::deleteAllNotification);
     }
 
-    private JsonNode deleteAllNotification(EntityManager em){
+    private Stream<Notification> deleteAllNotification(EntityManager em){
         List<Notification> notifications = em.createQuery("select n from Notification n", Notification.class).getResultList();
         for(Notification n : notifications){
             em.remove(n);
         }
-        return toJson(notifications.stream());
+        return notifications.stream();
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

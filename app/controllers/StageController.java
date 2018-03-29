@@ -34,10 +34,8 @@ public class StageController extends Controller {
     }
 
     public CompletionStage<Result> getStages() {
-        return stageRepository.getAllStages().thenApplyAsync(stages -> {
-            return ok(stages);
-        }).exceptionally(ex -> {
-            Result res = null;
+        return stageRepository.getAllStages().thenApplyAsync(stages -> ok(toJson(stages.collect(Collectors.toList())))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
                     res = badRequest("No stage are set in DB.");
@@ -50,11 +48,9 @@ public class StageController extends Controller {
     }
 
 
-    public CompletionStage<Result> getStage(int stageId) {
-        return stageRepository.getStage(stageId).thenApplyAsync(stage -> {
-           return ok(stage);
-        }).exceptionally(ex -> {
-            Result res = null;
+    public CompletionStage<Result> getStage(long stageId) {
+        return stageRepository.getStage(stageId).thenApplyAsync(stage -> ok(toJson(stage))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NoResultException":
                     res = badRequest("No Stage with id: " + stageId + ", is available in DB.");
@@ -66,14 +62,12 @@ public class StageController extends Controller {
         });
     }
 
+    /*
     @BodyParser.Of(BodyParser.Json.class)
     public CompletableFuture<Result> addStage() {
         JsonNode json = request().body().asJson();
-        return parseStage(json).thenApply(stage -> stageRepository.addStage(stage)).thenApply(message -> {
-            return ok(message + " has been added");
-        }).exceptionally(ex -> {
-            Result res = null;
-            String name = ExceptionUtils.getRootCause(ex).getClass().getSimpleName();
+        return parseStage(json).thenApply(stageRepository::addStage).thenApply(message -> ok(toJson(message) + " has been added")).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NullPointerException":
                     res = badRequest("json format of stage was wrong");
@@ -95,7 +89,6 @@ public class StageController extends Controller {
         Executors.newCachedThreadPool().submit(() -> {
             try{
             Stage stage = new Stage();
-            stage.setStageId(json.findPath("stageId").intValue());
             stage.setStageType(StageType.valueOf(json.findPath("type").textValue()));
             stage.setDistance(json.findPath("distance").intValue());
             stage.setEndTime(new Date(json.findPath("endTime").longValue()));
@@ -103,8 +96,8 @@ public class StageController extends Controller {
             stage.setStart(json.findPath("start").textValue());
             stage.setDestination(json.findPath("destination").textValue());
             final Race[] r = new Race[1];
-            int raceId = json.findPath("raceId").intValue();
-            raceRepository.getDbRace(raceId).thenApply(race -> {return r[0] = race; }).toCompletableFuture().join();
+            long raceId = json.findPath("raceId").longValue();
+            raceRepository.getRace(raceId).thenApply(race -> r[0] = race).toCompletableFuture().join();
             stage.setRace(r[0]);
             completableFuture.complete(stage);
             return stage;
@@ -118,16 +111,12 @@ public class StageController extends Controller {
     }
 
     public CompletionStage<Result> deleteAllStages() {
-        return stageRepository.deleteAllStages().thenApply(stages -> {
-            return ok(stages +  " have been deleted");
-        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
+        return stageRepository.deleteAllStages().thenApply(stages -> ok(toJson(stages.collect(Collectors.toList())) +  " have been deleted")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
-    public CompletionStage<Result> deleteStage (int stageId) {
-        return stageRepository.deleteStage(stageId).thenApplyAsync(stage -> {
-                return ok(stage + " has been deleted");
-        }).exceptionally(ex -> {
-            Result res = null;
+    public CompletionStage<Result> deleteStage (long stageId) {
+        return stageRepository.deleteStage(stageId).thenApplyAsync(stage -> ok(toJson(stage) + " has been deleted")).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NoResultException":
                     res = badRequest("Stage with Id: " + stageId + " ,not found in DB.");
@@ -137,5 +126,5 @@ public class StageController extends Controller {
             }
             return res;
         });
-    }
+    }*/
 }

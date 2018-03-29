@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 public class RiderStageConnection {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private int bonusPoints;
     private int mountainBonusPoints;
@@ -37,6 +37,8 @@ public class RiderStageConnection {
     public Long getId() {
         return id;
     }
+
+    public void setId(long id) {this.id = id;}
 
     public int getBonusPoints() {
         return bonusPoints;
@@ -124,5 +126,13 @@ public class RiderStageConnection {
 
     public void setRiderRankings(List<RiderRanking> riderRankings) {
         this.riderRankings = riderRankings;
+    }
+
+    public Rider getRider() {
+        return rider;
+    }
+
+    public void setRider(Rider rider) {
+        this.rider = rider;
     }
 }

@@ -1,13 +1,22 @@
 package controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import models.Notification;
+import models.enums.NotificationType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import repository.interfaces.NotificationRepository;
 
 import javax.inject.Inject;
 import java.sql.Timestamp;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+import static play.libs.Json.toJson;
 
 public class NotificationController extends Controller {
     private final NotificationRepository notificationRepository;
@@ -15,11 +24,9 @@ public class NotificationController extends Controller {
     @Inject
     public NotificationController(NotificationRepository notificationRepository) { this.notificationRepository = notificationRepository; }
 
-    public CompletionStage<Result> getNotifications() {
-        return notificationRepository.getAllNotifications().thenApplyAsync(notifications -> {
-            return ok(notifications);
-        }).exceptionally(ex -> {
-            Result res = null;
+    public CompletionStage<Result> getNotifications(long stageId) {
+        return notificationRepository.getAllNotifications(stageId).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
                     res = badRequest("No notifications are set in DB.");
@@ -31,11 +38,9 @@ public class NotificationController extends Controller {
         });
     }
 
-    public CompletionStage<Result> getNotificationsByTimestamp(Long timestamp) {
-        return notificationRepository.getNotificationsByTimestamp(new Timestamp(timestamp)).thenApplyAsync(notifications -> {
-            return ok(notifications);
-        }).exceptionally(ex -> {
-            Result res = null;
+    public CompletionStage<Result> getNotificationsByTimestamp(Long stageId, Long timestamp) {
+        return notificationRepository.getNotificationsByTimestamp(stageId, new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
                     res = badRequest("No notifications are set in DB.");
@@ -47,10 +52,42 @@ public class NotificationController extends Controller {
         });
     }
 
+    @BodyParser.Of(BodyParser.Json.class)
+    public CompletionStage<Result> addNotification(Long stageId) {
+        JsonNode json = request().body().asJson();
+        return parseNotification(json).thenApply(notification -> notificationRepository.addNotification(stageId, notification)).
+                thenApplyAsync(dbNotification -> ok(toJson(dbNotification)))
+                .exceptionally(ex -> {
+                    Result res;
+                    switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
+                        case "IndexOutOfBoundsException":
+                            res = badRequest("No notifications are set in DB.");
+                        break;
+                    default:
+                        res = internalServerError(ex.getMessage());
+                    }
+                 return res;
+                });
+    }
 
-    public CompletionStage<Result> deleteAllNotifications() {
-        return notificationRepository.deleteAllNotification().thenApply(notifications -> {
-            return ok(notifications +  " have been deleted");
-        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
+    private CompletableFuture<Notification> parseNotification(JsonNode json){
+        CompletableFuture<Notification> completableFuture
+                = new CompletableFuture<>();
+
+        Executors.newCachedThreadPool().submit(() -> {
+            try{
+                Notification notification = new Notification();
+                notification.setMessage(json.findPath("message").textValue());
+                notification.setNotificationType(NotificationType.valueOf(json.findPath("typeState").asText()));
+                notification.setTimestamp(new Timestamp(json.findPath("timestampe").asLong()));
+                completableFuture.complete(notification);
+                return notification;
+            } catch (Exception e){
+                completableFuture.obtrudeException(e);
+                throw  e;
+            }
+        });
+
+        return completableFuture;
     }
 }

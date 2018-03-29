@@ -9,10 +9,9 @@ import java.util.List;
 @Entity
 public class Race {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private String name;
-    private int raceId;
 
     @OneToMany(mappedBy="race", cascade= CascadeType.ALL)
     @JsonManagedReference
@@ -28,14 +27,6 @@ public class Race {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getRaceId() {
-        return raceId;
-    }
-
-    public void setRaceId(int raceId) {
-        this.raceId = raceId;
     }
 
     public List<Stage> getStages() {

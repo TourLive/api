@@ -25,55 +25,79 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     @Override
-    public CompletionStage<Stream<RiderStageConnection>> getAllRiderStageConnections() {
-        return supplyAsync(() -> wrap (this::getAllRiderStageConnections), databaseExecutionContext);
+    public CompletionStage<Stream<RiderStageConnection>> getAllRiderStageConnections(long stageId) {
+        return supplyAsync(() -> wrap (entityManager -> getAllRiderStageConnections(entityManager, stageId)), databaseExecutionContext);
     }
 
-    private Stream<RiderStageConnection> getAllRiderStageConnections(EntityManager em){
-        List<RiderStageConnection> riderStageConnections = em.createQuery("select rSC from RiderStageConnection rSC", RiderStageConnection.class).getResultList();
-        return riderStageConnections.stream();
+    private Stream<RiderStageConnection> getAllRiderStageConnections(EntityManager em, long stageId){
+        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.stage.id = :stageId" , RiderStageConnection.class);
+        query.setParameter("stageId", stageId);
+        return query.getResultList().stream();
     }
 
     @Override
-    public CompletionStage<RiderStageConnection> getRiderStageConnectionByRiderAndStage(int riderId, int stageId) {
-        return supplyAsync(() -> wrap (em -> getRiderStageConnection(em, riderId, stageId)), databaseExecutionContext);
+    public CompletionStage<RiderStageConnection> getRiderStageConnectionByRiderAndStage(long stageId, long riderId) {
+        return supplyAsync(() -> wrap (em -> getRiderStageConnection(em, stageId, riderId)), databaseExecutionContext);
     }
 
-    private RiderStageConnection getRiderStageConnection(EntityManager em, int riderId, int stageId){
-        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.riderId = :riderId and rSC.stage.stageId = :stageId" , RiderStageConnection.class);
+    private RiderStageConnection getRiderStageConnection(EntityManager em, long stageId, long riderId){
+        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.id = :riderId and rSC.stage.id = :stageId" , RiderStageConnection.class);
         query.setParameter("riderId", riderId);
         query.setParameter("stageId", stageId);
-        return query.getResultList().get(0);
+        return query.getSingleResult();
     }
 
     @Override
     public void addRiderStageConnection(RiderStageConnection riderStageConnection) {
-        jpaApi.em().getTransaction().begin();
-        jpaApi.em().persist(riderStageConnection);
-        jpaApi.em().getTransaction().commit();
+        wrap(entityManager -> addRiderStageConnection(entityManager,riderStageConnection));
+    }
+
+    private RiderStageConnection addRiderStageConnection(EntityManager entityManager, RiderStageConnection riderStageConnection){
+        entityManager.persist(riderStageConnection);
+        return null;
     }
 
     @Override
-    public void updateRiderStageConnection(RiderStageConnection riderStageConnection) {
-        RiderStageConnection pRSC = jpaApi.em().find(RiderStageConnection.class, riderStageConnection.getId());
-        pRSC = riderStageConnection;
+    public CompletionStage<RiderStageConnection> updateRiderStageConnection(RiderStageConnection riderStageConnection) {
+        return supplyAsync(() -> wrap(entityManager -> updateRiderStageConnection(entityManager, riderStageConnection)));
+    }
+
+    private RiderStageConnection updateRiderStageConnection(EntityManager entityManager, RiderStageConnection riderStageConnection){
+        RiderStageConnection dbRSC = entityManager.find(RiderStageConnection.class, riderStageConnection.getId());
+        riderStageConnection.setStage(entityManager.merge(dbRSC.getStage()));
+        riderStageConnection.setRiderRankings(entityManager.merge(dbRSC.getRiderRankings()));
+        riderStageConnection.setRider(entityManager.merge(dbRSC.getRider()));
+        entityManager.merge(riderStageConnection);
+        return riderStageConnection;
     }
 
     @Override
     public void deleteAllRiderStageConnections() {
-        List<RiderStageConnection> riderStageConnections = jpaApi.em().createQuery("select rSC from RiderStageConnection rSC", RiderStageConnection.class).getResultList();
-        jpaApi.em().remove(riderStageConnections);
+        wrap(this::deleteAllRiderStageConnections);
+    }
+
+    private Stream<RiderStageConnection> deleteAllRiderStageConnections(EntityManager entityManager){
+        List<RiderStageConnection> riderStageConnections = entityManager.createQuery("select rSC from RiderStageConnection rSC", RiderStageConnection.class).getResultList();
+        for(RiderStageConnection rSC : riderStageConnections){
+            entityManager.remove(rSC);
+        }
+        return null;
     }
 
     @Override
-    public void deleteRiderStageConnection(int riderId, int stageId) {
-        TypedQuery<RiderStageConnection> query = jpaApi.em().createQuery("select rSC from RiderStageConnection rSC where rSC.rider.riderId = :riderId and rSC.stage.stageId = :stageId" , RiderStageConnection.class);
+    public void deleteRiderStageConnection(long stageId, long riderId) {
+        wrap(entityManager -> deleteRiderStageConnection(entityManager, stageId, riderId));
+    }
+
+    private RiderStageConnection deleteRiderStageConnection(EntityManager entityManager, long stageId, long riderId) {
+        TypedQuery<RiderStageConnection> query = entityManager.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.id = :riderId and rSC.stage.id = :stageId" , RiderStageConnection.class);
         query.setParameter("riderId", riderId);
         query.setParameter("stageId", stageId);
         RiderStageConnection rSC = query.getResultList().get(0);
         if(rSC!= null){
             jpaApi.em().remove(rSC);
         }
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

@@ -11,9 +11,9 @@ import java.util.concurrent.CompletionStage;
 
 @ImplementedBy(StageRepositoryImpl.class)
 public interface StageRepository {
-    CompletionStage<JsonNode> getAllStages();
-    CompletionStage<JsonNode> getStage(int stageId);
-    CompletionStage<JsonNode> addStage(Stage stage);
-    CompletionStage<JsonNode> deleteAllStages();
-    CompletionStage<JsonNode> deleteStage(int stageId);
+    CompletionStage<Stream<Stage>> getAllStages();
+    CompletionStage<Stage> getStage(long stageId);
+    void addStage(Stage stage);
+    void deleteAllStages();
+    void deleteStage(long stageId);
 }

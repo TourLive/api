@@ -10,11 +10,11 @@ import java.util.stream.Stream;
 
 @ImplementedBy(RiderRankingRepositoryImpl.class)
 public interface RiderRankingRepository {
-    CompletionStage<Stream<RiderRanking>> getAllRiderRankings();
-    CompletionStage<Stream<RiderRanking>> getAllRiderRankingsByType(RankingType rankingType);
-    CompletionStage<RiderRanking> getRankingByRiderAndType(int riderId, RankingType rankingType);
+    CompletionStage<Stream<RiderRanking>> getAllRiderRankings(long riderStageConnectionId);
+    CompletionStage<Stream<RiderRanking>> getAllRiderRankingsByType(long riderStageConnectionId, String rankingType);
+    CompletionStage<RiderRanking> getRiderRankingByRiderAndType(long riderId, String rankingType);
     void addRiderRanking(RiderRanking riderRanking);
-    void updateRiderRanking(RiderRanking riderRanking);
+    CompletionStage<RiderRanking> updateRiderRanking(RiderRanking riderRanking);
     void deleteAllRiderRankings();
-    void deleteRiderRankingByRiderAndType(int riderId, RankingType rankingType);
+    void deleteRiderRankingByRiderAndType(long riderId, RankingType rankingType);
 }

@@ -35,37 +35,50 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Judgment>> getJudgmentsByRider(int riderId) {
-        return supplyAsync(() -> wrap (em -> getJudgmentsByRider(em, riderId)), databaseExecutionContext);
+    public CompletionStage<Stream<Judgment>> getJudgmentsByRider(long id) {
+        return supplyAsync(() -> wrap (em -> getJudgmentsByRider(em, id)), databaseExecutionContext);
     }
 
-    private Stream<Judgment> getJudgmentsByRider(EntityManager em, int riderId){
-        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j where j.judgmentRiderConnections.rider.riderId = :riderId" , Judgment.class);
-        query.setParameter("riderId", riderId);
+    private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){
+        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j where j.judgmentRiderConnections.rider.id = :id" , Judgment.class);
+        query.setParameter("id", id);
         return query.getResultList().stream();
     }
 
     @Override
-    public void addJudgment(Judgment judgment) {
-        jpaApi.em().getTransaction().begin();
-        jpaApi.em().persist(judgment);
-        jpaApi.em().getTransaction().commit();
+    public CompletionStage<Judgment> addJudgment(Judgment judgment) {
+        return supplyAsync(() -> wrap(entityManager -> addJudgment(entityManager, judgment)), databaseExecutionContext);
+    }
+
+    private Judgment addJudgment(EntityManager entityManager, Judgment judgment) {
+        entityManager.persist(judgment);
+        return judgment;
     }
 
     @Override
-    public void deleteAllJudgment() {
-        List<Judgment> judgments = jpaApi.em().createQuery("select j from Judgment j", Judgment.class).getResultList();
-        jpaApi.em().remove(judgments);
+    public CompletionStage<Stream<Judgment>> deleteAllJudgment() {
+        return supplyAsync(() -> wrap(this::deleteAllJudgment), databaseExecutionContext);
+    }
+
+    private Stream<Judgment> deleteAllJudgment(EntityManager entityManager) {
+        List<Judgment> judgments = entityManager.createQuery("select j from Judgment j", Judgment.class).getResultList();
+        entityManager.remove(judgments);
+        return judgments.stream();
     }
 
     @Override
-    public void deleteJudgmentByJudgmentName(String judgmentName) {
-        TypedQuery<Judgment> query = jpaApi.em().createQuery("select j from Judgment j where j.name = :judgmentName", Judgment.class);
-        query.setParameter("judgmentName", judgmentName);
+    public CompletionStage<Judgment> deleteJudgmentById(long id) {
+        return supplyAsync(() -> wrap(entityManager -> deleteJudgmentById(entityManager, id)), databaseExecutionContext);
+    }
+
+    private Judgment deleteJudgmentById(EntityManager entityManager, long id) {
+        TypedQuery<Judgment> query = entityManager.createQuery("select j from Judgment j where j.id = :id", Judgment.class);
+        query.setParameter("id", id);
         Judgment j = query.getResultList().get(0);
         if (j != null) {
-            jpaApi.em().remove(j);
+            entityManager.remove(j);
         }
+        return j;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

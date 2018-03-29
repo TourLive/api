@@ -10,27 +10,18 @@ import java.util.List;
 @Entity
 public class Reward {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
-    private int rewardId;
     private RewardType rewardType;
     private ArrayList<Integer> points;
     private ArrayList<Integer> money;
 
-    @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="reward", cascade= CascadeType.ALL)
     @JsonManagedReference
     private List<Judgment> judgmentRiderConnections = new ArrayList<Judgment>();
 
     public Long getId() {
         return id;
-    }
-
-    public int getRewardId() {
-        return rewardId;
-    }
-
-    public void setRewardId(int rewardId) {
-        this.rewardId = rewardId;
     }
 
     public RewardType getRewardType() {

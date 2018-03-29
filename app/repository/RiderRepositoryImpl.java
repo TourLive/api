@@ -1,14 +1,11 @@
 package repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import models.Rider;
 import play.db.jpa.JPAApi;
-import play.libs.Json;
 import repository.interfaces.RiderRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
@@ -16,7 +13,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
-import static play.libs.Json.toJson;
 
 public class RiderRepositoryImpl implements RiderRepository {
     private final JPAApi jpaApi;
@@ -29,69 +25,80 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     @Override
-    public CompletionStage<JsonNode> getAllRiders() {
-        return supplyAsync(() -> wrap (this::getAllRiders), databaseExecutionContext);
+    public List<Rider> getAllRiders() {
+        return wrap(this::getAllRiders);
     }
 
-    private JsonNode getAllRiders(EntityManager em){
+    private List<Rider> getAllRiders(EntityManager em){
         List<Rider> riders = em.createQuery("select r from Rider r", Rider.class).getResultList();
-        return toJson(riders.stream());
+        return riders;
     }
 
     @Override
-    public CompletionStage<JsonNode> getRider(int riderId) {
-        return supplyAsync(() -> wrap (em -> getRider(em, riderId)), databaseExecutionContext);
+    public Rider getRider(long riderId) {
+        return wrap(entityManager -> getRider(entityManager, riderId));
     }
 
-    private JsonNode getRider(EntityManager em, int riderId){
-        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
-        query.setParameter("riderId", riderId);
-        return toJson(query.getSingleResult());
-    }
-
-    @Override
-    public CompletionStage<JsonNode> addRider(Rider rider) {
-        return supplyAsync(() -> wrap (em -> addRider(em, rider)), databaseExecutionContext);
-    }
-
-    private JsonNode addRider(EntityManager em, Rider rider){
-        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
-        query.setParameter("riderId", rider.getRiderId());
-        try{
-            query.getSingleResult();
-            return toJson("rider with same id allready persisted in db");
-        } catch (NoResultException e){
-            em.persist(rider);
-            return toJson(rider);
-        }
+    private Rider getRider(EntityManager em, long riderId){
+        return em.find(Rider.class, riderId);
     }
 
     @Override
-    public CompletionStage<JsonNode> deleteAllRiders() {
-        return supplyAsync(() -> wrap (this::deleteAllRiders), databaseExecutionContext);
+    public CompletionStage<Stream<Rider>> getAllRiders(long stageid) {
+        return supplyAsync(() -> wrap(entityManager -> getAllRiders(entityManager, stageid)), databaseExecutionContext);
     }
 
-    private JsonNode deleteAllRiders(EntityManager em){
+    private Stream<Rider> getAllRiders(EntityManager entityManager, long stageid) {
+        TypedQuery<Rider> query = entityManager.createQuery("select r from Rider r where r.riderStageConnections.stage.id = :stageid" , Rider.class);
+        query.setParameter("stageid", stageid);
+        return query.getResultList().stream();
+    }
+
+    @Override
+    public CompletionStage<Rider> getRiderAsync(long riderId) {
+        return supplyAsync(() -> wrap(entityManager -> getRiderAsync(entityManager, riderId)), databaseExecutionContext);
+    }
+
+    private Rider getRiderAsync(EntityManager em, long riderId){
+        return em.find(Rider.class, riderId);
+    }
+
+    @Override
+    public void addRider(Rider rider) {
+        wrap(entityManager -> addRider(entityManager, rider));
+    }
+
+    private Rider addRider(EntityManager em, Rider rider){
+        em.persist(rider);
+        return null;
+    }
+
+    @Override
+    public void deleteAllRiders() {
+        wrap(this::deleteAllRiders);
+    }
+
+    private Rider deleteAllRiders(EntityManager em){
         List<Rider> riders = em.createQuery("select r from Rider r", Rider.class).getResultList();
         for(Rider r : riders){
             em.remove(r);
         }
-        return toJson(riders.stream());
+        return null;
     }
 
     @Override
-    public CompletionStage<JsonNode> deleteRider(int riderId) {
-        return supplyAsync(() -> wrap (em -> deleteRider(em, riderId)), databaseExecutionContext);
+    public void deleteRider(long riderId) {
+        wrap(entityManager -> deleteRider(entityManager, riderId));
     }
 
-    private JsonNode deleteRider(EntityManager em, int riderId){
-        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+    private Rider deleteRider(EntityManager em, long riderId){
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id = :riderId" , Rider.class);
         query.setParameter("riderId", riderId);
         Rider rider = query.getSingleResult();
         if(rider != null){
             em.remove(rider);
         }
-        return toJson(rider);
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

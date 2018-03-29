@@ -29,10 +29,8 @@ public class RaceController extends Controller {
     }
 
     public CompletionStage<Result> getAllRaces() {
-        return raceRepository.getAllRaces().thenApplyAsync(races -> {
-            return ok(races);
-        }).exceptionally(ex -> {
-            Result res = null;
+        return raceRepository.getAllRaces().thenApplyAsync(races -> ok(toJson(races.collect(Collectors.toList())))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
                     res = badRequest("No races are set in DB.");
@@ -44,11 +42,9 @@ public class RaceController extends Controller {
         });
     }
 
-    public CompletionStage<Result> getRace(int raceId) {
-        return raceRepository.getRace(raceId).thenApplyAsync(race -> {
-           return ok(race);
-        }).exceptionally(ex -> {
-            Result res = null;
+    public CompletionStage<Result> getRace(Long raceId) {
+        return raceRepository.getRace(raceId).thenApplyAsync(race -> ok(toJson(race))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NoResultException":
                     res = badRequest("Race with id: " + raceId + " is not available in DB.");
@@ -60,38 +56,31 @@ public class RaceController extends Controller {
         });
     }
 
+    /*
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> setRace() {
         JsonNode json = request().body().asJson();
         Race race = new Race();
         race.setName(json.findPath("name").textValue());
-        race.setRaceId(json.findPath("raceId").intValue());
 
-        return raceRepository.setRace(race).thenApplyAsync(racePersisted -> {
-            return ok(racePersisted + " has been added");
-        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
+        return raceRepository.addRace(race).thenApplyAsync(racePersisted -> ok(toJson(racePersisted) + " has been added")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
     public CompletionStage<Result> deleteAllRaces() {
-        return raceRepository.deleteAllRaces().thenApply(races -> {
-            return ok(races +  "have been deleted");
-
-        }).exceptionally(ex -> {return internalServerError(ex.getMessage());});
+        return raceRepository.deleteAllRaces().thenApply(races -> ok(toJson(races.collect(Collectors.toList())) +  "have been deleted")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
-    public CompletionStage<Result> deleteRace (String name) {
-        return raceRepository.deleteRace(name).thenApplyAsync(race -> {
-                return ok(toJson(race + " has been deleted"));
-        }).exceptionally(ex -> {
-            Result res = null;
+    public CompletionStage<Result> deleteRace (Long id) {
+        return raceRepository.deleteRace(id).thenApplyAsync(race -> ok(toJson(race) + " has been deleted")).exceptionally(ex -> {
+            Result res ;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "NoResultException":
-                    res = badRequest("Race " + name + " not found in DB.");
+                    res = badRequest("Race " + id + " not found in DB.");
                     break;
                 default:
                     res = internalServerError(ex.getMessage());
             }
             return res;
         });
-    }
+    }*/
 }
