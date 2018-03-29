@@ -12,6 +12,6 @@ public interface JudgmentRiderConnectionRepository {
     CompletionStage<Stream<JudgmentRiderConnection>> getAllJudgmentRiderConnections();
     CompletionStage<Stream<JudgmentRiderConnection>> getJudgmentRiderConnectionsByRider(long id);
     CompletionStage<JudgmentRiderConnection> addJudgmentRiderConnection(JudgmentRiderConnection judgmentRiderConnection);
-    CompletionStage<Stream<JudgmentRiderConnection>> deleteAllJudgmentRiderConnections();
+    void deleteAllJudgmentRiderConnections();
     CompletionStage<JudgmentRiderConnection> deleteJudgmentRiderConnectionByRiderAndJudgmentName(long riderid, long judgementId);
 }

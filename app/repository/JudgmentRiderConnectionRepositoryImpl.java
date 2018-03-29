@@ -56,14 +56,14 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
     }
 
     @Override
-    public CompletionStage<Stream<JudgmentRiderConnection>> deleteAllJudgmentRiderConnections() {
-        return supplyAsync(() -> wrap(this::deleteAllJudgmentRiderConnections), databaseExecutionContext);
+    public void deleteAllJudgmentRiderConnections() {
+        wrap(this::deleteAllJudgmentRiderConnections);
     }
 
-    private Stream<JudgmentRiderConnection> deleteAllJudgmentRiderConnections(EntityManager entityManager) {
+    private JudgmentRiderConnection deleteAllJudgmentRiderConnections(EntityManager entityManager) {
         List<JudgmentRiderConnection> judgmentRiderConnections = entityManager.createQuery("select jRC from JudgmentRiderConnection jRC", JudgmentRiderConnection.class).getResultList();
         entityManager.remove(judgmentRiderConnections);
-        return judgmentRiderConnections.stream();
+        return null;
     }
 
     @Override
