@@ -79,43 +79,43 @@ public class ImportController extends Controller {
 
 
     private CompletionStage<Result> importRace(){
-        return  null;
+        return (CompletionStage<Result>) ok();
     }
 
 
     private CompletionStage<Result> importStages(){
-        return  null;
+        return  (CompletionStage<Result>) ok();
     }
 
     private CompletionStage<Result> importRiders(){
         createRiderStageConnections();
-        return null;
+        return (CompletionStage<Result>) ok();
     }
 
     private CompletionStage<Result>  createRiderStageConnections(){
         createDefaultRaceGroup();
-        return null;
+        return (CompletionStage<Result>) ok();
     }
 
     private CompletionStage<Result>  createDefaultRaceGroup(){
-        return null;
+        return (CompletionStage<Result>) ok();
     }
 
     private CompletionStage<Result> importMaillots(){
         importMaillotRiderConnections();
-        return null;
+        return (CompletionStage<Result>) ok();
     }
 
     private CompletionStage<Result> importMaillotRiderConnections(){
-        return null;
+        return (CompletionStage<Result>) ok();
     }
 
     private CompletionStage<Result> importJudgments(){
-        return  null;
+        return  (CompletionStage<Result>) ok();
     }
 
     private CompletionStage<Result> importRewards(){
-        return  null;
+        return  (CompletionStage<Result>) ok();
     }
 
 }
