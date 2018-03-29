@@ -16,22 +16,20 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class RewardRepositoryImpl implements RewardRepository {
     private final JPAApi jpaApi;
-    private final DatabaseExecutionContext databaseExecutionContext;
 
     @Inject
-    public RewardRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
+    public RewardRepositoryImpl(JPAApi jpaApi) {
         this.jpaApi = jpaApi;
-        this.databaseExecutionContext = databaseExecutionContext;
     }
 
     @Override
-    public CompletionStage<Stream<Reward>> getAllRewards() {
-        return supplyAsync(() -> wrap (this::getAllRewards), databaseExecutionContext);
+    public Stream<Reward> getAllRewards() {
+        return wrap(this::getAllRewards);
     }
 
     @Override
-    public CompletionStage<Reward> getRewardById(long id) {
-        return supplyAsync(() -> wrap(entityManager -> getRewardById(entityManager, id)), databaseExecutionContext);
+    public Reward getRewardById(long id) {
+        return wrap(entityManager -> getRewardById(entityManager, id));
     }
 
     private Reward getRewardById(EntityManager entityManager, long id) {
@@ -46,26 +44,24 @@ public class RewardRepositoryImpl implements RewardRepository {
     }
 
     @Override
-    public CompletionStage<Reward> addReward(Reward reward) {
-        return supplyAsync(() -> wrap(em -> addReward(em, reward)), databaseExecutionContext);
+    public void addReward(Reward reward) {
+        wrap(entityManager -> addReward(entityManager, reward));
     }
 
     private Reward addReward(EntityManager entityManager, Reward reward) {
-        entityManager.getTransaction().begin();
         entityManager.persist(reward);
-        entityManager.getTransaction().commit();
-        return reward;
+        return null;
     }
 
     @Override
-    public CompletionStage<Stream<Reward>> deleteAllRewards() {
-        return supplyAsync(() -> wrap(this::deleteAllRewards), databaseExecutionContext);
+    public void deleteAllRewards() {
+        wrap(this::deleteAllRewards);
     }
 
-    private Stream<Reward> deleteAllRewards(EntityManager entityManager) {
+    private Reward deleteAllRewards(EntityManager entityManager) {
         List<Reward> rewards = entityManager.createQuery("select r from Reward r", Reward.class).getResultList();
         entityManager.remove(rewards);
-        return rewards.stream();
+        return null;
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

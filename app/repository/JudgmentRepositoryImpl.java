@@ -25,8 +25,8 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Judgment>> getAllJudgments() {
-        return supplyAsync(() -> wrap (this::getAllJudgments), databaseExecutionContext);
+    public Stream<Judgment> getAllJudgments() {
+        return wrap(this::getAllJudgments);
     }
 
     private Stream<Judgment> getAllJudgments(EntityManager em){
@@ -35,8 +35,8 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Judgment>> getJudgmentsByRider(long id) {
-        return supplyAsync(() -> wrap (em -> getJudgmentsByRider(em, id)), databaseExecutionContext);
+    public Stream<Judgment> getJudgmentsByRider(long id) {
+        return wrap(entityManager -> getJudgmentsByRider(entityManager, id));
     }
 
     private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){
@@ -46,29 +46,29 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     @Override
-    public CompletionStage<Judgment> addJudgment(Judgment judgment) {
-        return supplyAsync(() -> wrap(entityManager -> addJudgment(entityManager, judgment)), databaseExecutionContext);
+    public void addJudgment(Judgment judgment) {
+        wrap(entityManager -> addJudgment(entityManager, judgment));
     }
 
     private Judgment addJudgment(EntityManager entityManager, Judgment judgment) {
         entityManager.persist(judgment);
-        return judgment;
+        return null;
     }
 
     @Override
-    public CompletionStage<Stream<Judgment>> deleteAllJudgment() {
-        return supplyAsync(() -> wrap(this::deleteAllJudgment), databaseExecutionContext);
+    public void deleteAllJudgment() {
+        wrap(this::deleteAllJudgment);
     }
 
-    private Stream<Judgment> deleteAllJudgment(EntityManager entityManager) {
+    private Judgment deleteAllJudgment(EntityManager entityManager) {
         List<Judgment> judgments = entityManager.createQuery("select j from Judgment j", Judgment.class).getResultList();
         entityManager.remove(judgments);
-        return judgments.stream();
+        return null;
     }
 
     @Override
-    public CompletionStage<Judgment> deleteJudgmentById(long id) {
-        return supplyAsync(() -> wrap(entityManager -> deleteJudgmentById(entityManager, id)), databaseExecutionContext);
+    public void deleteJudgmentById(long id) {
+        wrap(entityManager -> deleteJudgmentById(entityManager, id));
     }
 
     private Judgment deleteJudgmentById(EntityManager entityManager, long id) {
