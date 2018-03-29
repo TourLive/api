@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 @ImplementedBy(MaillotRepositoryImpl.class)
 public interface MaillotRepository {
     CompletionStage<Stream<Maillot>> getAllMaillots(long stageId);
-    CompletionStage<Maillot> getMaillot(long stageId, long maillotId);
+    CompletionStage<Maillot> getMaillot(long maillotId);
     void addMaillot(Maillot maillot);
     void deleteAllMaillots();
     void deleteMaillot(long stageId, long maillotId);

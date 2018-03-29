@@ -1,6 +1,10 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import models.RaceGroup;
 import models.Stage;
 import models.enums.RaceGroupType;
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;
 
+@Api("Racegroup")
 public class RaceGroupController extends Controller {
     private final RaceGroupRepository raceGroupRepository;
     private final StageRepository stageRepository;
@@ -30,6 +35,7 @@ public class RaceGroupController extends Controller {
         this.stageRepository = stageRepository;
     }
 
+    @ApiOperation(value ="get all racegroups of a stage", response = RaceGroup.class)
     public CompletionStage<Result> getAllRaceGroups(long stageId) {
         return raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -44,6 +50,7 @@ public class RaceGroupController extends Controller {
         });
     }
 
+    @ApiOperation(value ="get a racegroup by id", response = RaceGroup.class)
     public CompletionStage<Result> getRaceGroup(long id) {
         return raceGroupRepository.getRaceGroupById(id).thenApplyAsync(raceGroup -> ok(toJson(raceGroup))).exceptionally(ex -> {
             Result res;
@@ -58,6 +65,7 @@ public class RaceGroupController extends Controller {
         });
     }
 
+    @ApiOperation(value ="add new racegroup")
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> addRaceGroup() {
         JsonNode json = request().body().asJson();
@@ -74,6 +82,7 @@ public class RaceGroupController extends Controller {
         });
     }
 
+    @ApiOperation(value ="update a specific racegroup")
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> updateRaceGroup(long raceGroupId) {
         JsonNode json = request().body().asJson();

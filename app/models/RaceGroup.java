@@ -20,7 +20,6 @@ public class RaceGroup {
     private Timestamp timestamp;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    @JsonBackReference
     private Stage stage;
 
     @ManyToMany

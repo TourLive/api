@@ -3,7 +3,10 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
+GET     /                           controllers.Application.index
+GET   /docs/                   controllers.Application.redirectDocs
+GET   /swagger.json                 controllers.ApiHelpController.getResources
+GET   /docs/*file                   controllers.Assets.at(path="/public/swagger-ui",file)
 
 #Race Routes
 GET     /race                       controllers.RaceController.getAllRaces()
@@ -40,7 +43,7 @@ POST    /judgmentRiderConnection                    controllers.JudgmentRiderCon
 
 #Maillot Routes
 GET     /:stageId/maillot                            controllers.MaillotController.getMaillots(stageId : Long)
-GET     /:stageId/maillot/:maillotId                 controllers.MaillotController.getMaillot(stageId : Long, maillotId : Long)
+GET     /maillot/:maillotId                 controllers.MaillotController.getMaillot(maillotId : Long)
 
 #RiderRanking Routes
 GET     /riderRanking/:riderStageConnectionId                   controllers.RiderRankingConnectionController.getRiderRankings(riderStageConnectionId : Long)

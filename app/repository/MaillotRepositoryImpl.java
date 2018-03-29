@@ -35,13 +35,12 @@ public class MaillotRepositoryImpl implements MaillotRepository {
     }
 
     @Override
-    public CompletionStage<Maillot> getMaillot(long stageId, long maillotId) {
-        return supplyAsync(() -> wrap (em -> getMaillot(em, stageId, maillotId)), databaseExecutionContext);
+    public CompletionStage<Maillot> getMaillot(long maillotId) {
+        return supplyAsync(() -> wrap (em -> getMaillot(em, maillotId)), databaseExecutionContext);
     }
 
-    private Maillot getMaillot(EntityManager em, long stageId, long maillotId){
-        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.stage.id = :stageId and m.id = :maillotId" , Maillot.class);
-        query.setParameter("stageId", stageId);
+    private Maillot getMaillot(EntityManager em, long maillotId){
+        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.id = :maillotId" , Maillot.class);
         query.setParameter("maillotId", maillotId);
         return query.getSingleResult();
     }
