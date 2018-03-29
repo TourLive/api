@@ -25,13 +25,13 @@ public class RaceGroupController extends Controller {
     private final StageRepository stageRepository;
 
     @Inject
-    public RaceGroupController(RaceGroupRepository raceGroupRepository) {
+    public RaceGroupController(RaceGroupRepository raceGroupRepository, StageRepository stageRepository) {
         this.raceGroupRepository = raceGroupRepository;
-        this.
+        this.stageRepository = stageRepository;
     }
 
-    public CompletionStage<Result> getAllRaceGroups(long stageid) {
-        return raceGroupRepository.getAllRaceGroups(stageid).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
+    public CompletionStage<Result> getAllRaceGroups(long stageId) {
+        return raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()) {
                 case "IndexOutOfBoundsException":

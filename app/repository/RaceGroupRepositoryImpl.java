@@ -25,8 +25,8 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     }
 
     @Override
-    public CompletionStage<Stream<RaceGroup>> getAllRaceGroups(long stageid) {
-        return supplyAsync(() -> wrap (entityManager -> getAllRaceGroups(entityManager, stageid)), databaseExecutionContext);
+    public CompletionStage<Stream<RaceGroup>> getAllRaceGroups(long stageId) {
+        return supplyAsync(() -> wrap (entityManager -> getAllRaceGroups(entityManager, stageId)), databaseExecutionContext);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     }
 
     private Stream<RaceGroup> getAllRaceGroups(EntityManager em, long stageId){
-        TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.stage.id = :stageid" , RaceGroup.class);
+        TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.stage.id = :stageId" , RaceGroup.class);
         query.setParameter("stageId", stageId);
         return query.getResultList().stream();
     }
@@ -79,7 +79,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
 
     @Override
     public void deleteRaceGroupById(long id) {
-        return wrap(entityManager -> deleteRaceGroupById(entityManager, id));
+        wrap(entityManager -> deleteRaceGroupById(entityManager, id));
     }
 
     private RaceGroup deleteRaceGroupById(EntityManager em, long id) {
