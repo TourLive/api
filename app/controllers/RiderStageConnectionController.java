@@ -82,7 +82,7 @@ public class RiderStageConnectionController extends Controller {
         });
     }
 
-    private CompletableFuture<RiderStageConnection> parseRiderStageConnection(JsonNode json, Long riderStageConnectionId){
+    private CompletableFuture<RiderStageConnection> parseRiderStageConnection(JsonNode json, long riderStageConnectionId){
         CompletableFuture<RiderStageConnection> completableFuture
                 = new CompletableFuture<>();
 

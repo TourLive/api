@@ -2,6 +2,8 @@ package repository;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import models.Notification;
+import models.Stage;
+import play.api.mvc.Handler;
 import play.db.jpa.JPAApi;
 import repository.interfaces.NotificationRepository;
 
@@ -52,11 +54,12 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
-    public void addNotification(Notification notification) {
-        wrap(em -> addNotification(em, notification));
+    public CompletionStage<Notification> addNotification(long stageId, Notification notification) {
+        return supplyAsync(() -> wrap(em -> addNotification(em, stageId, notification)), databaseExecutionContext);
     }
 
-    private Notification addNotification(EntityManager em, Notification notification){
+    private Notification addNotification(EntityManager em, long stageId, Notification notification){
+        notification.setStage(em.find(Stage.class, stageId));
         em.persist(notification);
         return notification;
     }

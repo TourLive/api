@@ -14,6 +14,6 @@ import java.util.stream.Stream;
 public interface NotificationRepository {
     CompletionStage<Stream<Notification>> getAllNotifications(long stageId);
     CompletionStage<Stream<Notification>> getNotificationsByTimestamp(long stageId, Timestamp timestamp);
-    void addNotification(Notification notifications);
+    CompletionStage<Notification> addNotification(long stageId, Notification notification);
     void deleteAllNotification();
 }

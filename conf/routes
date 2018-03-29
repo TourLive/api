@@ -25,6 +25,7 @@ GET     /rider/:riderId             controllers.RiderController.getRider(riderId
 #Notifcation Routes
 GET     /:stageId/notification               controllers.NotificationController.getNotifications(stageId : Long)
 GET     /:stageId/notification/:timestamp    controllers.NotificationController.getNotificationsByTimestamp(timestamp : Long, stageId : Long)
+POST    /:stageId/notification               controllers.NotificationController.addNotification(stageId : Long)
 
 #RiderStageConnection Routes
 GET     /:stageId/riderStageConnection              controllers.RiderStageConnectionController.getRiderStageConnections(stageId : Long)
