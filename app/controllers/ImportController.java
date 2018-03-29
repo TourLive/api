@@ -49,19 +49,28 @@ public class ImportController extends Controller {
                         importJudgments().thenApply(judgment -> {
                             importRewards().thenApply(reward -> {
                                 return ok("successfully imported rewards");
+                            }).exceptionally(ex -> {
+                                return internalServerError("importing rewards failed");
                             });
                             return ok("successfully imported judgments");
+                        }) .exceptionally(ex -> {
+                            return internalServerError("importing judgments failed");
                         });
                         return ok("successfully imported maillots");
+                    }) .exceptionally(ex -> {
+                        return internalServerError("importing maillots failed");
                     });
                    return ok("successfully imported riders");
-               }) ;
+               }) .exceptionally(ex -> {
+                   return internalServerError("importing riders failed");
+               });
                return ok("successfully imported stages");
+            }) .exceptionally(ex -> {
+                return internalServerError("importing stages failed");
             });
             return ok("successfully imported race");
-        })
-        .exceptionally(ex -> {
-          return internalServerError(ex.getMessage());
+        }).exceptionally(ex -> {
+          return internalServerError("importing race failed");
         });
     }
 
