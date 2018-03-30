@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContextExecutor;
 import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
+import javax.swing.plaf.UIResource;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +31,6 @@ public class ImportController extends Controller {
     private final StageRepository stageRepository;
     private final WSClient wsClient;
     private final ExecutionContextExecutor executionContextExecutor;
-    private long RACEID;
 
     @Inject
     public ImportController(JudgmentRepository judgmentRepository, JudgmentRiderConnectionRepository judgmentRiderConnectionRepository,
@@ -94,7 +94,7 @@ public class ImportController extends Controller {
             return Parser.ParseRace(res.asJson());
         });
         Race race = promiseRace.toCompletableFuture().join();
-        RACEID = race.getId();
+        UrlLinks.setRaceId(race.getId());
         raceRepository.addRace(race);
         return CompletableFuture.completedFuture("success");
     }

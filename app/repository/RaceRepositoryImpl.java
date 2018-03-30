@@ -51,7 +51,7 @@ public class RaceRepositoryImpl implements RaceRepository{
     }
 
     private Race addRace(EntityManager em, Race race){
-        em.persist(race);
+        em.merge(race);
         return null;
     }
 
