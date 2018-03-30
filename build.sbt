@@ -15,6 +15,9 @@ libraryDependencies += guice
 libraryDependencies += javaJpa
 libraryDependencies += "org.hibernate" % "hibernate-core" % "5.2.15.Final"
 libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
+libraryDependencies ++= Seq(
+  ws
+)
 
 // Test Database
 libraryDependencies += "com.h2database" % "h2" % "1.4.196"

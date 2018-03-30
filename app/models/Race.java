@@ -9,7 +9,6 @@ import java.util.List;
 @Entity
 public class Race {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private String name;
 
@@ -20,6 +19,8 @@ public class Race {
     public Long getId() {
         return id;
     }
+
+    public void setId(long id){this.id = id;}
 
     public String getName() {
         return name;

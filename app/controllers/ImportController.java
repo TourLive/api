@@ -1,12 +1,19 @@
 package controllers;
 
+import controllers.importUtilities.*;
+import models.Race;
+import play.libs.ws.*;
 import play.mvc.Controller;
 import play.mvc.Result;
 import repository.interfaces.*;
+import scala.concurrent.ExecutionContextExecutor;
+import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
+
 
 
 public class ImportController extends Controller {
@@ -21,13 +28,17 @@ public class ImportController extends Controller {
     private final RiderRepository riderRepository;
     private final RiderStageConnectionRepository riderStageConnectionRepository;
     private final StageRepository stageRepository;
+    private final WSClient wsClient;
+    private final ExecutionContextExecutor executionContextExecutor;
+    private long RACEID;
 
     @Inject
     public ImportController(JudgmentRepository judgmentRepository, JudgmentRiderConnectionRepository judgmentRiderConnectionRepository,
                             MaillotRepository maillotRepository, NotificationRepository notificationRepository,
                             RaceGroupRepository raceGroupRepository, RaceRepository raceRepository,
                             RewardRepository rewardRepository, RiderRankingRepository riderRankingRepository,
-                            RiderRepository riderRepository, RiderStageConnectionRepository riderStageConnectionRepository, StageRepository stageRepository) {
+                            RiderRepository riderRepository, RiderStageConnectionRepository riderStageConnectionRepository,
+                            StageRepository stageRepository, WSClient wsClient, ExecutionContextExecutor executionContextExecutor) {
         this.judgmentRepository = judgmentRepository;
         this.judgmentRiderConnectionRepository = judgmentRiderConnectionRepository;
         this.maillotRepository = maillotRepository;
@@ -39,6 +50,8 @@ public class ImportController extends Controller {
         this.riderRepository = riderRepository;
         this.riderStageConnectionRepository = riderStageConnectionRepository;
         this.stageRepository = stageRepository;
+        this.wsClient = wsClient;
+        this.executionContextExecutor = executionContextExecutor;
     }
 
     public CompletionStage<Result> importAllStaticData() {
@@ -75,7 +88,15 @@ public class ImportController extends Controller {
     }
 
     private CompletionStage<String> importRace(){
-       return CompletableFuture.completedFuture("success");
+        WSRequest request = wsClient.url(UrlLinks.RACE);
+        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        CompletionStage<Race> promiseRace = request.get().thenApply(res -> {
+            return Parser.ParseRace(res.asJson());
+        });
+        Race race = promiseRace.toCompletableFuture().join();
+        RACEID = race.getId();
+        raceRepository.addRace(race);
+        return CompletableFuture.completedFuture("success");
     }
 
     private CompletionStage<String> importStages(){
@@ -112,5 +133,4 @@ public class ImportController extends Controller {
     private CompletionStage<String> importRewards(){
         return CompletableFuture.completedFuture("success");
     }
-
 }
