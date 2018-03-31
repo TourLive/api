@@ -11,6 +11,8 @@ public class Rider {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
+
+    private Long riderId;
     private int startNr;
     private String name;
     private String country;
@@ -18,7 +20,7 @@ public class Rider {
     private String teamShortName;
     private boolean isUnknown;
 
-    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
@@ -30,6 +32,14 @@ public class Rider {
 
     public Long getId() {
         return id;
+    }
+
+    public Long getRiderId() {
+        return riderId;
+    }
+
+    public void setRiderId(Long riderId) {
+        this.riderId = riderId;
     }
 
     public int getStartNr() {

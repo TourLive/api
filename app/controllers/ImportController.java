@@ -1,9 +1,7 @@
 package controllers;
 
 import controllers.importUtilities.*;
-import models.Race;
-import models.Reward;
-import models.Stage;
+import models.*;
 import play.libs.ws.*;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -13,11 +11,12 @@ import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
 import javax.swing.plaf.UIResource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
-
+import java.util.stream.Collectors;
 
 
 public class ImportController extends Controller {
@@ -93,6 +92,8 @@ public class ImportController extends Controller {
 
     private void deleteAllData(){
         rewardRepository.deleteAllRewards();
+        riderRepository.deleteAllRiders();
+        riderStageConnectionRepository.deleteAllRiderStageConnections();
         stageRepository.deleteAllStages();
         raceRepository.deleteAllRaces();
 
@@ -129,16 +130,44 @@ public class ImportController extends Controller {
     }
 
     private CompletionStage<String> importRiders(){
-        createRiderStageConnections();
+        List<Stage> stages = CompletableFuture.completedFuture(stageRepository.getAllStages()).join().toCompletableFuture().join().collect(Collectors.toList());
+        boolean oneTimeImportRiders = false;
+        List<Rider> riders = new ArrayList<>();
+        for(Stage stage : stages){
+            if(!oneTimeImportRiders){
+                WSRequest request = wsClient.url(UrlLinks.RIDERS + stage.getStageId());
+                request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+                CompletionStage<List<Rider>> promiseRiders = request.get().thenApply(res -> Parser.ParseRiders(res.asJson()));
+                riders = promiseRiders.toCompletableFuture().join();
+                for(Rider r : riders){
+                    riderRepository.addRider(r);
+                }
+                oneTimeImportRiders = true;
+            }
+            createRiderStageConnections(stage, riders);
+            createDefaultRaceGroup(riders);
+        }
+
         return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<String>  createRiderStageConnections(){
-        createDefaultRaceGroup();
+    private CompletionStage<String>  createRiderStageConnections(Stage stage, List<Rider> riders){
+        WSRequest request = wsClient.url(UrlLinks.RIDERS + stage.getStageId());
+        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        CompletionStage<List<RiderStageConnection>> promiseRiderStageConnections = request.get().thenApply(res -> Parser.ParseRiderStageConnections(res.asJson()));
+        List<RiderStageConnection> riderStageConnections = promiseRiderStageConnections.toCompletableFuture().join();
+        for(int i = 0; i < riderStageConnections.size(); i++){
+            RiderStageConnection rSC = riderStageConnections.get(i);
+            riderStageConnectionRepository.addRiderStageConnection(rSC);
+            RiderStageConnection dbRSC = CompletableFuture.completedFuture(riderStageConnectionRepository.getRiderStageConnection(rSC.getId())).join().toCompletableFuture().join();
+            Rider dbRider = riderRepository.getRider(riders.get(i).getRiderId());
+            dbRSC.setRider(dbRider);
+            riderStageConnectionRepository.updateRiderStageConnection(dbRSC);
+        }
         return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<String>  createDefaultRaceGroup(){
+    private CompletionStage<String>  createDefaultRaceGroup(List<Rider> riders){
         return CompletableFuture.completedFuture("success");
     }
 

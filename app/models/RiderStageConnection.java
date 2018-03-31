@@ -18,9 +18,9 @@ public class RiderStageConnection {
     private int sprintBonusPoints;
     private int bonusTime;
     private int money;
-    private Long officialTime;
-    private Long officialGap;
-    private Long virtualGap;
+    private long officialTime;
+    private long officialGap;
+    private long virtualGap;
     private TypeState typeState;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
@@ -79,27 +79,27 @@ public class RiderStageConnection {
         this.money = money;
     }
 
-    public Long getOfficialTime() {
+    public long getOfficialTime() {
         return officialTime;
     }
 
-    public void setOfficialTime(Long officialTime) {
+    public void setOfficialTime(long officialTime) {
         this.officialTime = officialTime;
     }
 
-    public Long getOfficialGap() {
+    public long getOfficialGap() {
         return officialGap;
     }
 
-    public void setOfficialGap(Long officialGap) {
+    public void setOfficialGap(long officialGap) {
         this.officialGap = officialGap;
     }
 
-    public Long getVirtualGap() {
+    public long getVirtualGap() {
         return virtualGap;
     }
 
-    public void setVirtualGap(Long virtualGap) {
+    public void setVirtualGap(long virtualGap) {
         this.virtualGap = virtualGap;
     }
 

@@ -2,11 +2,10 @@ package controllers.importUtilities;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import models.Race;
-import models.Reward;
-import models.Stage;
+import models.*;
 import models.enums.RewardType;
 import models.enums.StageType;
+import models.enums.TypeState;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,9 +38,46 @@ public final class Parser {
             stage.setEndTime(new Date(n.findPath("endtimeAsTimestamp").asLong()));
             stage.setStartTime(new Date(n.findPath("starttimeAsTimestamp").asLong()));
             stage.setStageType(StageType.valueOf(n.findPath("stagetype").textValue()));
+            stage.setStageId(n.findPath("stageId").longValue());
             stages.add(stage);
         }
         return stages;
+    }
+
+    public static final List<Rider> ParseRiders(JsonNode json){
+        ArrayList<Rider> riders = new ArrayList<>();
+        for (JsonNode n : (ArrayNode)json.findPath("data")) {
+            Rider rider = new Rider();
+            rider.setCountry(n.findPath("country").textValue());
+            rider.setName(n.findPath("name").textValue());
+            rider.setRiderId(n.findPath("riderId").longValue());
+            rider.setStartNr(n.findPath("startNr").intValue());
+            rider.setTeamName(n.findPath("team").textValue());
+            rider.setTeamShortName(n.findPath("teamShort").textValue());
+            rider.setUnkown(false);
+            riders.add(rider);
+        }
+        return riders;
+    }
+
+    public static final List<RiderStageConnection> ParseRiderStageConnections(JsonNode json){
+        ArrayList<RiderStageConnection> riderStageConnections = new ArrayList<>();
+        for (JsonNode n : (ArrayNode)json.findPath("data")) {
+            RiderStageConnection rSC = new RiderStageConnection();
+            rSC.setBonusPoints(0);
+            rSC.setBonusTime(0);
+            rSC.setOfficialGap(json.findPath("timeRueckLong").longValue());
+            rSC.setOfficialTime(json.findPath("timeOffLong").longValue());
+            rSC.setVirtualGap(json.findPath("timeVirtLong").longValue());
+            boolean state = json.findPath("active").booleanValue();
+            if (state) {
+                rSC.setTypeState(TypeState.ACTIVE);
+            } else {
+                rSC.setTypeState(TypeState.DNC);
+            }
+            riderStageConnections.add(rSC);
+        }
+        return riderStageConnections;
     }
 
     public static final List<Reward> ParseRewards(JsonNode jsonNode){
@@ -49,7 +85,7 @@ public final class Parser {
         for (JsonNode n : (ArrayNode) jsonNode.findPath("rewards")) {
             Reward reward = new Reward();
 
-            reward.setId(Long.valueOf(n.path("id").textValue()));
+            reward.setRewardId(Long.valueOf(n.path("id").textValue()));
 
             ArrayList<Integer> moneyList = new ArrayList<>();
             String[] moneyString = n.get("reward").textValue().split(",");

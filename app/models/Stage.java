@@ -11,7 +11,10 @@ import java.util.List;
 @Entity
 public class Stage {
     @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
+
+    private Long stageId;
     private Date startTime;
     private Date endTime;
     private double distance;
@@ -126,5 +129,13 @@ public class Stage {
 
     public void setRaceGroups(List<RaceGroup> racegroups) {
         this.racegroups = racegroups;
+    }
+
+    public Long getStageId() {
+        return stageId;
+    }
+
+    public void setStageId(Long stageId) {
+        this.stageId = stageId;
     }
 }

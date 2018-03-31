@@ -10,7 +10,10 @@ import java.util.List;
 @Entity
 public class Reward {
     @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
+
+    private Long rewardId;
     private RewardType rewardType;
     private String points;
     private String money;
@@ -23,7 +26,13 @@ public class Reward {
         return id;
     }
 
-    public void setId(long id){ this.id = id; }
+    public Long getRewardId() {
+        return rewardId;
+    }
+
+    public void setRewardId(Long rewardId) {
+        this.rewardId = rewardId;
+    }
 
     public RewardType getRewardType() {
         return rewardType;

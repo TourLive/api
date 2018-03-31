@@ -40,7 +40,9 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private Rider getRider(EntityManager em, long riderId){
-        return em.find(Rider.class, riderId);
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        query.setParameter("riderId", riderId);
+        return query.getSingleResult();
     }
 
     @Override
