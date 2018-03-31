@@ -7,15 +7,11 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import repository.interfaces.*;
 import scala.concurrent.ExecutionContextExecutor;
-import scala.concurrent.duration.Duration;
-
 import javax.inject.Inject;
-import javax.swing.plaf.UIResource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -96,7 +92,6 @@ public class ImportController extends Controller {
         riderStageConnectionRepository.deleteAllRiderStageConnections();
         stageRepository.deleteAllStages();
         raceRepository.deleteAllRaces();
-
     }
 
     private CompletionStage<String> importRace(){
@@ -161,6 +156,8 @@ public class ImportController extends Controller {
             riderStageConnectionRepository.addRiderStageConnection(rSC);
             RiderStageConnection dbRSC = CompletableFuture.completedFuture(riderStageConnectionRepository.getRiderStageConnection(rSC.getId())).join().toCompletableFuture().join();
             Rider dbRider = riderRepository.getRider(riders.get(i).getRiderId());
+            Stage dbStage = CompletableFuture.completedFuture(stageRepository.getStage(stage.getId())).join().toCompletableFuture().join();
+            dbRSC.setStage(dbStage);
             dbRSC.setRider(dbRider);
             riderStageConnectionRepository.updateRiderStageConnection(dbRSC);
         }
