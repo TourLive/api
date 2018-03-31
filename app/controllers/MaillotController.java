@@ -17,8 +17,8 @@ public class MaillotController extends Controller {
     @Inject
     public MaillotController(MaillotRepository maillotRepository) { this.maillotRepository = maillotRepository; }
 
-    public CompletionStage<Result> getMaillots(long stageId) {
-        return maillotRepository.getAllMaillots(stageId).thenApplyAsync(maillots -> ok(toJson(maillots.collect(Collectors.toList())))).exceptionally(ex -> {
+    public CompletionStage<Result> getMaillots() {
+        return maillotRepository.getAllMaillots().thenApplyAsync(maillots -> ok(toJson(maillots.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
@@ -31,8 +31,8 @@ public class MaillotController extends Controller {
         });
     }
 
-    public CompletionStage<Result> getMaillot(Long stageId, Long maillotId) {
-        return maillotRepository.getMaillot(stageId, maillotId).thenApplyAsync(maillot -> ok(toJson(maillot))).exceptionally(ex -> {
+    public CompletionStage<Result> getMaillot(Long maillotId) {
+        return maillotRepository.getMaillot(maillotId).thenApplyAsync(maillot -> ok(toJson(maillot))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":

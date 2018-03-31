@@ -44,6 +44,19 @@ public final class Parser {
         return stages;
     }
 
+    public static final List<Maillot> ParseMaillots(JsonNode json){
+        ArrayList<Maillot> maillots = new ArrayList<>();
+        for (JsonNode n : (ArrayNode)json) {
+            Maillot maillot = new Maillot();
+            maillot.setColor(json.findPath("color").asText());
+            maillot.setPartner(json.findPath("partner").asText());
+            maillot.setName(json.findPath("name").textValue());
+            maillot.setType(json.findPath("type").textValue());
+            maillots.add(maillot);
+        }
+        return maillots;
+    }
+
     public static final List<Rider> ParseRiders(JsonNode json){
         ArrayList<Rider> riders = new ArrayList<>();
         for (JsonNode n : (ArrayNode)json.findPath("data")) {

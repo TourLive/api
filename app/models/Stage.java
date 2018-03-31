@@ -30,9 +30,6 @@ public class Stage {
     private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonBackReference
-    private List<Maillot> mailllots = new ArrayList<Maillot>();
-    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    @JsonBackReference
     private List<Notification> notifications = new ArrayList<Notification>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
@@ -105,14 +102,6 @@ public class Stage {
 
     public void setRiderStageConnections(List<RiderStageConnection> riderStageConnections) {
         this.riderStageConnections = riderStageConnections;
-    }
-
-    public List<Maillot> getMailllots() {
-        return mailllots;
-    }
-
-    public void setMailllots(List<Maillot> mailllots) {
-        this.mailllots = mailllots;
     }
 
     public List<Notification> getNotifications() {

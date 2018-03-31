@@ -57,7 +57,6 @@ public class ImportController extends Controller {
         return importRace().thenApply(race -> {
             importStages().thenApply(stage -> {
                importRiders().thenApply(rider -> {
-                    importMaillots().thenApply(maillot -> {
                         importJudgments().thenApply(judgment -> {
                             importRewards().thenApply(reward -> {
                                 return ok("successfully imported rewards");
@@ -68,10 +67,6 @@ public class ImportController extends Controller {
                         }) .exceptionally(ex -> {
                             return internalServerError("importing judgments failed");
                         });
-                        return ok("successfully imported maillots");
-                    }) .exceptionally(ex -> {
-                        return internalServerError("importing maillots failed");
-                    });
                    return ok("successfully imported riders");
                }) .exceptionally(ex -> {
                    return internalServerError("importing riders failed");
@@ -88,6 +83,7 @@ public class ImportController extends Controller {
 
     private void deleteAllData(){
         rewardRepository.deleteAllRewards();
+        maillotRepository.deleteAllMaillots();
         riderRepository.deleteAllRiders();
         riderStageConnectionRepository.deleteAllRiderStageConnections();
         stageRepository.deleteAllStages();
@@ -106,13 +102,25 @@ public class ImportController extends Controller {
         CompletionStage<Race> promiseRace = request.get().thenApply(res -> Parser.ParseRace(res.asJson()));
         Race race = promiseRace.toCompletableFuture().join();
         raceRepository.addRace(race);
+
+        request = wsClient.url(UrlLinks.MAILLOTS + UrlLinks.getRaceId());
+        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        CompletionStage<List<Maillot>> promiseMaillot = request.get().thenApply(res -> Parser.ParseMaillots(res.asJson()));
+        List<Maillot> maillots = promiseMaillot.toCompletableFuture().join();
+        Race dbRace = CompletableFuture.completedFuture(raceRepository.getRace(UrlLinks.getRaceId())).join().toCompletableFuture().join();
+        for(Maillot m : maillots){
+            maillotRepository.addMaillot(m);
+            Maillot dbMaillot = CompletableFuture.completedFuture(maillotRepository.getMaillot(m.getId())).join().toCompletableFuture().join();
+            dbMaillot.setRace(dbRace);
+            maillotRepository.updateMaillot(dbMaillot);
+        }
         return CompletableFuture.completedFuture("success");
     }
 
     private CompletionStage<String> importStages(){
         WSRequest request = wsClient.url(UrlLinks.STAGES + UrlLinks.getRaceId());
-        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
         Race race = CompletableFuture.completedFuture(raceRepository.getRace(UrlLinks.getRaceId())).join().toCompletableFuture().join();
+
         CompletionStage<List<Stage>> promiseStages = request.get().thenApply(res -> Parser.ParseStages(res.asJson()));
         List<Stage> stages = promiseStages.toCompletableFuture().join();
         for(Stage s : stages) {
@@ -121,6 +129,12 @@ public class ImportController extends Controller {
             stage.setRace(race);
             stageRepository.updateStage(stage);
         }
+        return CompletableFuture.completedFuture("success");
+    }
+
+    private CompletionStage<String> importMaillots(){
+
+        importMaillotRiderConnections();
         return CompletableFuture.completedFuture("success");
     }
 
@@ -168,11 +182,7 @@ public class ImportController extends Controller {
         return CompletableFuture.completedFuture("success");
     }
 
-    private CompletionStage<String> importMaillots(){
 
-        importMaillotRiderConnections();
-        return CompletableFuture.completedFuture("success");
-    }
 
     private CompletionStage<String> importMaillotRiderConnections(){
         return CompletableFuture.completedFuture("success");

@@ -1,5 +1,6 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -15,6 +16,10 @@ public class Race {
     @OneToMany(mappedBy = "race", orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Stage> stages = new ArrayList<Stage>();
+
+    @OneToMany(mappedBy="race", cascade= CascadeType.ALL)
+    @JsonBackReference
+    private List<Maillot> mailllots = new ArrayList<Maillot>();
 
     public Long getId() {
         return id;
@@ -36,5 +41,13 @@ public class Race {
 
     public void setStages(List<Stage> stages) {
         this.stages = stages;
+    }
+
+    public List<Maillot> getMailllots() {
+        return mailllots;
+    }
+
+    public void setMailllots(List<Maillot> mailllots) {
+        this.mailllots = mailllots;
     }
 }

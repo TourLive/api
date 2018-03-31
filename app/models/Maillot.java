@@ -16,7 +16,7 @@ public class Maillot {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
-    private Stage stage;
+    private Race race;
 
     public Long getId() {
         return id;
@@ -54,11 +54,9 @@ public class Maillot {
         this.partner = partner;
     }
 
-    public Stage getStage() {
-        return stage;
-    }
+    public Race getRace() { return race; }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    public void setRace(Race race) {
+        this.race = race;
     }
 }
