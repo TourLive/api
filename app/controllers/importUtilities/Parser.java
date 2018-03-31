@@ -37,7 +37,6 @@ public final class Parser {
             stage.setEndTime(new Date(n.findPath("endtimeAsTimestamp").asLong()));
             stage.setStartTime(new Date(n.findPath("starttimeAsTimestamp").asLong()));
             stage.setStageType(StageType.valueOf(n.findPath("stagetype").textValue()));
-            stage.setId(n.findPath("stageId").longValue());
             stages.add(stage);
         }
         return stages;
