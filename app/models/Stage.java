@@ -11,7 +11,6 @@ import java.util.List;
 @Entity
 public class Stage {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private Date startTime;
     private Date endTime;
