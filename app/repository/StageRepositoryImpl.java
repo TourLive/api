@@ -83,6 +83,16 @@ public class StageRepositoryImpl implements StageRepository{
         return null;
     }
 
+    @Override
+    public void updateStage(Stage stage){
+        wrap(entityManager -> updateStage(entityManager, stage));
+    }
+
+    private Stage updateStage(EntityManager em, Stage stage){
+        em.merge(stage);
+        return null;
+    }
+
     private <T> T wrap(Function<EntityManager, T> function) {
         return jpaApi.withTransaction(function);
     }

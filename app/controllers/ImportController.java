@@ -104,9 +104,7 @@ public class ImportController extends Controller {
         promiseRaceId.toCompletableFuture().join();
         long test = UrlLinks.getRaceId();
         request = wsClient.url(UrlLinks.STAGES + UrlLinks.getRaceId());
-        CompletionStage<Race> promiseRace = request.get().thenApply(res -> {
-            return Parser.ParseRace(res.asJson());
-        });
+        CompletionStage<Race> promiseRace = request.get().thenApply(res -> Parser.ParseRace(res.asJson()));
         Race race = promiseRace.toCompletableFuture().join();
         raceRepository.addRace(race);
         return CompletableFuture.completedFuture("success");
@@ -116,16 +114,14 @@ public class ImportController extends Controller {
         WSRequest request = wsClient.url(UrlLinks.STAGES + UrlLinks.getRaceId());
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
         Race race = CompletableFuture.completedFuture(raceRepository.getRace(UrlLinks.getRaceId())).join().toCompletableFuture().join();
-        CompletionStage<List<Stage>> promiseStages = request.get().thenApply(res -> {
-            return Parser.ParseStages(res.asJson());
-        });
+        CompletionStage<List<Stage>> promiseStages = request.get().thenApply(res -> Parser.ParseStages(res.asJson()));
         List<Stage> stages = promiseStages.toCompletableFuture().join();
-        for(Stage s : stages){
+        for(Stage s : stages) {
             stageRepository.addStage(s);
+            Stage stage = CompletableFuture.completedFuture(stageRepository.getStage(s.getId())).join().toCompletableFuture().join();
+            stage.setRace(race);
+            stageRepository.updateStage(stage);
         }
-        race.setStages(stages);
-        raceRepository.updateRace(race);
-        Race race2 = CompletableFuture.completedFuture(raceRepository.getRace(UrlLinks.getRaceId())).join().toCompletableFuture().join();
         return CompletableFuture.completedFuture("success");
     }
 
