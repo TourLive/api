@@ -90,11 +90,16 @@ public class ImportController extends Controller {
     private CompletionStage<String> importRace(){
         WSRequest request = wsClient.url(UrlLinks.RACE);
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        CompletionStage<String> promiseRaceId = request.get().thenApply(res -> {
+            return Parser.setActualRaceId(res.asJson());
+        });
+        promiseRaceId.toCompletableFuture().join();
+        long test = UrlLinks.getRaceId();
+        request = wsClient.url(UrlLinks.STAGES + UrlLinks.getRaceId());
         CompletionStage<Race> promiseRace = request.get().thenApply(res -> {
             return Parser.ParseRace(res.asJson());
         });
         Race race = promiseRace.toCompletableFuture().join();
-        UrlLinks.setRaceId(race.getId());
         raceRepository.addRace(race);
         return CompletableFuture.completedFuture("success");
     }
