@@ -12,7 +12,7 @@ public class Race {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy="race", cascade= CascadeType.ALL)
+    @OneToMany(targetEntity = Stage.class, fetch = FetchType.EAGER, mappedBy = "race")
     @JsonManagedReference
     private List<Stage> stages = new ArrayList<Stage>();
 

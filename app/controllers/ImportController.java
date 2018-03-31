@@ -57,6 +57,7 @@ public class ImportController extends Controller {
     }
 
     public CompletionStage<Result> importAllStaticData() {
+        deleteAllData();
         return importRace().thenApply(race -> {
             importStages().thenApply(stage -> {
                importRiders().thenApply(rider -> {
@@ -89,6 +90,11 @@ public class ImportController extends Controller {
         });
     }
 
+    private void deleteAllData(){
+        stageRepository.deleteAllStages();
+        raceRepository.deleteAllRaces();
+    }
+
     private CompletionStage<String> importRace(){
         WSRequest request = wsClient.url(UrlLinks.RACE);
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
@@ -115,11 +121,11 @@ public class ImportController extends Controller {
         });
         List<Stage> stages = promiseStages.toCompletableFuture().join();
         for(Stage s : stages){
-
             stageRepository.addStage(s);
-            race.getStages().add(s);
-
         }
+        race.setStages(stages);
+        raceRepository.updateRace(race);
+        Race race2 = CompletableFuture.completedFuture(raceRepository.getRace(UrlLinks.getRaceId())).join().toCompletableFuture().join();
         return CompletableFuture.completedFuture("success");
     }
 
