@@ -2,6 +2,7 @@ package controllers;
 
 import controllers.importUtilities.*;
 import models.Race;
+import models.Stage;
 import play.libs.ws.*;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -11,6 +12,7 @@ import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
 import javax.swing.plaf.UIResource;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -105,6 +107,19 @@ public class ImportController extends Controller {
     }
 
     private CompletionStage<String> importStages(){
+        WSRequest request = wsClient.url(UrlLinks.STAGES + UrlLinks.getRaceId());
+        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        Race race = CompletableFuture.completedFuture(raceRepository.getRace(UrlLinks.getRaceId())).join().toCompletableFuture().join();
+        CompletionStage<List<Stage>> promiseStages = request.get().thenApply(res -> {
+            return Parser.ParseStages(res.asJson());
+        });
+        List<Stage> stages = promiseStages.toCompletableFuture().join();
+        for(Stage s : stages){
+
+            stageRepository.addStage(s);
+            race.getStages().add(s);
+
+        }
         return CompletableFuture.completedFuture("success");
     }
 

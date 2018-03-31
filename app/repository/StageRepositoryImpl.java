@@ -51,7 +51,6 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     private Stage addStage(EntityManager em, Stage stage) {
-        stage.setRace(em.merge(stage.getRace()));
         em.persist(stage);
         return null;
     }
