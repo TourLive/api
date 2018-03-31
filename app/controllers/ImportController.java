@@ -2,6 +2,7 @@ package controllers;
 
 import controllers.importUtilities.*;
 import models.Race;
+import models.Reward;
 import models.Stage;
 import play.libs.ws.*;
 import play.mvc.Controller;
@@ -91,8 +92,10 @@ public class ImportController extends Controller {
     }
 
     private void deleteAllData(){
+        rewardRepository.deleteAllRewards();
         stageRepository.deleteAllStages();
         raceRepository.deleteAllRaces();
+
     }
 
     private CompletionStage<String> importRace(){
@@ -144,6 +147,7 @@ public class ImportController extends Controller {
     }
 
     private CompletionStage<String> importMaillots(){
+
         importMaillotRiderConnections();
         return CompletableFuture.completedFuture("success");
     }
@@ -157,6 +161,15 @@ public class ImportController extends Controller {
     }
 
     private CompletionStage<String> importRewards(){
+        WSRequest request = wsClient.url(UrlLinks.JUDGEMENTS + UrlLinks.getRaceId());
+        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        CompletionStage<List<Reward>> promiseRewards = request.get().thenApply(res -> {
+            return Parser.ParseRewards(res.asJson());
+        });
+        List<Reward> rewards = promiseRewards.toCompletableFuture().join();
+        for(Reward r : rewards){
+            rewardRepository.addReward(r);
+        }
         return CompletableFuture.completedFuture("success");
     }
 }
