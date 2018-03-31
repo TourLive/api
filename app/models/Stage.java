@@ -15,7 +15,7 @@ public class Stage {
     private Long id;
     private Date startTime;
     private Date endTime;
-    private int distance;
+    private double distance;
     private StageType stageType;
     private String start;
     private String destination;
@@ -57,11 +57,11 @@ public class Stage {
         this.endTime = endTime;
     }
 
-    public int getDistance() {
+    public double getDistance() {
         return distance;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 
