@@ -3,7 +3,9 @@ package controllers.importUtilities;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import models.Race;
+import models.Reward;
 import models.Stage;
+import models.enums.RewardType;
 import models.enums.StageType;
 
 import java.util.ArrayList;
@@ -40,5 +42,39 @@ public final class Parser {
             stages.add(stage);
         }
         return stages;
+    }
+
+    public static final List<Reward> ParseRewards(JsonNode jsonNode){
+        ArrayList<Reward> rewards = new ArrayList<>();
+        for (JsonNode n : (ArrayNode) jsonNode.findPath("rewards")) {
+            Reward reward = new Reward();
+
+            reward.setId(Long.valueOf(n.path("id").textValue()));
+
+            ArrayList<Integer> moneyList = new ArrayList<>();
+            String[] moneyString = n.get("reward").textValue().split(",");
+            for (String s : moneyString) {
+                moneyList.add(Integer.valueOf(s));
+            }
+            reward.setMoney(moneyList);
+
+            ArrayList<Integer> pointList = new ArrayList<>();
+            String[] pointString = n.get("bonus").textValue().split(",");
+            for (String s : pointString) {
+                pointList.add(Integer.valueOf(s));
+            }
+            reward.setPoints(pointList);
+
+            String bonusType = n.findPath("bonusType").textValue();
+            if (bonusType.equals("time")) {
+                reward.setRewardType(RewardType.TIME);
+            }
+            if (bonusType.equals("points")) {
+                reward.setRewardType(RewardType.POINTS);
+            }
+
+            rewards.add(reward);
+        }
+        return rewards;
     }
 }
