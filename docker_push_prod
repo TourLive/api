@@ -6,4 +6,4 @@ sbt docker:publish
 docker pull tourlive/api:$actual_version
 docker tag tourlive/api:$actual_version tourlive/api:stable
 docker push tourlive/api:stable
-ssh -p 40001 -o StrictHostKeyChecking=no ufo@sinv-56034.edu.hsr.ch "sh /opt/tourlive/restart-prod.sh"
+ssh -p 40001 -o StrictHostKeyChecking=no deploy@sinv-56034.edu.hsr.ch "sh /opt/tourlive/restart-prod.sh"
