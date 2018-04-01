@@ -1,0 +1,9 @@
+#!/bin/bash
+docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+actual_version=$(sed -n '3p' < build.sbt | awk -F'"' '{print $2}')
+echo $actual_version
+sbt docker:publish
+docker pull tourlive/api:$actual_version
+docker tag tourlive/api:$actual_version tourlive/api:latest
+docker push tourlive/api:latest
+ssh -p 40001 -o StrictHostKeyChecking=no deploy@sinv-56034.edu.hsr.ch "sh /opt/tourlive/restart-dev.sh"
