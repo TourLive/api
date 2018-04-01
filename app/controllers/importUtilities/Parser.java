@@ -6,10 +6,9 @@ import models.*;
 import models.enums.RewardType;
 import models.enums.StageType;
 import models.enums.TypeState;
+import scala.Int;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 public final class Parser {
@@ -125,5 +124,23 @@ public final class Parser {
             rewards.add(reward);
         }
         return rewards;
+    }
+
+    public static final HashMap<Long, ArrayList<Judgment>> ParseJudgments(JsonNode jsonNode){
+        HashMap<Long, ArrayList<Judgment>> judgmentHashMap = new HashMap<Long, ArrayList<Judgment>>();
+        for (JsonNode n : (ArrayNode) jsonNode.findPath("judgements")) {
+            Judgment judgment = new Judgment();
+            judgment.setDistance(n.findPath("rennkm").asDouble());
+            judgment.setName(n.findPath("name").asText());
+            long rewardId = n.findPath("rewardId").asLong();
+            if(judgmentHashMap.containsKey(rewardId)){
+                judgmentHashMap.get(rewardId).add(judgment);
+            } else {
+                ArrayList<Judgment> judgments = new ArrayList<>();
+                judgments.add(judgment);
+                judgmentHashMap.put(rewardId, judgments);
+            }
+        }
+        return judgmentHashMap;
     }
 }

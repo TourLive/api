@@ -9,7 +9,9 @@ import repository.interfaces.*;
 import scala.concurrent.ExecutionContextExecutor;
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
@@ -57,15 +59,15 @@ public class ImportController extends Controller {
         return importRace().thenApply(race -> {
             importStages().thenApply(stage -> {
                importRiders().thenApply(rider -> {
-                        importJudgments().thenApply(judgment -> {
-                            importRewards().thenApply(reward -> {
-                                return ok("successfully imported rewards");
+                   importRewards().thenApply(judgment -> {
+                            importJudgments().thenApply(reward -> {
+                                return ok("successfully imported judgments");
                             }).exceptionally(ex -> {
-                                return internalServerError("importing rewards failed");
+                                return internalServerError("importing judgments failed");
                             });
-                            return ok("successfully imported judgments");
+                            return ok("successfully imported rewards");
                         }) .exceptionally(ex -> {
-                            return internalServerError("importing judgments failed");
+                            return internalServerError("importing rewards failed");
                         });
                    return ok("successfully imported riders");
                }) .exceptionally(ex -> {
@@ -82,6 +84,7 @@ public class ImportController extends Controller {
     }
 
     private void deleteAllData(){
+        judgmentRepository.deleteAllJudgment();
         rewardRepository.deleteAllRewards();
         maillotRepository.deleteAllMaillots();
         riderRepository.deleteAllRiders();
@@ -185,11 +188,7 @@ public class ImportController extends Controller {
 
 
     private CompletionStage<String> importMaillotRiderConnections(){
-        // Link Maillot to rider
-        return CompletableFuture.completedFuture("success");
-    }
-
-    private CompletionStage<String> importJudgments(){
+        // Link Maillot to rider over riderstageconnection, LINK: RIDERJERSEY + STAGEID
         return CompletableFuture.completedFuture("success");
     }
 
@@ -205,4 +204,32 @@ public class ImportController extends Controller {
         }
         return CompletableFuture.completedFuture("success");
     }
+
+    private CompletionStage<String> importJudgments(){
+        WSRequest request = wsClient.url(UrlLinks.JUDGEMENTS + UrlLinks.getRaceId());
+        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        CompletionStage<HashMap<Long, ArrayList<Judgment>>> promiseJudgments = request.get().thenApply(res -> {
+            return Parser.ParseJudgments(res.asJson());
+        });
+        HashMap<Long, ArrayList<Judgment>> judgments = promiseJudgments.toCompletableFuture().join();
+        List<Reward> dbRewards = CompletableFuture.completedFuture(rewardRepository.getAllRewards()).join().collect(Collectors.toList());
+        for(Long rewardId : judgments.keySet()){
+            Reward dbReward = null;
+            for(Reward r : dbRewards){
+                if(r.getRewardId() == rewardId){
+                    dbReward = r;
+                    break;
+                }
+            }
+            ArrayList<Judgment> judgmentList = judgments.get(rewardId);
+            for (Judgment j : judgmentList) {
+                judgmentRepository.addJudgment(j);
+                Judgment dbJ = CompletableFuture.completedFuture(judgmentRepository.getJudgmentById(j.getId())).join();
+                dbJ.setReward(dbReward);
+                judgmentRepository.updateJudgment(dbJ);
+            }
+        }
+        return CompletableFuture.completedFuture("success");
+    }
 }
+
