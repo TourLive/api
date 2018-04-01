@@ -3,6 +3,8 @@ package models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Maillot {
@@ -13,6 +15,9 @@ public class Maillot {
     private String name;
     private String color;
     private String partner;
+    @ManyToMany(cascade=CascadeType.PERSIST)
+    @JsonBackReference
+    private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference

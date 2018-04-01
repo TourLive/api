@@ -32,6 +32,9 @@ public class RiderStageConnection {
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
     private Rider rider;
+    @ManyToMany(mappedBy="riderStageConnections", cascade= CascadeType.ALL)
+    @JsonManagedReference
+    private List<Maillot> riderMaillots = new ArrayList<Maillot>();
 
     public Long getId() {
         return id;
@@ -133,5 +136,13 @@ public class RiderStageConnection {
 
     public void setRider(Rider rider) {
         this.rider = rider;
+    }
+
+    public List<Maillot> getRiderMaillots() {
+        return riderMaillots;
+    }
+
+    public void setRiderMaillots(List<Maillot> riderMaillots) {
+        this.riderMaillots = riderMaillots;
     }
 }

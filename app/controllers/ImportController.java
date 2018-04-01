@@ -185,6 +185,7 @@ public class ImportController extends Controller {
 
 
     private CompletionStage<String> importMaillotRiderConnections(){
+        // Link Maillot to rider
         return CompletableFuture.completedFuture("success");
     }
 
