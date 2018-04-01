@@ -6,6 +6,7 @@ import models.enums.RaceGroupType;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,12 +25,8 @@ public class RaceGroup {
     private Stage stage;
 
     @ManyToMany
-    @JoinTable(
-            name="RiderInRaceGroup",
-            joinColumns=@JoinColumn(name="RiderId", referencedColumnName="id"),
-            inverseJoinColumns=@JoinColumn(name="RaceGroupsId", referencedColumnName="id"))
     @JsonManagedReference
-    private List<Rider> riders;
+    private List<Rider> riders = new ArrayList<>();
 
     public Long getId() {
         return id;
