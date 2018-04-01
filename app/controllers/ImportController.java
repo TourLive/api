@@ -90,6 +90,7 @@ public class ImportController extends Controller {
         judgmentRepository.deleteAllJudgment();
         rewardRepository.deleteAllRewards();
         maillotRepository.deleteAllMaillots();
+        raceGroupRepository.deleteAllRaceGroups();
         riderRepository.deleteAllRiders();
         riderStageConnectionRepository.deleteAllRiderStageConnections();
         stageRepository.deleteAllStages();
