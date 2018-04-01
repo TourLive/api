@@ -24,7 +24,7 @@ public class RaceGroup {
     @JsonBackReference
     private Stage stage;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JsonManagedReference
     private List<Rider> riders = new ArrayList<>();
 
