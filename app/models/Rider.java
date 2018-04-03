@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -11,6 +13,8 @@ public class Rider {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
+
+    private Long riderId;
     private int startNr;
     private String name;
     private String country;
@@ -18,18 +22,26 @@ public class Rider {
     private String teamShortName;
     private boolean isUnknown;
 
-    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonBackReference
     private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
     @ManyToMany(mappedBy="riders")
-    @JsonManagedReference
+    @JsonIgnore
     private List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
 
     public Long getId() {
         return id;
+    }
+
+    public Long getRiderId() {
+        return riderId;
+    }
+
+    public void setRiderId(Long riderId) {
+        this.riderId = riderId;
     }
 
     public int getStartNr() {

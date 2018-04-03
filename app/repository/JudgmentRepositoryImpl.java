@@ -61,13 +61,25 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     @Override
+    public void updateJudgment(Judgment judgment){
+        wrap(entityManager -> updateJudgment(entityManager, judgment));
+    }
+
+    private Judgment updateJudgment(EntityManager entityManager, Judgment judgment) {
+        entityManager.merge(judgment);
+        return null;
+    }
+
+    @Override
     public void deleteAllJudgment() {
         wrap(this::deleteAllJudgment);
     }
 
     private Judgment deleteAllJudgment(EntityManager entityManager) {
         List<Judgment> judgments = entityManager.createQuery("select j from Judgment j", Judgment.class).getResultList();
-        entityManager.remove(judgments);
+        for(Judgment j : judgments){
+            entityManager.remove(j);
+        }
         return null;
     }
 

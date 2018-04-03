@@ -14,4 +14,5 @@ public interface StageRepository {
     void addStage(Stage stage);
     void deleteAllStages();
     void deleteStage(long stageId);
+    void updateStage(Stage stage);
 }

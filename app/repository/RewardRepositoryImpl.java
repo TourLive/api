@@ -57,7 +57,9 @@ public class RewardRepositoryImpl implements RewardRepository {
 
     private Reward deleteAllRewards(EntityManager entityManager) {
         List<Reward> rewards = entityManager.createQuery("select r from Reward r", Reward.class).getResultList();
-        entityManager.remove(rewards);
+        for(Reward r : rewards){
+            entityManager.remove(r);
+        }
         return null;
     }
 
