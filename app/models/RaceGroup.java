@@ -1,11 +1,13 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.RaceGroupType;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,15 +22,12 @@ public class RaceGroup {
     private Timestamp timestamp;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
+    @JsonIgnore
     private Stage stage;
 
-    @ManyToMany
-    @JoinTable(
-            name="RiderInRaceGroup",
-            joinColumns=@JoinColumn(name="RiderId", referencedColumnName="id"),
-            inverseJoinColumns=@JoinColumn(name="RaceGroupsId", referencedColumnName="id"))
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JsonManagedReference
-    private List<Rider> riders;
+    private List<Rider> riders = new ArrayList<>();
 
     public Long getId() {
         return id;

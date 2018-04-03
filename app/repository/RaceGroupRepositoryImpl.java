@@ -73,7 +73,9 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
 
     private Stream<RaceGroup> deleteAllRaceGroups(EntityManager entityManager) {
         List<RaceGroup> raceGroups = entityManager.createQuery("select rG from RaceGroup rG", RaceGroup.class).getResultList();
-        entityManager.remove(raceGroups);
+        for(RaceGroup rG : raceGroups){
+            entityManager.remove(rG);
+        }
         return null;
     }
 

@@ -56,6 +56,16 @@ public class RaceRepositoryImpl implements RaceRepository{
     }
 
     @Override
+    public void updateRace(Race race){
+        wrap(entityManager -> updateRace(entityManager, race));
+    }
+
+    private Race updateRace(EntityManager em, Race race){
+        em.merge(race);
+        return null;
+    }
+
+    @Override
     public void deleteAllRaces() {
         wrap(this::deleteAllRaces);
     }

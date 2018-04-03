@@ -24,13 +24,12 @@ public class MaillotRepositoryImpl implements MaillotRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Maillot>> getAllMaillots(long stageId) {
-        return supplyAsync(() -> wrap (entityManager -> getAllMaillots(entityManager, stageId)), databaseExecutionContext);
+    public CompletionStage<Stream<Maillot>> getAllMaillots() {
+        return supplyAsync(() -> wrap (this::getAllMaillots), databaseExecutionContext);
     }
 
-    private Stream<Maillot> getAllMaillots(EntityManager em, long stageId){
-        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.stage.id = :stageId" , Maillot.class);
-        query.setParameter("stageId", stageId);
+    private Stream<Maillot> getAllMaillots(EntityManager em){
+        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m" , Maillot.class);
         return query.getResultList().stream();
     }
 
@@ -40,18 +39,26 @@ public class MaillotRepositoryImpl implements MaillotRepository {
     }
 
     private Maillot getMaillot(EntityManager em, long maillotId){
-        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.id = :maillotId" , Maillot.class);
-        query.setParameter("maillotId", maillotId);
-        return query.getSingleResult();
+        return em.find(Maillot.class, maillotId);
     }
 
     @Override
     public void addMaillot(Maillot maillot) {
-        wrap(entityManager -> addRiderStageConnection(entityManager, maillot));
+        wrap(entityManager -> addMaillot(entityManager, maillot));
     }
 
-    private Maillot addRiderStageConnection(EntityManager entityManager, Maillot maillot){
+    private Maillot addMaillot(EntityManager entityManager, Maillot maillot){
         entityManager.persist(maillot);
+        return null;
+    }
+
+    @Override
+    public void updateMaillot(Maillot maillot) {
+        wrap(entityManager -> updateMaillot(entityManager, maillot));
+    }
+
+    private Maillot updateMaillot(EntityManager entityManager, Maillot maillot){
+        entityManager.merge(maillot);
         return null;
     }
 

@@ -9,7 +9,6 @@ scalaVersion := "2.12.4"
 crossScalaVersions := Seq("2.11.12", "2.12.4")
 
 dockerUsername := Some("tourlive")
-dockerUpdateLatest := true
 
 libraryDependencies += guice
 libraryDependencies += javaJpa
@@ -18,6 +17,9 @@ libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
 libraryDependencies += "io.swagger" %% "swagger-play2" % "1.6.0"
 libraryDependencies += "org.webjars" %% "webjars-play" % "2.6.3"
 libraryDependencies += "org.webjars" % "swagger-ui" % "2.2.0"
+libraryDependencies ++= Seq(
+  ws
+)
 
 // Test Database
 libraryDependencies += "com.h2database" % "h2" % "1.4.196"

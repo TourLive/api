@@ -43,7 +43,7 @@ POST    /judgmentRiderConnection                    controllers.JudgmentRiderCon
 
 
 #Maillot Routes
-GET     /:stageId/maillot                            controllers.MaillotController.getMaillots(stageId : Long)
+GET     /maillot                            controllers.MaillotController.getMaillots
 GET     /maillot/:maillotId                 controllers.MaillotController.getMaillot(maillotId : Long)
 
 #RiderRanking Routes
@@ -51,6 +51,13 @@ GET     /riderRanking/:riderStageConnectionId                   controllers.Ride
 GET     /riderRanking/:riderStageConnectionId/:rankingType      controllers.RiderRankingConnectionController.getRiderRankingsByType(riderStageConnectionId : Long, rankingType : String)
 GET     /riderRanking/rider/:riderId/:rankingType               controllers.RiderRankingConnectionController.getRiderRankingByRiderAndType(riderId : Long, rankingType : String)
 PUT     /riderRanking/:riderRankingId                           controllers.RiderRankingConnectionController.updateRiderRanking(riderRankingId : Long)
+
+#Import Route
+GET     /import                             controllers.ImportController.importAllStaticData
+
+# Settings Route
+GET     /settings                           controllers.SettingsController.getSettings
+PUT     /settings                           controllers.SettingsController.updateSettings
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

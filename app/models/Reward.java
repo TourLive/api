@@ -12,9 +12,11 @@ public class Reward {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
+
+    private Long rewardId;
     private RewardType rewardType;
-    private ArrayList<Integer> points;
-    private ArrayList<Integer> money;
+    private String points;
+    private String money;
 
     @OneToMany(mappedBy="reward", cascade= CascadeType.ALL)
     @JsonManagedReference
@@ -22,6 +24,14 @@ public class Reward {
 
     public Long getId() {
         return id;
+    }
+
+    public Long getRewardId() {
+        return rewardId;
+    }
+
+    public void setRewardId(Long rewardId) {
+        this.rewardId = rewardId;
     }
 
     public RewardType getRewardType() {
@@ -33,19 +43,37 @@ public class Reward {
     }
 
     public ArrayList<Integer> getPoints() {
-        return points;
+        String[] m = points.split(",");
+        ArrayList<Integer> i = new ArrayList<>();
+        for(String s : m){
+            i.add(Integer.valueOf(s));
+        }
+        return i;
     }
 
     public void setPoints(ArrayList<Integer> points) {
-        this.points = points;
+        String s = "";
+        for(int i : points){
+            s = s.concat(String.valueOf(i)+",");
+        }
+        this.points = s;
     }
 
     public ArrayList<Integer> getMoney() {
-        return money;
+        String[] m = money.split(",");
+        ArrayList<Integer> i = new ArrayList<>();
+        for(String s : m){
+            i.add(Integer.valueOf(s));
+        }
+        return i;
     }
 
     public void setMoney(ArrayList<Integer> money) {
-        this.money = money;
+        String s = "";
+        for(int i : money){
+            s = s.concat(String.valueOf(i)+",");
+        }
+        this.money = s;
     }
 
     public List<Judgment> getJudgmentRiderConnections() {

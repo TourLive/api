@@ -13,7 +13,7 @@ public class Judgment {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private String name;
-    private int distance;
+    private double distance;
 
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
     @JsonManagedReference
@@ -35,11 +35,11 @@ public class Judgment {
         this.name = name;
     }
 
-    public int getDistance() {
+    public double getDistance() {
         return distance;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 

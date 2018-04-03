@@ -51,7 +51,6 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     private Stage addStage(EntityManager em, Stage stage) {
-        stage.setRace(em.merge(stage.getRace()));
         em.persist(stage);
         return null;
     }
@@ -81,6 +80,16 @@ public class StageRepositoryImpl implements StageRepository{
         if(stage != null){
             em.remove(stage);
         }
+        return null;
+    }
+
+    @Override
+    public void updateStage(Stage stage){
+        wrap(entityManager -> updateStage(entityManager, stage));
+    }
+
+    private Stage updateStage(EntityManager em, Stage stage){
+        em.merge(stage);
         return null;
     }
 

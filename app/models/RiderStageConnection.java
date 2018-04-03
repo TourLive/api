@@ -1,6 +1,7 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.TypeState;
 
@@ -18,20 +19,23 @@ public class RiderStageConnection {
     private int sprintBonusPoints;
     private int bonusTime;
     private int money;
-    private Long officialTime;
-    private Long officialGap;
-    private Long virtualGap;
+    private long officialTime;
+    private long officialGap;
+    private long virtualGap;
     private TypeState typeState;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
     private Stage stage;
-    @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<RiderRanking> riderRankings = new ArrayList<RiderRanking>();
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
     private Rider rider;
+    @ManyToMany(mappedBy="riderStageConnections", cascade= CascadeType.ALL)
+    @JsonIgnore
+    private List<Maillot> riderMaillots = new ArrayList<Maillot>();
 
     public Long getId() {
         return id;
@@ -79,27 +83,27 @@ public class RiderStageConnection {
         this.money = money;
     }
 
-    public Long getOfficialTime() {
+    public long getOfficialTime() {
         return officialTime;
     }
 
-    public void setOfficialTime(Long officialTime) {
+    public void setOfficialTime(long officialTime) {
         this.officialTime = officialTime;
     }
 
-    public Long getOfficialGap() {
+    public long getOfficialGap() {
         return officialGap;
     }
 
-    public void setOfficialGap(Long officialGap) {
+    public void setOfficialGap(long officialGap) {
         this.officialGap = officialGap;
     }
 
-    public Long getVirtualGap() {
+    public long getVirtualGap() {
         return virtualGap;
     }
 
-    public void setVirtualGap(Long virtualGap) {
+    public void setVirtualGap(long virtualGap) {
         this.virtualGap = virtualGap;
     }
 
@@ -133,5 +137,13 @@ public class RiderStageConnection {
 
     public void setRider(Rider rider) {
         this.rider = rider;
+    }
+
+    public List<Maillot> getRiderMaillots() {
+        return riderMaillots;
+    }
+
+    public void setRiderMaillots(List<Maillot> riderMaillots) {
+        this.riderMaillots = riderMaillots;
     }
 }

@@ -48,6 +48,15 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     @Override
+    public CompletionStage<RiderStageConnection> getRiderStageConnection(long stageId) {
+        return supplyAsync(() -> wrap (em -> getRiderStageConnection(em, stageId)), databaseExecutionContext);
+    }
+
+    private RiderStageConnection getRiderStageConnection(EntityManager em, long stageId){
+        return em.find(RiderStageConnection.class, stageId);
+    }
+
+    @Override
     public void addRiderStageConnection(RiderStageConnection riderStageConnection) {
         wrap(entityManager -> addRiderStageConnection(entityManager,riderStageConnection));
     }
@@ -63,12 +72,8 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     private RiderStageConnection updateRiderStageConnection(EntityManager entityManager, RiderStageConnection riderStageConnection){
-        RiderStageConnection dbRSC = entityManager.find(RiderStageConnection.class, riderStageConnection.getId());
-        riderStageConnection.setStage(entityManager.merge(dbRSC.getStage()));
-        riderStageConnection.setRiderRankings(entityManager.merge(dbRSC.getRiderRankings()));
-        riderStageConnection.setRider(entityManager.merge(dbRSC.getRider()));
         entityManager.merge(riderStageConnection);
-        return riderStageConnection;
+        return null;
     }
 
     @Override
