@@ -1,5 +1,8 @@
 package controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import models.Race;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -11,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;
 
+@Api("Race")
 public class RaceController extends Controller {
     private final RaceRepository raceRepository;
 
@@ -19,6 +23,7 @@ public class RaceController extends Controller {
         this.raceRepository = raceRepository;
     }
 
+    @ApiOperation(value ="get all races", response = Race.class)
     public CompletionStage<Result> getAllRaces() {
         return raceRepository.getAllRaces().thenApplyAsync(races -> ok(toJson(races.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -33,6 +38,7 @@ public class RaceController extends Controller {
         });
     }
 
+    @ApiOperation(value ="get race by id", response = Race.class)
     public CompletionStage<Result> getRace(Long raceId) {
         return raceRepository.getRace(raceId).thenApplyAsync(race -> ok(toJson(race))).exceptionally(ex -> {
             Result res;

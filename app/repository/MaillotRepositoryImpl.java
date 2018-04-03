@@ -17,6 +17,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class MaillotRepositoryImpl implements MaillotRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
+
     @Inject
     public MaillotRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;

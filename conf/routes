@@ -3,7 +3,11 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
+GET     /                           controllers.Application.index
+GET   /docs                         controllers.Application.redirectDocs
+GET   /api                          controllers.Application.redirectDocs
+GET   /swagger.json                 controllers.ApiHelpController.getResources
+GET   /docs/*file                   controllers.Assets.at(path="/public/swagger-ui",file)
 
 #Race Routes
 GET     /race                       controllers.RaceController.getAllRaces()

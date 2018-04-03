@@ -1,6 +1,9 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import models.JudgmentRiderConnection;
 import models.RiderStageConnection;
 import models.enums.TypeState;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -13,9 +16,11 @@ import javax.inject.Inject;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;
 
+@Api("RiderStageConnection")
 public class RiderStageConnectionController extends Controller {
     private final RiderStageConnectionRepository riderStageConnectionRepository;
 
@@ -25,11 +30,10 @@ public class RiderStageConnectionController extends Controller {
     }
 
 
+    @ApiOperation(value ="get all rider stage connections of a stage", response = RiderStageConnection.class)
     public CompletionStage<Result> getRiderStageConnections(long stageId) {
-        return riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> {
-            return ok(toJson(riderStageConnections));
-        }).exceptionally(ex -> {
-            Result res = null;
+        return riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> ok(toJson(riderStageConnections.collect(Collectors.toList())))).exceptionally(ex -> {
+            Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
                     res = badRequest("No stage are set in DB.");
@@ -41,6 +45,7 @@ public class RiderStageConnectionController extends Controller {
         });
     }
 
+    @ApiOperation(value ="get the rider stage connection of a rider in a specific stage", response = RiderStageConnection.class)
     public CompletionStage<Result> getRiderStageConnection(long stageId, long riderId) {
         return riderStageConnectionRepository.getRiderStageConnectionByRiderAndStage(stageId, riderId).thenApplyAsync(riderStageConnection -> {
             return ok(toJson(riderStageConnection));
@@ -57,6 +62,7 @@ public class RiderStageConnectionController extends Controller {
         });
     }
 
+    @ApiOperation(value = "update a existing rider stage connection")
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> updateRiderStageConnection(long riderStageConnectionId) {
         JsonNode json = request().body().asJson();
