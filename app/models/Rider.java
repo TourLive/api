@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -21,13 +23,13 @@ public class Rider {
     private boolean isUnknown;
 
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @JsonBackReference
     private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
     @ManyToMany(mappedBy="riders")
-    @JsonManagedReference
+    @JsonIgnore
     private List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
 
     public Long getId() {

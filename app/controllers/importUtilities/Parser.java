@@ -27,6 +27,13 @@ public final class Parser {
         return race;
     }
 
+    public static final Setting ParseSettings(JsonNode json){
+        Setting setting = new Setting();
+        setting.setStageID(json.findPath("stageID").longValue());
+        setting.setRaceID(json.findPath("raceID").longValue());
+        return setting;
+    }
+
     public static final List<Stage> ParseStages(JsonNode json){
         ArrayList<Stage> stages = new ArrayList<>();
         for (JsonNode n : (ArrayNode)json) {

@@ -1,6 +1,7 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.TypeState;
 
@@ -26,14 +27,14 @@ public class RiderStageConnection {
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
     private Stage stage;
-    @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<RiderRanking> riderRankings = new ArrayList<RiderRanking>();
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
     private Rider rider;
     @ManyToMany(mappedBy="riderStageConnections", cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @JsonIgnore
     private List<Maillot> riderMaillots = new ArrayList<Maillot>();
 
     public Long getId() {

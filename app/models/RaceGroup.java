@@ -1,6 +1,7 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.RaceGroupType;
 
@@ -21,10 +22,10 @@ public class RaceGroup {
     private Timestamp timestamp;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    @JsonBackReference
+    @JsonIgnore
     private Stage stage;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Rider> riders = new ArrayList<>();
 

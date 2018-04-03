@@ -1,6 +1,8 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.StageType;
 
 import javax.persistence.*;
@@ -25,16 +27,18 @@ public class Stage {
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
     private Race race;
+
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonBackReference
     private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
+
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonBackReference
     private List<Notification> notifications = new ArrayList<Notification>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    @JsonBackReference
-    private List<RaceGroup> racegroups = new ArrayList<RaceGroup>();
+    @JsonIgnore
+    private transient List<RaceGroup> racegroups = new ArrayList<RaceGroup>();
 
     public Long getId() {
         return id;

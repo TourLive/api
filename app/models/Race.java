@@ -1,6 +1,7 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -18,7 +19,7 @@ public class Race {
     private List<Stage> stages = new ArrayList<Stage>();
 
     @OneToMany(mappedBy="race", cascade= CascadeType.ALL)
-    @JsonBackReference
+    @JsonIgnore
     private List<Maillot> mailllots = new ArrayList<Maillot>();
 
     public Long getId() {
