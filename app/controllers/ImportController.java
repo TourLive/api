@@ -11,10 +11,7 @@ import repository.interfaces.*;
 import scala.concurrent.ExecutionContextExecutor;
 import javax.inject.Inject;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
@@ -61,8 +58,9 @@ public class ImportController extends Controller {
         deleteAllData();
         return importRace().thenApply(race -> {
             importStages().thenApply(stage -> {
-               importRiders().thenApply(rider -> {
-                   importRewards().thenApply(judgment -> {
+                importMaillots().thenApply(maillot -> {
+                    importRiders().thenApply(rider -> {
+                        importRewards().thenApply(judgment -> {
                             importJudgments().thenApply(reward -> {
                                 return ok("successfully imported judgments");
                             }).exceptionally(ex -> {
@@ -72,10 +70,14 @@ public class ImportController extends Controller {
                         }) .exceptionally(ex -> {
                             return internalServerError("importing rewards failed");
                         });
-                   return ok("successfully imported riders");
-               }) .exceptionally(ex -> {
-                   return internalServerError("importing riders failed");
-               });
+                        return ok("successfully imported riders");
+                    }) .exceptionally(ex -> {
+                        return internalServerError("importing riders failed");
+                    });
+                    return ok("successfully imported maillots");
+                }).exceptionally(ex -> {
+                    return internalServerError("importing maillots failed");
+                });
                return ok("successfully imported stages");
             }) .exceptionally(ex -> {
                 return internalServerError("importing stages failed");
@@ -109,18 +111,6 @@ public class ImportController extends Controller {
         CompletionStage<Race> promiseRace = request.get().thenApply(res -> Parser.ParseRace(res.asJson()));
         Race race = promiseRace.toCompletableFuture().join();
         raceRepository.addRace(race);
-
-        request = wsClient.url(UrlLinks.MAILLOTS + UrlLinks.getRaceId());
-        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
-        CompletionStage<List<Maillot>> promiseMaillot = request.get().thenApply(res -> Parser.ParseMaillots(res.asJson()));
-        List<Maillot> maillots = promiseMaillot.toCompletableFuture().join();
-        Race dbRace = CompletableFuture.completedFuture(raceRepository.getRace(UrlLinks.getRaceId())).join().toCompletableFuture().join();
-        for(Maillot m : maillots){
-            maillotRepository.addMaillot(m);
-            Maillot dbMaillot = CompletableFuture.completedFuture(maillotRepository.getMaillot(m.getId())).join().toCompletableFuture().join();
-            dbMaillot.setRace(dbRace);
-            maillotRepository.updateMaillot(dbMaillot);
-        }
         return CompletableFuture.completedFuture("success");
     }
 
@@ -140,6 +130,24 @@ public class ImportController extends Controller {
     }
 
     private CompletionStage<String> importMaillots(){
+        WSRequest request = wsClient.url(UrlLinks.MAILLOTS + UrlLinks.getRaceId());
+        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        List<Stage> stages = CompletableFuture.completedFuture(stageRepository.getAllStagesByRaceId(UrlLinks.getRaceId())).join().toCompletableFuture().join().collect(Collectors.toList());
+        for(Stage s : stages){
+            CompletionStage<List<Maillot>> promiseMaillot = request.get().thenApply(res -> Parser.ParseMaillots(res.asJson()));
+            for(Maillot m : promiseMaillot.toCompletableFuture().join()){
+                maillotRepository.addMaillot(m);
+                Maillot dbMaillot = CompletableFuture.completedFuture(maillotRepository.getMaillot(m.getId())).join().toCompletableFuture().join();
+                dbMaillot.setStage(s);
+                maillotRepository.updateMaillot(dbMaillot);
+            }
+        }
+        return CompletableFuture.completedFuture("success");
+    }
+
+
+
+    private CompletionStage<String> importMaillots2(){
 
         importMaillotRiderConnections();
         return CompletableFuture.completedFuture("success");

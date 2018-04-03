@@ -43,7 +43,7 @@ POST    /judgmentRiderConnection                    controllers.JudgmentRiderCon
 
 
 #Maillot Routes
-GET     /maillot                            controllers.MaillotController.getMaillots
+GET     /maillot/stage/:stageId              controllers.MaillotController.getMaillots(stageId : Long)
 GET     /maillot/:maillotId                 controllers.MaillotController.getMaillot(maillotId : Long)
 
 #RiderRanking Routes

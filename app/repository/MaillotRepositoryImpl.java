@@ -25,12 +25,13 @@ public class MaillotRepositoryImpl implements MaillotRepository {
     }
 
     @Override
-    public CompletionStage<Stream<Maillot>> getAllMaillots() {
-        return supplyAsync(() -> wrap (this::getAllMaillots), databaseExecutionContext);
+    public CompletionStage<Stream<Maillot>> getAllMaillots(long stageId) {
+        return supplyAsync(() -> wrap(entityManager -> getAllMaillots(entityManager, stageId)), databaseExecutionContext);
     }
 
-    private Stream<Maillot> getAllMaillots(EntityManager em){
-        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m" , Maillot.class);
+    private Stream<Maillot> getAllMaillots(EntityManager em, long stageId){
+        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.stage.id = :stageId" , Maillot.class);
+        query.setParameter("stageId", stageId);
         return query.getResultList().stream();
     }
 
