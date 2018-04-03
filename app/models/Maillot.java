@@ -1,6 +1,8 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,12 +17,12 @@ public class Maillot {
     private String name;
     private String color;
     private String partner;
-    @ManyToMany(cascade=CascadeType.PERSIST)
+    @ManyToMany(mappedBy="riderMaillots", cascade= CascadeType.ALL)
     @JsonBackReference
     private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    @JsonBackReference
+    @JsonIgnore
     private Stage stage;
 
     public Long getId() {
@@ -63,5 +65,13 @@ public class Maillot {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public List<RiderStageConnection> getRiderStageConnections() {
+        return riderStageConnections;
+    }
+
+    public void setRiderStageConnections(List<RiderStageConnection> riderStageConnections) {
+        this.riderStageConnections = riderStageConnections;
     }
 }

@@ -1,7 +1,9 @@
 package controllers;
 
-import akka.http.impl.util.JavaMapping;
 import controllers.importUtilities.*;
+import controllers.importUtilities.comparators.LeaderComparator;
+import controllers.importUtilities.comparators.PointsComparator;
+import controllers.importUtilities.comparators.MountainPointsComparator;
 import models.*;
 import models.enums.RaceGroupType;
 import play.libs.ws.*;
@@ -145,14 +147,6 @@ public class ImportController extends Controller {
         return CompletableFuture.completedFuture("success");
     }
 
-
-
-    private CompletionStage<String> importMaillots2(){
-
-        importMaillotRiderConnections();
-        return CompletableFuture.completedFuture("success");
-    }
-
     private CompletionStage<String> importRiders(){
         List<Stage> stages = CompletableFuture.completedFuture(stageRepository.getAllStages()).join().toCompletableFuture().join().collect(Collectors.toList());
         boolean oneTimeImportRiders = false;
@@ -169,6 +163,7 @@ public class ImportController extends Controller {
                 oneTimeImportRiders = true;
             }
             createRiderStageConnections(stage, riders).toCompletableFuture().join();
+            createMaillotRiderConnections(stage).toCompletableFuture().join();
             createDefaultRaceGroup(stage).toCompletableFuture().join();
         }
 
@@ -193,6 +188,51 @@ public class ImportController extends Controller {
         return CompletableFuture.completedFuture("success");
     }
 
+    private CompletionStage<String> createMaillotRiderConnections(Stage stage){
+        List<RiderStageConnection> rSCs = CompletableFuture.completedFuture(riderStageConnectionRepository.getRiderStageConnectionsByStageWithRiderMaillots(stage.getId())).join().toCompletableFuture().join().collect(Collectors.toList());
+        List<RiderStageConnection> rSCsBestSwiss = CompletableFuture.completedFuture(riderStageConnectionRepository.getRiderStageConnectionsByStageWithRiderMaillots(stage.getId())).join().toCompletableFuture().join().collect(Collectors.toList());
+        rSCsBestSwiss.removeIf(rSC -> !rSC.getRider().getCountry().equals("SUI"));
+
+        List<Maillot> maillots = CompletableFuture.completedFuture(maillotRepository.getAllMaillots(stage.getId())).join().toCompletableFuture().join().collect(Collectors.toList());
+        RiderStageConnection leader = null;
+        for(Maillot m : maillots){
+            switch (m.getType()){
+                case "points":
+                    Collections.sort(rSCs, new PointsComparator());
+                    leader = rSCs.get(0);
+                    leader.addRiderMaillots(m);
+                    riderStageConnectionRepository.updateRiderStageConnection(leader).toCompletableFuture().join();
+                    rSCs.set(0, riderStageConnectionRepository.getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(leader.getId()).toCompletableFuture().join());
+                    break;
+                case "bestSwiss":
+                    Collections.sort(rSCsBestSwiss, new PointsComparator());
+                    leader = rSCsBestSwiss.get(0);
+                    leader.addRiderMaillots(m);
+                    riderStageConnectionRepository.updateRiderStageConnection(leader).toCompletableFuture().join();
+                    rSCsBestSwiss.set(0, riderStageConnectionRepository.getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(leader.getId()).toCompletableFuture().join());
+                    break;
+                case "leader":
+                    Collections.sort(rSCs, new LeaderComparator());
+                    leader = rSCs.get(0);
+                    leader.addRiderMaillots(m);
+                    riderStageConnectionRepository.updateRiderStageConnection(leader).toCompletableFuture().join();
+                    rSCs.set(0, riderStageConnectionRepository.getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(leader.getId()).toCompletableFuture().join());
+                    break;
+                case "mountain":
+                    Collections.sort(rSCs, new MountainPointsComparator());
+                    leader = rSCs.get(0);
+                    leader.addRiderMaillots(m);
+                    riderStageConnectionRepository.updateRiderStageConnection(leader).toCompletableFuture().join();
+                    rSCs.set(0, riderStageConnectionRepository.getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(leader.getId()).toCompletableFuture().join());
+                    break;
+                default:
+                    break;
+            }
+        }
+        return CompletableFuture.completedFuture("success");
+    }
+
+
     private CompletionStage<String>  createDefaultRaceGroup(Stage stage){
         List<Rider> dbRiders = CompletableFuture.completedFuture(riderRepository.getAllRiders()).join();
         Stage dbStage = CompletableFuture.completedFuture(stageRepository.getStage(stage.getId())).join().toCompletableFuture().join();
@@ -200,20 +240,13 @@ public class ImportController extends Controller {
         raceGroup.setActualGapTime(0);
         raceGroup.setHistoryGapTime(0);
         raceGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        raceGroup.setPosition(0);
+        raceGroup.setPosition(1);
         raceGroup.setRaceGroupType(RaceGroupType.FELD);
         raceGroupRepository.addRaceGroup(raceGroup).toCompletableFuture().join();
         RaceGroup dbRaceGroup = CompletableFuture.completedFuture(raceGroupRepository.getRaceGroupById(raceGroup.getId())).join().toCompletableFuture().join();
         dbRaceGroup.setRiders(dbRiders);
         dbRaceGroup.setStage(dbStage);
         raceGroupRepository.updateRaceGroup(dbRaceGroup).toCompletableFuture().join();
-        return CompletableFuture.completedFuture("success");
-    }
-
-
-
-    private CompletionStage<String> importMaillotRiderConnections(){
-        // Link Maillot to rider over riderstageconnection, LINK: RIDERJERSEY + STAGEID
         return CompletableFuture.completedFuture("success");
     }
 

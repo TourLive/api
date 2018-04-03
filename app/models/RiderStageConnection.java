@@ -1,7 +1,6 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.TypeState;
 
@@ -33,8 +32,8 @@ public class RiderStageConnection {
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonManagedReference
     private Rider rider;
-    @ManyToMany(mappedBy="riderStageConnections", cascade= CascadeType.ALL)
-    @JsonIgnore
+    @ManyToMany(cascade= CascadeType.ALL)
+    @JsonManagedReference
     private List<Maillot> riderMaillots = new ArrayList<Maillot>();
 
     public Long getId() {
@@ -145,5 +144,9 @@ public class RiderStageConnection {
 
     public void setRiderMaillots(List<Maillot> riderMaillots) {
         this.riderMaillots = riderMaillots;
+    }
+
+    public void addRiderMaillots(Maillot riderMaillot) {
+        this.riderMaillots.add(riderMaillot);
     }
 }
