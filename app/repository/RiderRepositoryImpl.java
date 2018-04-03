@@ -51,7 +51,7 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private Stream<Rider> getAllRiders(EntityManager entityManager, long stageid) {
-        TypedQuery<Rider> query = entityManager.createQuery("select r from Rider r where r.riderStageConnections.stage.id = :stageid" , Rider.class);
+        TypedQuery<Rider> query = entityManager.createQuery("select r from Rider r inner join RiderStageConnection rc on r.id = rc.rider.id where rc.stage.id = :stageid" , Rider.class);
         query.setParameter("stageid", stageid);
         return query.getResultList().stream();
     }
