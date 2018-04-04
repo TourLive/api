@@ -150,4 +150,12 @@ public final class Parser {
         }
         return judgmentHashMap;
     }
+
+    public static final ArrayList<Long> ParseJudgmentsStage(JsonNode jsonNode){
+        ArrayList<Long> judgmentStageList = new ArrayList<>();
+        for (JsonNode n : (ArrayNode) jsonNode.findPath("judgements")) {
+            judgmentStageList.add(n.findPath("etappe").asLong());
+        }
+        return judgmentStageList;
+    }
 }

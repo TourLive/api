@@ -44,6 +44,10 @@ public class Stage {
     @JsonIgnore
     private List<Maillot> mailllots = new ArrayList<Maillot>();
 
+    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @JsonIgnore
+    private List<Judgment> judgments = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -142,5 +146,13 @@ public class Stage {
 
     public void setMailllots(List<Maillot> mailllots) {
         this.mailllots = mailllots;
+    }
+
+    public List<Judgment> getJudgments() {
+        return judgments;
+    }
+
+    public void setJudgments(List<Judgment> judgments) {
+        this.judgments = judgments;
     }
 }

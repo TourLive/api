@@ -23,6 +23,10 @@ public class Judgment {
     @JsonBackReference
     private Reward reward;
 
+    @ManyToOne(cascade=CascadeType.PERSIST)
+    @JsonBackReference
+    private Stage stage;
+
     public Long getId() {
         return id;
     }
@@ -57,5 +61,13 @@ public class Judgment {
 
     public void setReward(Reward reward) {
         this.reward = reward;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
     }
 }
