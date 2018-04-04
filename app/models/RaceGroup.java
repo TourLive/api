@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SequenceGenerator(name = "key_gen_RaceGroup", sequenceName = "key_gen_RaceGroup",  initialValue = 1)
 public class RaceGroup {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_RaceGroup")
     private Long id;
     private RaceGroupType raceGroupType;
     private long actualGapTime;

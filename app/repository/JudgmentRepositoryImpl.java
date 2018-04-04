@@ -8,20 +8,25 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static java.util.concurrent.CompletableFuture.supplyAsync;
+
 public class JudgmentRepositoryImpl implements JudgmentRepository {
     private final JPAApi jpaApi;
+    private final DatabaseExecutionContext databaseExecutionContext;
 
     @Inject
-    public JudgmentRepositoryImpl(JPAApi jpaApi) {
+    public JudgmentRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
+        this.databaseExecutionContext =  databaseExecutionContext;
     }
 
     @Override
-    public Stream<Judgment> getAllJudgments() {
-        return wrap(this::getAllJudgments);
+    public CompletionStage<Stream<Judgment>> getAllJudgments() {
+        return supplyAsync(() -> wrap(this::getAllJudgments), databaseExecutionContext);
     }
 
     private Stream<Judgment> getAllJudgments(EntityManager em){
@@ -30,8 +35,8 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     @Override
-    public Stream<Judgment> getJudgmentsByRider(long id) {
-        return wrap(entityManager -> getJudgmentsByRider(entityManager, id));
+    public CompletionStage<Stream<Judgment>> getJudgmentsByRider(long id) {
+        return supplyAsync(() -> wrap(entityManager -> getJudgmentsByRider(entityManager, id)), databaseExecutionContext);
     }
 
     @Override
@@ -45,10 +50,22 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){
-        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j where j.judgmentRiderConnections.rider.id = :id" , Judgment.class);
+        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j left join JudgmentRiderConnection jRC on jRC.rider.id = :id where jRC.rider.id=:id" , Judgment.class);
         query.setParameter("id", id);
         return query.getResultList().stream();
     }
+
+    @Override
+    public CompletionStage<Stream<Judgment>> getJudgmentsByStage(long stageId) {
+        return supplyAsync(() -> wrap(entityManager -> getJudgmentByStage(entityManager, stageId)), databaseExecutionContext);
+    }
+
+    private Stream<Judgment> getJudgmentByStage(EntityManager entityManager, long stageId) {
+        TypedQuery<Judgment> query = entityManager.createQuery("select j from Judgment j where j.stage.id = :stageId" , Judgment.class);
+        query.setParameter("stageId", stageId);
+        return query.getResultList().stream();
+    }
+
 
     @Override
     public void addJudgment(Judgment judgment) {

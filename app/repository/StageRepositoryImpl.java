@@ -46,6 +46,17 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     @Override
+    public CompletionStage<Stage> getStageByCnlabId(long stageId) {
+        return supplyAsync(() -> wrap (em -> getStageByCnlabId(em, stageId)), databaseExecutionContext);
+    }
+
+    private Stage getStageByCnlabId(EntityManager em, long stageId){
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
+        query.setParameter("stageId", stageId);
+        return query.getSingleResult();
+    }
+
+    @Override
     public CompletionStage<Stream<Stage>> getAllStagesByRaceId(long raceId) {
         return supplyAsync(() -> wrap (em -> getAllStagesByRaceId(em, raceId)), databaseExecutionContext);
     }

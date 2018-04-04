@@ -2,15 +2,13 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@SequenceGenerator(name = "key_gen_Settings", sequenceName = "key_gen_Settings",  initialValue = 1)
 public class Setting {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.AUTO, generator = "key_gen_Settings")
     @JsonIgnore
     private Long id;
 

@@ -11,9 +11,10 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@SequenceGenerator(name = "key_gen_Stage", sequenceName = "key_gen_Stage",  initialValue = 1)
 public class Stage {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Stage")
     private Long id;
 
     private Long stageId;
@@ -43,6 +44,10 @@ public class Stage {
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonIgnore
     private List<Maillot> mailllots = new ArrayList<Maillot>();
+
+    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @JsonIgnore
+    private List<Judgment> judgments = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -142,5 +147,13 @@ public class Stage {
 
     public void setMailllots(List<Maillot> mailllots) {
         this.mailllots = mailllots;
+    }
+
+    public List<Judgment> getJudgments() {
+        return judgments;
+    }
+
+    public void setJudgments(List<Judgment> judgments) {
+        this.judgments = judgments;
     }
 }

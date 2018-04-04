@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SequenceGenerator(name = "key_gen_RiderStageConnections", sequenceName = "key_gen_RiderStageConnections", initialValue = 1)
 public class RiderStageConnection {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_RiderStageConnections")
     private Long id;
     private int bonusPoints;
     private int mountainBonusPoints;
