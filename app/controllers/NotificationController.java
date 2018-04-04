@@ -43,7 +43,7 @@ public class NotificationController extends Controller {
     }
 
     @ApiOperation(value ="get notifications of a specific stage at a timestamp", response = Notification.class)
-    public CompletionStage<Result> getNotificationsByTimestamp(Long stageId, Long timestamp) {
+    public CompletionStage<Result> getNotificationsByStageAndTimestamp(Long stageId, Long timestamp) {
         return notificationRepository.getNotificationsByTimestamp(stageId, new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
