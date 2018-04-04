@@ -40,6 +40,10 @@ public class Stage {
     @JsonIgnore
     private transient List<RaceGroup> racegroups = new ArrayList<RaceGroup>();
 
+    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @JsonIgnore
+    private List<Maillot> mailllots = new ArrayList<Maillot>();
+
     public Long getId() {
         return id;
     }
@@ -130,5 +134,13 @@ public class Stage {
 
     public void setStageId(Long stageId) {
         this.stageId = stageId;
+    }
+
+    public List<Maillot> getMailllots() {
+        return mailllots;
+    }
+
+    public void setMailllots(List<Maillot> mailllots) {
+        this.mailllots = mailllots;
     }
 }

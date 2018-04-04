@@ -54,10 +54,10 @@ public final class Parser {
         ArrayList<Maillot> maillots = new ArrayList<>();
         for (JsonNode n : (ArrayNode)json) {
             Maillot maillot = new Maillot();
-            maillot.setColor(json.findPath("color").asText());
-            maillot.setPartner(json.findPath("partner").asText());
-            maillot.setName(json.findPath("name").textValue());
-            maillot.setType(json.findPath("type").textValue());
+            maillot.setColor(n.findPath("color").asText());
+            maillot.setPartner(n.findPath("partner").asText());
+            maillot.setName(n.findPath("name").textValue());
+            maillot.setType(n.findPath("type").textValue());
             maillots.add(maillot);
         }
         return maillots;

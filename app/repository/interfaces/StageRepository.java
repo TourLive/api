@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 public interface StageRepository {
     CompletionStage<Stream<Stage>> getAllStages();
     CompletionStage<Stage> getStage(long stageId);
+    CompletionStage<Stream<Stage>> getAllStagesByRaceId(long raceId);
     void addStage(Stage stage);
     void deleteAllStages();
     void deleteStage(long stageId);

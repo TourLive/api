@@ -1,7 +1,9 @@
 package controllers;
 
-import akka.http.impl.util.JavaMapping;
 import controllers.importUtilities.*;
+import controllers.importUtilities.comparators.LeaderComparator;
+import controllers.importUtilities.comparators.PointsComparator;
+import controllers.importUtilities.comparators.MountainPointsComparator;
 import models.*;
 import models.enums.RaceGroupType;
 import play.libs.ws.*;
@@ -11,10 +13,7 @@ import repository.interfaces.*;
 import scala.concurrent.ExecutionContextExecutor;
 import javax.inject.Inject;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
@@ -61,8 +60,9 @@ public class ImportController extends Controller {
         deleteAllData();
         return importRace().thenApply(race -> {
             importStages().thenApply(stage -> {
-               importRiders().thenApply(rider -> {
-                   importRewards().thenApply(judgment -> {
+                importMaillots().thenApply(maillot -> {
+                    importRiders().thenApply(rider -> {
+                        importRewards().thenApply(judgment -> {
                             importJudgments().thenApply(reward -> {
                                 return ok("successfully imported judgments");
                             }).exceptionally(ex -> {
@@ -72,10 +72,14 @@ public class ImportController extends Controller {
                         }) .exceptionally(ex -> {
                             return internalServerError("importing rewards failed");
                         });
-                   return ok("successfully imported riders");
-               }) .exceptionally(ex -> {
-                   return internalServerError("importing riders failed");
-               });
+                        return ok("successfully imported riders");
+                    }) .exceptionally(ex -> {
+                        return internalServerError("importing riders failed");
+                    });
+                    return ok("successfully imported maillots");
+                }).exceptionally(ex -> {
+                    return internalServerError("importing maillots failed");
+                });
                return ok("successfully imported stages");
             }) .exceptionally(ex -> {
                 return internalServerError("importing stages failed");
@@ -109,18 +113,6 @@ public class ImportController extends Controller {
         CompletionStage<Race> promiseRace = request.get().thenApply(res -> Parser.ParseRace(res.asJson()));
         Race race = promiseRace.toCompletableFuture().join();
         raceRepository.addRace(race);
-
-        request = wsClient.url(UrlLinks.MAILLOTS + UrlLinks.getRaceId());
-        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
-        CompletionStage<List<Maillot>> promiseMaillot = request.get().thenApply(res -> Parser.ParseMaillots(res.asJson()));
-        List<Maillot> maillots = promiseMaillot.toCompletableFuture().join();
-        Race dbRace = CompletableFuture.completedFuture(raceRepository.getRace(UrlLinks.getRaceId())).join().toCompletableFuture().join();
-        for(Maillot m : maillots){
-            maillotRepository.addMaillot(m);
-            Maillot dbMaillot = CompletableFuture.completedFuture(maillotRepository.getMaillot(m.getId())).join().toCompletableFuture().join();
-            dbMaillot.setRace(dbRace);
-            maillotRepository.updateMaillot(dbMaillot);
-        }
         return CompletableFuture.completedFuture("success");
     }
 
@@ -140,8 +132,18 @@ public class ImportController extends Controller {
     }
 
     private CompletionStage<String> importMaillots(){
-
-        importMaillotRiderConnections();
+        WSRequest request = wsClient.url(UrlLinks.MAILLOTS + UrlLinks.getRaceId());
+        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        List<Stage> stages = CompletableFuture.completedFuture(stageRepository.getAllStagesByRaceId(UrlLinks.getRaceId())).join().toCompletableFuture().join().collect(Collectors.toList());
+        for(Stage s : stages){
+            CompletionStage<List<Maillot>> promiseMaillot = request.get().thenApply(res -> Parser.ParseMaillots(res.asJson()));
+            for(Maillot m : promiseMaillot.toCompletableFuture().join()){
+                maillotRepository.addMaillot(m);
+                Maillot dbMaillot = CompletableFuture.completedFuture(maillotRepository.getMaillot(m.getId())).join().toCompletableFuture().join();
+                dbMaillot.setStage(s);
+                maillotRepository.updateMaillot(dbMaillot);
+            }
+        }
         return CompletableFuture.completedFuture("success");
     }
 
@@ -161,6 +163,7 @@ public class ImportController extends Controller {
                 oneTimeImportRiders = true;
             }
             createRiderStageConnections(stage, riders).toCompletableFuture().join();
+            createMaillotRiderConnections(stage).toCompletableFuture().join();
             createDefaultRaceGroup(stage).toCompletableFuture().join();
         }
 
@@ -185,6 +188,51 @@ public class ImportController extends Controller {
         return CompletableFuture.completedFuture("success");
     }
 
+    private CompletionStage<String> createMaillotRiderConnections(Stage stage){
+        List<RiderStageConnection> rSCs = CompletableFuture.completedFuture(riderStageConnectionRepository.getRiderStageConnectionsByStageWithRiderMaillots(stage.getId())).join().toCompletableFuture().join().collect(Collectors.toList());
+        List<RiderStageConnection> rSCsBestSwiss = CompletableFuture.completedFuture(riderStageConnectionRepository.getRiderStageConnectionsByStageWithRiderMaillots(stage.getId())).join().toCompletableFuture().join().collect(Collectors.toList());
+        rSCsBestSwiss.removeIf(rSC -> !rSC.getRider().getCountry().equals("SUI"));
+
+        List<Maillot> maillots = CompletableFuture.completedFuture(maillotRepository.getAllMaillots(stage.getId())).join().toCompletableFuture().join().collect(Collectors.toList());
+        RiderStageConnection leader = null;
+        for(Maillot m : maillots){
+            switch (m.getType()){
+                case "points":
+                    Collections.sort(rSCs, new PointsComparator());
+                    leader = rSCs.get(0);
+                    leader.addRiderMaillots(m);
+                    riderStageConnectionRepository.updateRiderStageConnection(leader).toCompletableFuture().join();
+                    rSCs.set(0, riderStageConnectionRepository.getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(leader.getId()).toCompletableFuture().join());
+                    break;
+                case "bestSwiss":
+                    Collections.sort(rSCsBestSwiss, new PointsComparator());
+                    leader = rSCsBestSwiss.get(0);
+                    leader.addRiderMaillots(m);
+                    riderStageConnectionRepository.updateRiderStageConnection(leader).toCompletableFuture().join();
+                    rSCsBestSwiss.set(0, riderStageConnectionRepository.getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(leader.getId()).toCompletableFuture().join());
+                    break;
+                case "leader":
+                    Collections.sort(rSCs, new LeaderComparator());
+                    leader = rSCs.get(0);
+                    leader.addRiderMaillots(m);
+                    riderStageConnectionRepository.updateRiderStageConnection(leader).toCompletableFuture().join();
+                    rSCs.set(0, riderStageConnectionRepository.getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(leader.getId()).toCompletableFuture().join());
+                    break;
+                case "mountain":
+                    Collections.sort(rSCs, new MountainPointsComparator());
+                    leader = rSCs.get(0);
+                    leader.addRiderMaillots(m);
+                    riderStageConnectionRepository.updateRiderStageConnection(leader).toCompletableFuture().join();
+                    rSCs.set(0, riderStageConnectionRepository.getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(leader.getId()).toCompletableFuture().join());
+                    break;
+                default:
+                    break;
+            }
+        }
+        return CompletableFuture.completedFuture("success");
+    }
+
+
     private CompletionStage<String>  createDefaultRaceGroup(Stage stage){
         List<Rider> dbRiders = CompletableFuture.completedFuture(riderRepository.getAllRiders()).join();
         Stage dbStage = CompletableFuture.completedFuture(stageRepository.getStage(stage.getId())).join().toCompletableFuture().join();
@@ -192,20 +240,13 @@ public class ImportController extends Controller {
         raceGroup.setActualGapTime(0);
         raceGroup.setHistoryGapTime(0);
         raceGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
-        raceGroup.setPosition(0);
+        raceGroup.setPosition(1);
         raceGroup.setRaceGroupType(RaceGroupType.FELD);
         raceGroupRepository.addRaceGroup(raceGroup).toCompletableFuture().join();
         RaceGroup dbRaceGroup = CompletableFuture.completedFuture(raceGroupRepository.getRaceGroupById(raceGroup.getId())).join().toCompletableFuture().join();
         dbRaceGroup.setRiders(dbRiders);
         dbRaceGroup.setStage(dbStage);
         raceGroupRepository.updateRaceGroup(dbRaceGroup).toCompletableFuture().join();
-        return CompletableFuture.completedFuture("success");
-    }
-
-
-
-    private CompletionStage<String> importMaillotRiderConnections(){
-        // Link Maillot to rider over riderstageconnection, LINK: RIDERJERSEY + STAGEID
         return CompletableFuture.completedFuture("success");
     }
 
