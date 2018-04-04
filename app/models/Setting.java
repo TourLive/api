@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 
 @Entity
-@SequenceGenerator(name = "key_gen", sequenceName = "key_gen",  initialValue = 1)
+@SequenceGenerator(name = "key_gen_Settings", sequenceName = "key_gen_Settings",  initialValue = 1)
 public class Setting {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO, generator = "key_gen")
+    @GeneratedValue(strategy= GenerationType.AUTO, generator = "key_gen_Settings")
     @JsonIgnore
     private Long id;
 

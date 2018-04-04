@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@SequenceGenerator(name = "key_gen", sequenceName = "key_gen",  initialValue = 1)
+@SequenceGenerator(name = "key_gen_Judgment", sequenceName = "key_gen_Judgment",  initialValue = 1)
 public class Judgment {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen")
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Judgment")
     private Long id;
     private String name;
     private double distance;

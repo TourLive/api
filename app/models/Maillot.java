@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@SequenceGenerator(name = "key_gen", sequenceName = "key_gen",  initialValue = 1)
+@SequenceGenerator(name = "key_gen_Maillot", sequenceName = "key_gen_Maillot",  initialValue = 1)
 public class Maillot {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen")
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Maillot")
     private Long id;
     private String type;
     private String name;

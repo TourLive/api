@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@SequenceGenerator(name = "key_gen", sequenceName = "key_gen",  initialValue = 1)
+@SequenceGenerator(name = "key_gen_Stage", sequenceName = "key_gen_Stage",  initialValue = 1)
 public class Stage {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen")
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Stage")
     private Long id;
 
     private Long stageId;
