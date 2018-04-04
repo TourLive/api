@@ -33,7 +33,7 @@ public class RiderStageConnection {
     @JsonManagedReference
     private Rider rider;
     @ManyToMany(cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     private List<Maillot> riderMaillots = new ArrayList<Maillot>();
 
     public Long getId() {
