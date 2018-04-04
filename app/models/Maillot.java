@@ -17,12 +17,10 @@ public class Maillot {
     private String name;
     private String color;
     private String partner;
-    @ManyToMany(mappedBy="riderMaillots", cascade= CascadeType.ALL)
-    @JsonBackReference
+    @ManyToMany(mappedBy="riderMaillots", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    @JsonIgnore
     private Stage stage;
 
     public Long getId() {

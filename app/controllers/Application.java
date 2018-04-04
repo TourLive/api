@@ -12,4 +12,8 @@ public class Application extends Controller {
     public Result redirectDocs() {
         return  redirect("/assets/lib/swagger-ui/index.html?url=http://localhost:9000/swagger.json");
     }
+
+    public Result statusPage() {
+        return ok("I'm alive");
+    }
 }
