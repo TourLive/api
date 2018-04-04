@@ -49,6 +49,12 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
         return judgment;
     }
 
+    private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){
+        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j left join JudgmentRiderConnection jRC on jRC.rider.id = :id where jRC.rider.id=:id" , Judgment.class);
+        query.setParameter("id", id);
+        return query.getResultList().stream();
+    }
+
     @Override
     public CompletionStage<Stream<Judgment>> getJudgmentsByStage(long stageId) {
         return supplyAsync(() -> wrap(entityManager -> getJudgmentByStage(entityManager, stageId)), databaseExecutionContext);
@@ -60,11 +66,6 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
         return query.getResultList().stream();
     }
 
-    private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){
-        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j where j.judgmentRiderConnections.rider.id = :id" , Judgment.class);
-        query.setParameter("id", id);
-        return query.getResultList().stream();
-    }
 
     @Override
     public void addJudgment(Judgment judgment) {

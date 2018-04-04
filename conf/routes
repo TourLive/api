@@ -41,7 +41,7 @@ PUT     /riderStageConnection/:rSCId                controllers.RiderStageConnec
 #Judgment Routes
 GET     /judgments                                  controllers.JudgmentController.getJudgments()
 GET     /judgments/:stageId                         controllers.JudgmentController.getJudgmentsByStage(stageId : Long)
-GET     /judgments/rider/:riderId                   controllers.getJudgmentsByRider(riderId : Long)
+GET     /judgments/rider/:riderId                   controllers.JudgmentController.getJudgmentsByRider(riderId : Long)
 
 #JudgmentRiderConnection Routes
 GET     /judgmentRiderConnection/:riderId           controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)

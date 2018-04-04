@@ -6,9 +6,10 @@ import models.enums.RankingType;
 import javax.persistence.*;
 
 @Entity
+@SequenceGenerator(name = "key_gen", sequenceName = "key_gen", initialValue = 1)
 public class RiderRanking {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen")
     private Long id;
     private int rank;
     private RankingType rankingType;

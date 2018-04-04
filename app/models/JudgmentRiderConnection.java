@@ -5,9 +5,10 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import javax.persistence.*;
 
 @Entity
+@SequenceGenerator(name = "key_gen", sequenceName = "key_gen",  initialValue = 1)
 public class JudgmentRiderConnection {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen")
     private Long id;
     private int rank;
 

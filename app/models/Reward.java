@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SequenceGenerator(name = "key_gen", sequenceName = "key_gen",  initialValue = 1)
 public class Reward {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen")
     private Long id;
 
     private Long rewardId;

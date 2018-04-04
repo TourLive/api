@@ -7,9 +7,10 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
+@SequenceGenerator(name = "key_gen", sequenceName = "key_gen",  initialValue = 1)
 public class Notification {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen")
     private Long id;
     private String message;
     private Timestamp timestamp;
