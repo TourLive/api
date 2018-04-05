@@ -139,6 +139,7 @@ public final class Parser {
             Judgment judgment = new Judgment();
             judgment.setDistance(n.findPath("rennkm").asDouble());
             judgment.setName(n.findPath("name").asText());
+            judgment.setcnlabStageId(n.findPath("etappe").asLong());
             long rewardId = n.findPath("rewardId").asLong();
             if(judgmentHashMap.containsKey(rewardId)){
                 judgmentHashMap.get(rewardId).add(judgment);
@@ -149,13 +150,5 @@ public final class Parser {
             }
         }
         return judgmentHashMap;
-    }
-
-    public static final ArrayList<Long> ParseJudgmentsStage(JsonNode jsonNode){
-        ArrayList<Long> judgmentStageList = new ArrayList<>();
-        for (JsonNode n : (ArrayNode) jsonNode.findPath("judgements")) {
-            judgmentStageList.add(n.findPath("etappe").asLong());
-        }
-        return judgmentStageList;
     }
 }

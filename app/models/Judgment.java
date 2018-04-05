@@ -1,6 +1,7 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -13,6 +14,8 @@ public class Judgment {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Judgment")
     private Long id;
+    @JsonIgnore
+    private Long cnlabStageId;
     private String name;
     private double distance;
 
@@ -70,5 +73,13 @@ public class Judgment {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public Long getcnlabStageId() {
+        return cnlabStageId;
+    }
+
+    public void setcnlabStageId(Long cnlabStageId) {
+        this.cnlabStageId = cnlabStageId;
     }
 }
