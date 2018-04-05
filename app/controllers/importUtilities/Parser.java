@@ -85,10 +85,10 @@ public final class Parser {
             RiderStageConnection rSC = new RiderStageConnection();
             rSC.setBonusPoints(0);
             rSC.setBonusTime(0);
-            rSC.setOfficialGap(json.findPath("timeRueckLong").longValue());
-            rSC.setOfficialTime(json.findPath("timeOffLong").longValue());
-            rSC.setVirtualGap(json.findPath("timeVirtLong").longValue());
-            boolean state = json.findPath("active").booleanValue();
+            rSC.setOfficialGap(n.findPath("timeRueckLong").longValue());
+            rSC.setOfficialTime(n.findPath("timeOffLong").longValue());
+            rSC.setVirtualGap(n.findPath("timeVirtLong").longValue());
+            boolean state = n.findPath("active").booleanValue();
             if (state) {
                 rSC.setTypeState(TypeState.ACTIVE);
             } else {
