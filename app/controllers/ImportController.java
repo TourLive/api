@@ -270,7 +270,7 @@ public class ImportController extends Controller {
             return Parser.ParseJudgments(res.asJson());
         });
         HashMap<Long, ArrayList<Judgment>> judgments = promiseJudgments.toCompletableFuture().join();
-        List<Reward> dbRewards = CompletableFuture.completedFuture(rewardRepository.getAllRewards()).join().collect(Collectors.toList());
+        List<Reward> dbRewards = CompletableFuture.completedFuture(rewardRepository.getAllRewards()).join().toCompletableFuture().join().collect(Collectors.toList());
 
         for(Long rewardId : judgments.keySet()){
             Reward dbReward = null;

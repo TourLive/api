@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 @ImplementedBy(RewardRepositoryImpl.class)
 public interface RewardRepository {
-    Stream<Reward> getAllRewards();
+    CompletionStage<Stream<Reward>> getAllRewards();
     Reward getRewardById(long id);
     void addReward(Reward reward);
     void deleteAllRewards();
