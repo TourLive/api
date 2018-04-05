@@ -21,7 +21,7 @@ public class Judgment {
     private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
 
     @ManyToOne(cascade=CascadeType.PERSIST)
-    @JsonBackReference
+    @JsonManagedReference
     private Reward reward;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
