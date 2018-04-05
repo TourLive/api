@@ -43,6 +43,9 @@ GET     /judgments                                  controllers.JudgmentControll
 GET     /judgments/stages/:stageId                  controllers.JudgmentController.getJudgmentsByStage(stageId : Long)
 GET     /judgments/riders/:riderId                  controllers.JudgmentController.getJudgmentsByRider(riderId : Long)
 
+#Reward Routes
+GET     /rewards                                    controllers.RewardController.getRewards()
+
 #JudgmentRiderConnection Routes
 GET     /judgmentRiderConnections/:riderId          controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
 POST    /judgmentRiderConnections                   controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()

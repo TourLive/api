@@ -270,12 +270,8 @@ public class ImportController extends Controller {
             return Parser.ParseJudgments(res.asJson());
         });
         HashMap<Long, ArrayList<Judgment>> judgments = promiseJudgments.toCompletableFuture().join();
-        List<Reward> dbRewards = CompletableFuture.completedFuture(rewardRepository.getAllRewards()).join().collect(Collectors.toList());
-        CompletionStage<ArrayList<Long>> promiseJudgmentsStage = request.get().thenApply(res -> {
-            return Parser.ParseJudgmentsStage(res.asJson());
-        });
-        ArrayList<Long> judgmentForStageList = promiseJudgmentsStage.toCompletableFuture().join();
-        int judgmentpos = 0;
+        List<Reward> dbRewards = CompletableFuture.completedFuture(rewardRepository.getAllRewards()).join().toCompletableFuture().join().collect(Collectors.toList());
+
         for(Long rewardId : judgments.keySet()){
             Reward dbReward = null;
             for(Reward r : dbRewards){
@@ -287,10 +283,9 @@ public class ImportController extends Controller {
             ArrayList<Judgment> judgmentList = judgments.get(rewardId);
             for (Judgment j : judgmentList) {
                 judgmentRepository.addJudgment(j);
-                Judgment dbJ = CompletableFuture.completedFuture(judgmentRepository.getJudgmentById(j.getId())).join();
+                Judgment dbJ = CompletableFuture.completedFuture(judgmentRepository.getJudgmentByIdCompleted(j.getId())).join().toCompletableFuture().join();
                 dbJ.setReward(dbReward);
-                Stage stage = stageRepository.getStageByCnlabId(judgmentForStageList.get(judgmentpos)).toCompletableFuture().join();
-                judgmentpos++;
+                Stage stage = stageRepository.getStageByCnlabId(dbJ.getcnlabStageId()).toCompletableFuture().join();
                 dbJ.setStage(stage);
                 judgmentRepository.updateJudgment(dbJ);
             }

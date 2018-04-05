@@ -49,6 +49,16 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
         return judgment;
     }
 
+    @Override
+    public CompletionStage<Judgment> getJudgmentByIdCompleted(long id) {
+        return supplyAsync(() -> wrap(entityManager -> getJudgmentByIdCompleted(entityManager, id)), databaseExecutionContext);
+    }
+
+    private Judgment getJudgmentByIdCompleted(EntityManager entityManager, long id) {
+        Judgment judgment = entityManager.find(Judgment.class, id);
+        return judgment;
+    }
+
     private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){
         TypedQuery<Judgment> query = em.createQuery("select j from Judgment j left join JudgmentRiderConnection jRC on jRC.rider.id = :id where jRC.rider.id=:id" , Judgment.class);
         query.setParameter("id", id);
