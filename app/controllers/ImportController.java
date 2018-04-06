@@ -6,6 +6,7 @@ import controllers.importUtilities.comparators.PointsComparator;
 import controllers.importUtilities.comparators.MountainPointsComparator;
 import models.*;
 import models.enums.RaceGroupType;
+import models.enums.TypeState;
 import play.libs.ws.*;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -17,6 +18,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class ImportController extends Controller {
@@ -234,7 +236,12 @@ public class ImportController extends Controller {
 
 
     private CompletionStage<String>  createDefaultRaceGroup(Stage stage){
-        List<Rider> dbRiders = CompletableFuture.completedFuture(riderRepository.getAllRiders()).join();
+        Stream<RiderStageConnection> dbRSC = CompletableFuture.completedFuture(riderStageConnectionRepository.getAllRiderStageConnections(stage.getId())).join().toCompletableFuture().join();
+        List<RiderStageConnection> activeRSC = dbRSC.filter(rSC -> rSC.getTypeState() == TypeState.ACTIVE).collect(Collectors.toList());
+        List<Rider> activeRiders = new ArrayList<>();
+        for(RiderStageConnection s : activeRSC){
+            activeRiders.add(s.getRider());
+        }
         Stage dbStage = CompletableFuture.completedFuture(stageRepository.getStage(stage.getId())).join().toCompletableFuture().join();
         RaceGroup raceGroup = new RaceGroup();
         raceGroup.setActualGapTime(0);
@@ -244,7 +251,7 @@ public class ImportController extends Controller {
         raceGroup.setRaceGroupType(RaceGroupType.FELD);
         raceGroupRepository.addRaceGroup(raceGroup).toCompletableFuture().join();
         RaceGroup dbRaceGroup = CompletableFuture.completedFuture(raceGroupRepository.getRaceGroupById(raceGroup.getId())).join().toCompletableFuture().join();
-        dbRaceGroup.setRiders(dbRiders);
+        dbRaceGroup.setRiders(activeRiders);
         dbRaceGroup.setStage(dbStage);
         raceGroupRepository.updateRaceGroup(dbRaceGroup).toCompletableFuture().join();
         return CompletableFuture.completedFuture("success");

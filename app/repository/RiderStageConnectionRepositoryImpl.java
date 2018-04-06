@@ -48,12 +48,12 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     @Override
-    public CompletionStage<RiderStageConnection> getRiderStageConnection(long stageId) {
-        return supplyAsync(() -> wrap (em -> getRiderStageConnection(em, stageId)), databaseExecutionContext);
+    public CompletionStage<RiderStageConnection> getRiderStageConnection(long riderStageConnectionId) {
+        return supplyAsync(() -> wrap (em -> getRiderStageConnection(em, riderStageConnectionId)), databaseExecutionContext);
     }
 
-    private RiderStageConnection getRiderStageConnection(EntityManager em, long stageId){
-        return em.find(RiderStageConnection.class, stageId);
+    private RiderStageConnection getRiderStageConnection(EntityManager em, long riderStageConnectionId){
+        return em.find(RiderStageConnection.class, riderStageConnectionId);
     }
 
     @Override

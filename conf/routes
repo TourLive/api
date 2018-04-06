@@ -34,9 +34,9 @@ GET     /notifications/stages/:stageId/:timestamp   controllers.NotificationCont
 POST    /notifications/:stageId                     controllers.NotificationController.addNotification(stageId : Long)
 
 #RiderStageConnection Routes
-GET     /riderStageConnections/stages/:stageId              controllers.RiderStageConnectionController.getRiderStageConnections(stageId : Long)
-GET     /riderStageConnections/stages/:stageId/:riderId     controllers.RiderStageConnectionController.getRiderStageConnection(stageId : Long, riderId : Long)
-PUT     /riderStageConnections/:rSCId                       controllers.RiderStageConnectionController.updateRiderStageConnection(rSCId : Long)
+GET     /riderstageconnections/stages/:stageId              controllers.RiderStageConnectionController.getRiderStageConnections(stageId : Long)
+GET     /riderstageconnections/stages/:stageId/:riderId     controllers.RiderStageConnectionController.getRiderStageConnection(stageId : Long, riderId : Long)
+PUT     /riderstageconnections/:rSCId                       controllers.RiderStageConnectionController.updateRiderStageConnection(rSCId : Long)
 
 #Judgment Routes
 GET     /judgments                                  controllers.JudgmentController.getJudgments()
@@ -47,18 +47,18 @@ GET     /judgments/riders/:riderId                  controllers.JudgmentControll
 GET     /rewards                                    controllers.RewardController.getRewards()
 
 #JudgmentRiderConnection Routes
-GET     /judgmentRiderConnections/:riderId          controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
-POST    /judgmentRiderConnections                   controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()
+GET     /judgmentriderConnections/:riderId          controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
+POST    /judgmentriderConnections                   controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()
 
 #Maillot Routes
 GET     /maillots/stages/:stageId                   controllers.MaillotController.getMaillots(stageId : Long)
 GET     /maillots/:maillotId                        controllers.MaillotController.getMaillot(maillotId : Long)
 
 #RiderRanking Routes
-GET     /riderRankings/riderStageConnections/:riderStageConnectionId                                controllers.RiderRankingConnectionController.getRiderRankings(riderStageConnectionId : Long)
-GET     /riderRankings/riderStageConnections/:riderStageConnectionId/RankingTypes/:rankingType      controllers.RiderRankingConnectionController.getRiderRankingsByType(riderStageConnectionId : Long, rankingType : String)
-GET     /riderRankings/riders/:riderId/RankingsTypes/:rankingType                                   controllers.RiderRankingConnectionController.getRiderRankingByRiderAndType(riderId : Long, rankingType : String)
-PUT     /riderRankings/:riderRankingId                                                              controllers.RiderRankingConnectionController.updateRiderRanking(riderRankingId : Long)
+GET     /riderrankings/riderstageConnections/:riderStageConnectionId                                controllers.RiderRankingConnectionController.getRiderRankings(riderStageConnectionId : Long)
+GET     /riderrankings/riderstageConnections/:riderStageConnectionId/rankingtypes/:rankingType      controllers.RiderRankingConnectionController.getRiderRankingsByType(riderStageConnectionId : Long, rankingType : String)
+GET     /riderrankings/riders/:riderId/rankingstypes/:rankingType                                   controllers.RiderRankingConnectionController.getRiderRankingByRiderAndType(riderId : Long, rankingType : String)
+PUT     /riderrankings/:riderRankingId                                                              controllers.RiderRankingConnectionController.updateRiderRanking(riderRankingId : Long)
 
 #Import Route
 GET     /import                             controllers.ImportController.importAllStaticData

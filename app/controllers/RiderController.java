@@ -62,7 +62,7 @@ public class RiderController extends Controller {
             try{
                 Rider rider = new Rider();
                 rider.setCountry(json.findPath("country").textValue());
-                rider.setUnkown(json.findPath("isUnknown").booleanValue());
+                rider.setUnknown(json.findPath("isUnknown").booleanValue());
                 rider.setName(json.findPath("name").textValue());
                 rider.setStartNr(json.findPath("startNr").intValue());
                 rider.setTeamName(json.findPath("teamName").textValue());

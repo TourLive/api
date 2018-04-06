@@ -6,7 +6,6 @@ import models.*;
 import models.enums.RewardType;
 import models.enums.StageType;
 import models.enums.TypeState;
-import scala.Int;
 
 import java.util.*;
 
@@ -73,7 +72,7 @@ public final class Parser {
             rider.setStartNr(n.findPath("startNr").intValue());
             rider.setTeamName(n.findPath("team").textValue());
             rider.setTeamShortName(n.findPath("teamShort").textValue());
-            rider.setUnkown(false);
+            rider.setUnknown(false);
             riders.add(rider);
         }
         return riders;
