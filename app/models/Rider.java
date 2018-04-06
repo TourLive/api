@@ -85,11 +85,11 @@ public class Rider {
         this.teamShortName = teamShortName;
     }
 
-    public boolean isUnkown() {
+    public boolean isUnknown() {
         return isUnknown;
     }
 
-    public void setUnkown(boolean unknown) {
+    public void setUnknown(boolean unknown) {
         isUnknown = unknown;
     }
 
