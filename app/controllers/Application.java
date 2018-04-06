@@ -1,5 +1,7 @@
 package controllers;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.index;
@@ -16,6 +18,6 @@ public class Application extends Controller {
     }
 
     public Result statusPage() {
-        return ok(toJson("I'm alive"));
+        return ok("{\"status\": \"I'm alive\"}").as("application/json");
     }
 }
