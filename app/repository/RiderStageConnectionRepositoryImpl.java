@@ -94,6 +94,13 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     private RiderStageConnection updateRiderStageConnection(EntityManager entityManager, RiderStageConnection riderStageConnection){
+        if (riderStageConnection.getStage() == null) {
+            RiderStageConnection dbRSC = entityManager.find(RiderStageConnection.class, riderStageConnection.getId());
+            riderStageConnection.setRider(dbRSC.getRider());
+            riderStageConnection.setRiderMaillots(dbRSC.getRiderMaillots());
+            riderStageConnection.setRiderRankings(dbRSC.getRiderRankings());
+            riderStageConnection.setStage(dbRSC.getStage());
+        }
         entityManager.merge(riderStageConnection);
         return null;
     }

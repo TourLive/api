@@ -139,7 +139,8 @@ public class ImportController extends Controller {
         List<Stage> stages = CompletableFuture.completedFuture(stageRepository.getAllStagesByRaceId(UrlLinks.getRaceId())).join().toCompletableFuture().join().collect(Collectors.toList());
         for(Stage s : stages){
             CompletionStage<List<Maillot>> promiseMaillot = request.get().thenApply(res -> Parser.ParseMaillots(res.asJson()));
-            for(Maillot m : promiseMaillot.toCompletableFuture().join()){
+            List<Maillot> test = promiseMaillot.toCompletableFuture().join();
+            for(Maillot m : test){
                 maillotRepository.addMaillot(m);
                 Maillot dbMaillot = CompletableFuture.completedFuture(maillotRepository.getMaillot(m.getId())).join().toCompletableFuture().join();
                 dbMaillot.setStage(s);

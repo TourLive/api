@@ -89,7 +89,7 @@ public class RiderStageConnectionController extends Controller {
             try{
                 RiderStageConnection riderStageConnection = new RiderStageConnection();
                 riderStageConnection.setId(riderStageConnectionId);
-                riderStageConnection.setBonusPoints(json.findPath("bonusPoints").asInt());
+                riderStageConnection.setBonusPoints(json.findPath("bonusPoint").asInt());
                 riderStageConnection.setMountainBonusPoints(json.findPath("mountainBonusPoints").asInt());
                 riderStageConnection.setSprintBonusPoints(json.findPath("sprintBonusPoints").asInt());
                 riderStageConnection.setBonusTime(json.findPath("bonusTime").asInt());
