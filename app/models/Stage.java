@@ -24,6 +24,7 @@ public class Stage {
     private StageType stageType;
     private String start;
     private String destination;
+    private String stageName;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
@@ -155,5 +156,13 @@ public class Stage {
 
     public void setJudgments(List<Judgment> judgments) {
         this.judgments = judgments;
+    }
+
+    public String getStageName() {
+        return stageName;
+    }
+
+    public void setStageName(String stageName) {
+        this.stageName = stageName;
     }
 }

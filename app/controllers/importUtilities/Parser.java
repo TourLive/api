@@ -40,6 +40,7 @@ public final class Parser {
             stage.setDestination(n.findPath("to").textValue());
             stage.setStart(n.findPath("from").textValue());
             stage.setDistance(n.findPath("distance").asDouble());
+            stage.setStageName(n.findPath("stageName").asText());
             stage.setEndTime(new Date(n.findPath("endtimeAsTimestamp").asLong()));
             stage.setStartTime(new Date(n.findPath("starttimeAsTimestamp").asLong()));
             stage.setStageType(StageType.valueOf(n.findPath("stagetype").textValue()));
