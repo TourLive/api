@@ -24,8 +24,7 @@ public class RaceGroup {
     @JsonIgnore
     private Stage stage;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @ManyToMany(cascade= {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<Rider> riders = new ArrayList<>();
 
     public Long getId() {

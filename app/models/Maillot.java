@@ -18,7 +18,7 @@ public class Maillot {
     private String name;
     private String color;
     private String partner;
-    @ManyToMany(cascade= {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy="riderMaillots", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
     @ManyToOne

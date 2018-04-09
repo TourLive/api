@@ -23,14 +23,14 @@ public class Rider {
     private String teamShortName;
     private boolean isUnknown;
 
-    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonBackReference
     private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     @JsonBackReference
     private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
-    @ManyToMany(mappedBy="riders")
-    @JsonIgnore
+    @ManyToMany(mappedBy="riders", cascade= {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonBackReference
     private List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
 
     public Long getId() {
