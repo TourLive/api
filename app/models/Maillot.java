@@ -18,10 +18,10 @@ public class Maillot {
     private String name;
     private String color;
     private String partner;
-    @ManyToMany(mappedBy="riderMaillots", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade= {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    @ManyToOne
     private Stage stage;
 
     public Long getId() {

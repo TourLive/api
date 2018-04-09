@@ -33,7 +33,7 @@ public class RiderStageConnection {
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonManagedReference
     private Rider rider;
-    @ManyToMany(cascade= CascadeType.ALL)
+    @ManyToMany(mappedBy="riderStageConnections", cascade= {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonBackReference
     private List<Maillot> riderMaillots = new ArrayList<Maillot>();
 
