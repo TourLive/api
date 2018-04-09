@@ -1,6 +1,7 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import controllers.importUtilities.comparators.StartNrComparator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import models.JudgmentRiderConnection;
@@ -13,6 +14,8 @@ import play.mvc.Result;
 import repository.interfaces.RiderStageConnectionRepository;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
@@ -32,7 +35,11 @@ public class RiderStageConnectionController extends Controller {
 
     @ApiOperation(value ="get all rider stage connections of a stage", response = RiderStageConnection.class)
     public CompletionStage<Result> getRiderStageConnections(long stageId) {
-        return riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> ok(toJson(riderStageConnections.collect(Collectors.toList())))).exceptionally(ex -> {
+        return riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> {
+            List<RiderStageConnection> returnValues = riderStageConnections.collect(Collectors.toList());
+            returnValues.sort(new StartNrComparator());
+            return ok(toJson(returnValues));
+        }).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
