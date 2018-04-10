@@ -58,7 +58,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     }
 
     private RaceGroup getRaceGroupField(EntityManager entityManager, long stageId) {
-        TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.raceGroupType = :type and rg.stage.id = :stageId" , RaceGroup.class);
+        TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.raceGroupType = :type and rG.stage.id = :stageId" , RaceGroup.class);
         query.setParameter("type", RaceGroupType.FELD);
         query.setParameter("stageId", stageId);
         return query.getSingleResult();
