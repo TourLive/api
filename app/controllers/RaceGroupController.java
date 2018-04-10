@@ -149,12 +149,12 @@ public class RaceGroupController extends Controller {
 
     @ApiOperation(value ="update specific racegroups time")
     @BodyParser.Of(BodyParser.Json.class)
-    public CompletionStage<Result> updateRaceGroup(String raceGroupId) {
+    public CompletionStage<Result> updateRaceGroup(String raceGroupId, long stageId) {
         RaceGroup raceGroup = null;
         try{
             raceGroup = raceGroupRepository.getRaceGroupByAppId(raceGroupId).toCompletableFuture().join();
         } catch (Exception ex){
-            raceGroup = raceGroupRepository.getRaceGroupField();
+            raceGroup = raceGroupRepository.getRaceGroupField(stageId);
             raceGroup.setAppId(raceGroupId);
         }
         raceGroup = parseRaceGroup(request().body().asJson(), raceGroup).toCompletableFuture().join();

@@ -23,10 +23,10 @@ GET     /riders/stages/:stageId     controllers.RiderController.getRiders(stageI
 GET     /riders/:riderId            controllers.RiderController.getRider(riderId : Long)
 
 #Racegroup Routes
-GET     /racegroups/stages/:stageId          controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
-GET     /racegroups/:raceGroupId             controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
-POST    /racegroups/stages/:stageId          controllers.RaceGroupController.manageRaceGroups(stageId : Long)
-PUT     /racegroups/:raceGroupId             controllers.RaceGroupController.updateRaceGroup(raceGroupId : String)
+GET     /racegroups/stages/:stageId                      controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
+GET     /racegroups/:raceGroupId                         controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
+POST    /racegroups/stages/:stageId                      controllers.RaceGroupController.manageRaceGroups(stageId : Long)
+PUT     /racegroups/:raceGroupId/stages/:stageId         controllers.RaceGroupController.updateRaceGroup(raceGroupId : String, stageId : Long)
 
 #Notifcation Routes
 GET     /notifications/stages/:stageId              controllers.NotificationController.getNotifications(stageId : Long)

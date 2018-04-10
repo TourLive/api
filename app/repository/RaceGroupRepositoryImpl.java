@@ -53,13 +53,14 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     }
 
     @Override
-    public RaceGroup getRaceGroupField() {
-        return wrap(em -> getRaceGroupField(em));
+    public RaceGroup getRaceGroupField(long stageId) {
+        return wrap(em -> getRaceGroupField(em, stageId));
     }
 
-    private RaceGroup getRaceGroupField(EntityManager entityManager) {
-        TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.raceGroupType = :type" , RaceGroup.class);
+    private RaceGroup getRaceGroupField(EntityManager entityManager, long stageId) {
+        TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.raceGroupType = :type and rg.stage.id = :stageId" , RaceGroup.class);
         query.setParameter("type", RaceGroupType.FELD);
+        query.setParameter("stageId", stageId);
         return query.getSingleResult();
     }
 

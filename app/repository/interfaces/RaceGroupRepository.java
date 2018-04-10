@@ -12,7 +12,7 @@ public interface RaceGroupRepository {
     CompletionStage<Stream<RaceGroup>> getAllRaceGroups(long stageId);
     CompletionStage<RaceGroup> getRaceGroupById(long id);
     CompletionStage<RaceGroup> getRaceGroupByAppId(String id);
-    RaceGroup getRaceGroupField();
+    RaceGroup getRaceGroupField(long stageId);
     CompletionStage<RaceGroup> addRaceGroup(RaceGroup raceGroup);
     CompletionStage<RaceGroup> updateRaceGroup(RaceGroup raceGroup);
     void deleteAllRaceGroups();
