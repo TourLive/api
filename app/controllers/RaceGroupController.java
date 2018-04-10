@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import controllers.importUtilities.comparators.StartNrComparator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import models.Race;
 import models.RaceGroup;
 import models.Rider;
 import models.Stage;
@@ -21,6 +23,7 @@ import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -81,14 +84,17 @@ public class RaceGroupController extends Controller {
         for(RaceGroup raceGroup : dbRaceGroups){
             stringRaceGroupHashMap.put(raceGroup.getAppId(), raceGroup);
         }
-        Http.Request r = request();
-        List<RaceGroup> receivedRaceGroups = parseRaceGroups(r.body().asJson(), stageId).toCompletableFuture().join();
+        List<RaceGroup> receivedRaceGroups = parseRaceGroups(request().body().asJson(), stageId).toCompletableFuture().join();
         for(RaceGroup raceGroup : receivedRaceGroups){
             // Allready persisted raceGroup -> UpdateRaceGroup
             if(raceGroup.getRaceGroupType() == RaceGroupType.FELD || stringRaceGroupHashMap.containsKey(raceGroup.getAppId())){
-                raceGroup.setId(stringRaceGroupHashMap.get(raceGroup.getAppId()).getId());
+                if(raceGroup.getRaceGroupType() != RaceGroupType.FELD){
+                    raceGroup.setId(stringRaceGroupHashMap.get(raceGroup.getAppId()).getId());
+                    dbRaceGroups.remove(stringRaceGroupHashMap.get(raceGroup.getAppId()));
+                } else {
+                    dbRaceGroups.remove(raceGroup);
+                }
                 raceGroupRepository.updateRaceGroup(raceGroup);
-                dbRaceGroups.remove(stringRaceGroupHashMap.get(raceGroup.getAppId()));
             } else {
                 // New RaceGroup
                 raceGroupRepository.addRaceGroup(raceGroup);
@@ -117,7 +123,7 @@ public class RaceGroupController extends Controller {
                     RaceGroup raceGroup = new RaceGroup();
                     String raceGroupType = raceGroupJson.findPath("type").textValue();
                     raceGroup.setRaceGroupType(RaceGroupType.valueOf(raceGroupType));
-                    raceGroup.setHistoryGapTime(raceGroupJson.findPath("actualGapTime").longValue());
+                    raceGroup.setHistoryGapTime(raceGroupJson.findPath("historyGapTime").longValue());
                     raceGroup.setActualGapTime(raceGroupJson.findPath("actualGapTime").longValue());
                     raceGroup.setPosition(raceGroupJson.findPath("position").intValue());
                     raceGroup.setAppId(raceGroupJson.findPath("id").asText());
@@ -141,41 +147,38 @@ public class RaceGroupController extends Controller {
     }
 
 
-
-    @ApiOperation(value ="add new racegroup")
+    @ApiOperation(value ="update specific racegroups time")
     @BodyParser.Of(BodyParser.Json.class)
-    public CompletionStage<Result> addRaceGroup() {
-        JsonNode json = request().body().asJson();
-        return parseNewRaceGroup(json).thenApply(raceGroupRepository::addRaceGroup).thenApply(raceGroup -> ok("success")).exceptionally(ex -> {
-            Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "NullPointerException":
-                    res = badRequest("json format of racegroup was wrong");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
-            }
-            return res;
-        });
+    public CompletionStage<Result> updateRaceGroup(String raceGroupId) {
+        RaceGroup raceGroup = null;
+        try{
+            raceGroup = raceGroupRepository.getRaceGroupByAppId(raceGroupId).toCompletableFuture().join();
+        } catch (Exception ex){
+            raceGroup = raceGroupRepository.getRaceGroupField();
+            raceGroup.setAppId(raceGroupId);
+        }
+        raceGroup = parseRaceGroup(request().body().asJson(), raceGroup).toCompletableFuture().join();
+        raceGroupRepository.updateRaceGroup(raceGroup);
+        return CompletableFuture.completedFuture(ok());
     }
 
-    @ApiOperation(value ="update a specific racegroup")
-    @BodyParser.Of(BodyParser.Json.class)
-    public CompletionStage<Result> updateRaceGroup(long raceGroupId) {
-        JsonNode json = request().body().asJson();
-        return parseUpdateRaceGroup(json, raceGroupId).thenApply(raceGroupRepository::updateRaceGroup).thenApply(raceGroup -> ok("success")).exceptionally(ex -> {
-            Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "NullPointerException":
-                    res = badRequest("json format of racegroup was wrong");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
-            }
-            return res;
-        });
-    }
+    private CompletableFuture<RaceGroup> parseRaceGroup (JsonNode json, RaceGroup raceGroup) {
+        CompletableFuture<RaceGroup> completableFuture = new CompletableFuture<>();
 
+        Executors.newCachedThreadPool().submit(() -> {
+            try {
+                raceGroup.setActualGapTime(json.findPath("actualGapTime").longValue());
+                raceGroup.setHistoryGapTime(json.findPath("historyGapTime").longValue());
+                completableFuture.complete(raceGroup);
+
+            } catch (Exception e) {
+                completableFuture.obtrudeException(e);
+                throw e;
+            }
+        });
+
+        return completableFuture;
+    }
 
     private CompletableFuture<RaceGroup> parseNewRaceGroup (JsonNode json) {
         CompletableFuture<RaceGroup> completableFuture = new CompletableFuture<>();

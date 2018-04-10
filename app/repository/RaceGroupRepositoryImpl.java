@@ -1,6 +1,7 @@
 package repository;
 
 import models.RaceGroup;
+import models.enums.RaceGroupType;
 import play.db.jpa.JPAApi;
 import repository.interfaces.RaceGroupRepository;
 
@@ -37,6 +38,28 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     private RaceGroup getRaceGroupById(EntityManager entityManager, long id) {
         TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.id = :raceGroupId" , RaceGroup.class);
         query.setParameter("raceGroupId", id);
+        return query.getSingleResult();
+    }
+
+    @Override
+    public CompletionStage<RaceGroup> getRaceGroupByAppId(String id) {
+        return supplyAsync(() -> wrap(em -> getRaceGroupByAppId(em, id)), databaseExecutionContext);
+    }
+
+    private RaceGroup getRaceGroupByAppId(EntityManager entityManager, String id) {
+        TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.appId = :raceGroupId" , RaceGroup.class);
+        query.setParameter("raceGroupId", id);
+        return query.getSingleResult();
+    }
+
+    @Override
+    public RaceGroup getRaceGroupField() {
+        return wrap(em -> getRaceGroupField(em));
+    }
+
+    private RaceGroup getRaceGroupField(EntityManager entityManager) {
+        TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.raceGroupType = :type" , RaceGroup.class);
+        query.setParameter("type", RaceGroupType.FELD);
         return query.getSingleResult();
     }
 
