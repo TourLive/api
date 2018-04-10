@@ -14,11 +14,11 @@ public class JudgmentRiderConnection {
 
     private String appId;
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    @ManyToOne(cascade=CascadeType.MERGE)
     @JsonBackReference
     private Rider rider;
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    @ManyToOne(cascade=CascadeType.MERGE)
     @JsonBackReference
     private Judgment judgment;
 

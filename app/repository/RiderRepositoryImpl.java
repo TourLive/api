@@ -35,12 +35,23 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     @Override
+    public Rider getRiderByCnlabId(long riderId) {
+        return wrap(entityManager -> getRiderByCnlabId(entityManager, riderId));
+    }
+
+    private Rider getRiderByCnlabId(EntityManager em, long riderId){
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        query.setParameter("riderId", riderId);
+        return query.getSingleResult();
+    }
+
+    @Override
     public Rider getRider(long riderId) {
         return wrap(entityManager -> getRider(entityManager, riderId));
     }
 
     private Rider getRider(EntityManager em, long riderId){
-        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id = :riderId" , Rider.class);
         query.setParameter("riderId", riderId);
         return query.getSingleResult();
     }

@@ -182,7 +182,7 @@ public class ImportController extends Controller {
             RiderStageConnection rSC = riderStageConnections.get(i);
             riderStageConnectionRepository.addRiderStageConnection(rSC);
             RiderStageConnection dbRSC = CompletableFuture.completedFuture(riderStageConnectionRepository.getRiderStageConnection(rSC.getId())).join().toCompletableFuture().join();
-            Rider dbRider = riderRepository.getRider(riders.get(i).getRiderId());
+            Rider dbRider = riderRepository.getRiderByCnlabId(riders.get(i).getRiderId());
             Stage dbStage = CompletableFuture.completedFuture(stageRepository.getStage(stage.getId())).join().toCompletableFuture().join();
             dbRSC.setStage(dbStage);
             dbRSC.setRider(dbRider);

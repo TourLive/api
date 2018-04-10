@@ -86,4 +86,9 @@ public class JudgmentRiderConnectionController extends Controller {
 
         return completableFuture;
     }
+
+    @ApiOperation(value ="delete a judgment rider connection by appId")
+    public CompletionStage<Result> deleteJudgmentRiderConnection(String appId) {
+        return judgmentRiderConnectionRepository.deleteJudgmentRiderConnection(appId).thenApply(judgmentRiderConnection -> ok("success")).exceptionally(ex -> internalServerError(ex.getMessage()));
+    }
 }
