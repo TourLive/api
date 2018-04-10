@@ -18,14 +18,13 @@ public class RaceGroup {
     private long actualGapTime;
     private long historyGapTime;
     private int position;
-    private Timestamp timestamp;
+    private String appId;
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    @ManyToOne(cascade=CascadeType.MERGE)
     @JsonIgnore
     private Stage stage;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @ManyToMany(cascade= CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<Rider> riders = new ArrayList<>();
 
     public Long getId() {
@@ -68,13 +67,6 @@ public class RaceGroup {
         this.position = position;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Timestamp timestamp) {
-        this.timestamp = timestamp;
-    }
 
     public List<Rider> getRiders() {
         return riders;
@@ -90,5 +82,13 @@ public class RaceGroup {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 }

@@ -23,10 +23,10 @@ GET     /riders/stages/:stageId     controllers.RiderController.getRiders(stageI
 GET     /riders/:riderId            controllers.RiderController.getRider(riderId : Long)
 
 #Racegroup Routes
-GET     /racegroups/stages/:stageId          controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
-GET     /racegroups/:raceGroupId             controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
-POST    /racegroups                          controllers.RaceGroupController.addRaceGroup()
-PUT     /racegroups/:raceGroupId             controllers.RaceGroupController.updateRaceGroup(raceGroupId: Long)
+GET     /racegroups/stages/:stageId                      controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
+GET     /racegroups/:raceGroupId                         controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
+POST    /racegroups/stages/:stageId                      controllers.RaceGroupController.manageRaceGroups(stageId : Long)
+PUT     /racegroups/:raceGroupId/stages/:stageId         controllers.RaceGroupController.updateRaceGroup(raceGroupId : String, stageId : Long)
 
 #Notifcation Routes
 GET     /notifications/stages/:stageId              controllers.NotificationController.getNotifications(stageId : Long)
@@ -47,8 +47,9 @@ GET     /judgments/riders/:riderId                  controllers.JudgmentControll
 GET     /rewards                                    controllers.RewardController.getRewards()
 
 #JudgmentRiderConnection Routes
-GET     /judgmentriderConnections/:riderId          controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
-POST    /judgmentriderConnections                   controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()
+GET     /judgmentriderconnections/:riderId          controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
+POST    /judgmentriderconnections                   controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()
+DELETE  /judgmentriderconnections/:appId            controllers.JudgmentRiderConnectionController.deleteJudgmentRiderConnection(appId : String)
 
 #Maillot Routes
 GET     /maillots/stages/:stageId                   controllers.MaillotController.getMaillots(stageId : Long)

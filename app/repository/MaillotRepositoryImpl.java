@@ -66,10 +66,10 @@ public class MaillotRepositoryImpl implements MaillotRepository {
 
     @Override
     public void deleteAllMaillots() {
-        wrap(this::deleteAllRiderStageConnections);
+        wrap(this::deleteAllMaillots);
     }
 
-    private Stream<Maillot> deleteAllRiderStageConnections(EntityManager entityManager){
+    private Stream<Maillot> deleteAllMaillots(EntityManager entityManager){
         List<Maillot> maillots = entityManager.createQuery("select m from Maillot m", Maillot.class).getResultList();
         for(Maillot m : maillots){
             entityManager.remove(m);

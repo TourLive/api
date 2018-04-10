@@ -71,10 +71,11 @@ public class JudgmentRiderConnectionController extends Controller {
         Executors.newCachedThreadPool().submit(() -> {
             try {
                 JudgmentRiderConnection judgmentRiderConnection = new JudgmentRiderConnection();
+                judgmentRiderConnection.setAppId(json.findPath("id").textValue());
                 judgmentRiderConnection.setRank(json.findPath("rank").intValue());
                 long riderId = json.findPath("riderId").longValue();
                 judgmentRiderConnection.setRider(riderRepository.getRider(riderId));
-                long judgmentId = json.findPath("judgmentId").longValue();
+                long judgmentId = json.findPath("judgementId").longValue();
                 judgmentRiderConnection.setJudgment(judgmentRepository.getJudgmentById(judgmentId));
                 completableFuture.complete(judgmentRiderConnection);
             } catch (Exception e) {
@@ -84,5 +85,10 @@ public class JudgmentRiderConnectionController extends Controller {
         });
 
         return completableFuture;
+    }
+
+    @ApiOperation(value ="delete a judgment rider connection by appId")
+    public CompletionStage<Result> deleteJudgmentRiderConnection(String appId) {
+        return judgmentRiderConnectionRepository.deleteJudgmentRiderConnection(appId).thenApply(judgmentRiderConnection -> ok("success")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 }

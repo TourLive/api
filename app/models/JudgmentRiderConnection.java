@@ -12,16 +12,26 @@ public class JudgmentRiderConnection {
     private Long id;
     private int rank;
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    private String appId;
+
+    @ManyToOne(cascade=CascadeType.MERGE)
     @JsonBackReference
     private Rider rider;
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    @ManyToOne(cascade=CascadeType.MERGE)
     @JsonBackReference
     private Judgment judgment;
 
     public Long getId() {
         return id;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public int getRank() {

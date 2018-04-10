@@ -39,4 +39,5 @@ jacocoExcludes := Seq("views*", "*Routes*")
 jacocoDirectory := baseDirectory.value /"target/jacoco"
 
 PlayKeys.externalizeResources := false
+PlayKeys.devSettings := Seq("play.server.http.idleTimeout" -> "infinite")
 

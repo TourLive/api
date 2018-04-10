@@ -30,7 +30,7 @@ public class RiderStageConnection {
     @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<RiderRanking> riderRankings = new ArrayList<RiderRanking>();
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    @ManyToOne
     @JsonManagedReference
     private Rider rider;
     @ManyToMany(cascade= CascadeType.ALL)

@@ -182,7 +182,7 @@ public class ImportController extends Controller {
             RiderStageConnection rSC = riderStageConnections.get(i);
             riderStageConnectionRepository.addRiderStageConnection(rSC);
             RiderStageConnection dbRSC = CompletableFuture.completedFuture(riderStageConnectionRepository.getRiderStageConnection(rSC.getId())).join().toCompletableFuture().join();
-            Rider dbRider = riderRepository.getRider(riders.get(i).getRiderId());
+            Rider dbRider = riderRepository.getRiderByCnlabId(riders.get(i).getRiderId());
             Stage dbStage = CompletableFuture.completedFuture(stageRepository.getStage(stage.getId())).join().toCompletableFuture().join();
             dbRSC.setStage(dbStage);
             dbRSC.setRider(dbRider);
@@ -247,7 +247,6 @@ public class ImportController extends Controller {
         RaceGroup raceGroup = new RaceGroup();
         raceGroup.setActualGapTime(0);
         raceGroup.setHistoryGapTime(0);
-        raceGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
         raceGroup.setPosition(1);
         raceGroup.setRaceGroupType(RaceGroupType.FELD);
         raceGroupRepository.addRaceGroup(raceGroup).toCompletableFuture().join();

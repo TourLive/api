@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 @ImplementedBy(RiderRepositoryImpl.class)
 public interface RiderRepository {
     List<Rider> getAllRiders();
+    Rider getRiderByCnlabId(long riderId);
     Rider getRider(long riderId);
     CompletionStage<Stream<Rider>>  getAllRiders(long stageId);
     CompletionStage<Rider> getRiderAsync(long riderId);

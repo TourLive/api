@@ -21,7 +21,7 @@ public class Maillot {
     @ManyToMany(mappedBy="riderMaillots", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    @ManyToOne
     private Stage stage;
 
     public Long getId() {
