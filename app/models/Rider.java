@@ -29,7 +29,7 @@ public class Rider {
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     @JsonBackReference
     private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
-    @ManyToMany(mappedBy="riders", cascade= {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(mappedBy="riders", cascade= CascadeType.MERGE)
     @JsonBackReference
     private List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
 

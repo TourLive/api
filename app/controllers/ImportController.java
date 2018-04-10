@@ -247,7 +247,6 @@ public class ImportController extends Controller {
         RaceGroup raceGroup = new RaceGroup();
         raceGroup.setActualGapTime(0);
         raceGroup.setHistoryGapTime(0);
-        raceGroup.setTimestamp(new Timestamp(System.currentTimeMillis()));
         raceGroup.setPosition(1);
         raceGroup.setRaceGroupType(RaceGroupType.FELD);
         raceGroupRepository.addRaceGroup(raceGroup).toCompletableFuture().join();
