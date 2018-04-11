@@ -23,6 +23,8 @@ import static play.libs.Json.toJson;
 @Api("Notification")
 public class NotificationController extends Controller {
     private final NotificationRepository notificationRepository;
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
+    private static final String NULLPOINTEREXCEPTION = "NullPointerException";
 
     @Inject
     public NotificationController(NotificationRepository notificationRepository) { this.notificationRepository = notificationRepository; }
@@ -31,12 +33,10 @@ public class NotificationController extends Controller {
     public CompletionStage<Result> getNotifications(long stageId) {
         return notificationRepository.getAllNotifications(stageId).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No notifications are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+                res = badRequest("No notifications are set in DB for this stage.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -46,12 +46,10 @@ public class NotificationController extends Controller {
     public CompletionStage<Result> getNotificationsByStageAndTimestamp(Long stageId, Long timestamp) {
         return notificationRepository.getNotificationsByTimestamp(stageId, new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No notifications are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+                res = badRequest("No notifications are set in DB for this stage with this specific timestamp.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -65,14 +63,12 @@ public class NotificationController extends Controller {
                 thenApplyAsync(dbNotification -> ok(toJson(dbNotification)))
                 .exceptionally(ex -> {
                     Result res;
-                    switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                        case "IndexOutOfBoundsException":
-                            res = badRequest("No notifications are set in DB.");
-                        break;
-                    default:
+                    if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
+                        res = badRequest("adding notification failed.");
+                    } else {
                         res = internalServerError(ex.getMessage());
                     }
-                 return res;
+                    return res;
                 });
     }
 

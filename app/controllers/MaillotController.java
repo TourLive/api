@@ -20,11 +20,13 @@ import static play.libs.Json.toJson;
 @Api("Maillot")
 public class MaillotController extends Controller {
     private final MaillotRepository maillotRepository;
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
+    private static final String NULLPOINTEREXCEPTION = "NullPointerException";
 
     @Inject
     public MaillotController(MaillotRepository maillotRepository) { this.maillotRepository = maillotRepository; }
 
-    @ApiOperation(value ="get all maillots of a race", response = Maillot.class)
+    @ApiOperation(value ="get all maillots of a stage", response = Maillot.class)
     public CompletionStage<Result> getMaillots(Long stageId) {
         return maillotRepository.getAllMaillots(stageId).thenApplyAsync(maillots -> {
             List<MaillotDTO> maillotDTOList = new ArrayList<>();
@@ -34,12 +36,10 @@ public class MaillotController extends Controller {
             return ok(toJson(maillotDTOList));
         }).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No notifications are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+                res = badRequest("No maillots are set in DB for this stage.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -49,12 +49,10 @@ public class MaillotController extends Controller {
     public CompletionStage<Result> getMaillot(Long maillotId) {
         return maillotRepository.getMaillot(maillotId).thenApplyAsync(maillot -> ok(toJson(new MaillotDTO(maillot)))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No notifications are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
+                res = badRequest("No specific maillot is set in DB for this id.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });

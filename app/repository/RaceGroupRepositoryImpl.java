@@ -18,6 +18,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
+    private static final String RACEGROUP_ID = "raceGroupId";
 
     @Inject
     public RaceGroupRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
@@ -37,7 +38,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
 
     private RaceGroup getRaceGroupById(EntityManager entityManager, long id) {
         TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.id = :raceGroupId" , RaceGroup.class);
-        query.setParameter("raceGroupId", id);
+        query.setParameter(RACEGROUP_ID, id);
         return query.getSingleResult();
     }
 
@@ -48,7 +49,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
 
     private RaceGroup getRaceGroupByAppId(EntityManager entityManager, String id) {
         TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.appId = :raceGroupId" , RaceGroup.class);
-        query.setParameter("raceGroupId", id);
+        query.setParameter(RACEGROUP_ID, id);
         return query.getSingleResult();
     }
 
@@ -110,7 +111,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
 
     private RaceGroup deleteRaceGroupById(EntityManager em, long id) {
         TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.id = :raceGroupId" , RaceGroup.class);
-        query.setParameter("raceGroupId", id);
+        query.setParameter(RACEGROUP_ID, id);
         RaceGroup raceGroup = query.getSingleResult();
         if(raceGroup != null){
             em.remove(raceGroup);

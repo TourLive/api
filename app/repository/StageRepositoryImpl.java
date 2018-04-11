@@ -17,6 +17,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class StageRepositoryImpl implements StageRepository{
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
+    private static final String STAGE_ID = "stageId";
 
     @Inject
     public StageRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
@@ -41,7 +42,7 @@ public class StageRepositoryImpl implements StageRepository{
 
     private Stage getStage(EntityManager em, long stageId){
         TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.id = :stageId" , Stage.class);
-        query.setParameter("stageId", stageId);
+        query.setParameter(STAGE_ID, stageId);
         return query.getSingleResult();
     }
 
@@ -52,7 +53,7 @@ public class StageRepositoryImpl implements StageRepository{
 
     private Stage getStageByCnlabId(EntityManager em, long stageId){
         TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
-        query.setParameter("stageId", stageId);
+        query.setParameter(STAGE_ID, stageId);
         return query.getSingleResult();
     }
 
@@ -97,7 +98,7 @@ public class StageRepositoryImpl implements StageRepository{
 
     private Stage deleteStage(EntityManager em, long stageId){
         TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.id = :stageId" , Stage.class);
-        query.setParameter("stageId", stageId);
+        query.setParameter(STAGE_ID, stageId);
         Stage stage = query.getSingleResult();
         if(stage != null){
             em.remove(stage);

@@ -38,7 +38,7 @@ public class SettingRepositoryImpl implements SettingRepository {
 
     private Setting updateSetting(EntityManager entityManager, Setting setting) {
         List<Setting> settingList = entityManager.createQuery("select s from Setting s", Setting.class).getResultList();
-        if (settingList.size() == 0) {
+        if (settingList.isEmpty()) {
             entityManager.persist(setting);
         } else {
             Setting result = settingList.get(0);

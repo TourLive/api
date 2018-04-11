@@ -22,6 +22,7 @@ import static play.libs.Json.toJson;
 @Api("RiderRanking")
 public class RiderRankingConnectionController extends Controller {
     private final RiderRankingRepository riderRankingRepository;
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
 
     @Inject
     public RiderRankingConnectionController(RiderRankingRepository riderRankingRepository) {
@@ -33,12 +34,10 @@ public class RiderRankingConnectionController extends Controller {
     public CompletionStage<Result> getRiderRankings(long riderStageConnectionId) {
         return riderRankingRepository.getAllRiderRankings(riderStageConnectionId).thenApplyAsync(riderRankings -> ok(toJson(riderRankings.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No rider rankings are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+                res = badRequest("No rider rankings are set in DB for this riderStageConnection Id.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -48,12 +47,10 @@ public class RiderRankingConnectionController extends Controller {
     public CompletionStage<Result> getRiderRankingsByType(long riderStageConnectionId, String rankingType) {
         return riderRankingRepository.getAllRiderRankingsByType(riderStageConnectionId, rankingType).thenApplyAsync(riderRankings -> ok(toJson(riderRankings.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No rider rankings are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+                res = badRequest("No rider rankings are set in DB for this riderStageConnection id and Type.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -63,12 +60,10 @@ public class RiderRankingConnectionController extends Controller {
     public CompletionStage<Result> getRiderRankingByRiderAndType(long riderId, String rankingType) {
         return riderRankingRepository.getRiderRankingByRiderAndType(riderId, rankingType).thenApplyAsync(riderRanking -> ok(toJson(riderRanking))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No rider ranking is set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+                res = badRequest("No rider rankings are set in DB for this rider id and type.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -78,16 +73,12 @@ public class RiderRankingConnectionController extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> updateRiderRanking(long riderRankingId) {
         JsonNode json = request().body().asJson();
-        return parseRiderRanking(json, riderRankingId).thenApply(riderRankingRepository::updateRiderRanking).thenApplyAsync(rSC -> {
-            return ok("success");
-        }).exceptionally(ex -> {
+        return parseRiderRanking(json, riderRankingId).thenApply(riderRankingRepository::updateRiderRanking).thenApplyAsync(rSC -> ok("success")).exceptionally(ex -> {
             Result res = null;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No stage are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+                res = badRequest("The specific riderRanking with the id was not found in DB.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -102,7 +93,7 @@ public class RiderRankingConnectionController extends Controller {
                 RiderRanking riderRanking = new RiderRanking();
                 riderRanking.setId(riderRankingId);
                 riderRanking.setRank(json.findPath("rank").asInt());
-                riderRanking.setRankingType(RankingType.valueOf(json.findPath("rankingTyp").textValue()));;
+                riderRanking.setRankingType(RankingType.valueOf(json.findPath("rankingTyp").textValue()));
                 completableFuture.complete(riderRanking);
                 return riderRanking;
             } catch (Exception e){

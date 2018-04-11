@@ -21,7 +21,7 @@ public class Judgment {
 
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
     @JsonBackReference
-    private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
+    private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<>();
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonManagedReference

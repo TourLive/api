@@ -31,19 +31,19 @@ public class Stage {
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonBackReference
-    private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
+    private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonBackReference
-    private List<Notification> notifications = new ArrayList<Notification>();
+    private List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonIgnore
-    private transient List<RaceGroup> racegroups = new ArrayList<RaceGroup>();
+    private transient List<RaceGroup> racegroups = new ArrayList<>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonIgnore
-    private List<Maillot> mailllots = new ArrayList<Maillot>();
+    private List<Maillot> mailllots = new ArrayList<>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonIgnore
