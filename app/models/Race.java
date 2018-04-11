@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -9,17 +11,18 @@ import java.util.List;
 @Entity
 public class Race {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy="race", cascade= CascadeType.ALL)
+    @OneToMany(mappedBy = "race", orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<Stage> stages = new ArrayList<Stage>();
 
     public Long getId() {
         return id;
     }
+
+    public void setId(long id){this.id = id;}
 
     public String getName() {
         return name;

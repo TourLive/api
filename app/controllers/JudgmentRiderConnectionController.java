@@ -2,6 +2,8 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import models.JudgmentRiderConnection;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
@@ -14,9 +16,11 @@ import repository.interfaces.RiderRepository;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;
 
+@Api("JudgmentRiderConnection")
 public class JudgmentRiderConnectionController extends Controller {
     private final JudgmentRiderConnectionRepository judgmentRiderConnectionRepository;
     private final RiderRepository riderRepository;
@@ -29,8 +33,9 @@ public class JudgmentRiderConnectionController extends Controller {
         this.judgmentRepository = judgmentRepository;
     }
 
+    @ApiOperation(value ="get all judgment rider connections of a specific rider", response = JudgmentRiderConnection.class)
     public CompletionStage<Result> getJudgmentRiderConnection(long riderId) {
-        return judgmentRiderConnectionRepository.getJudgmentRiderConnectionsByRider(riderId).thenApplyAsync(judgmentRiderConnection -> ok(toJson(judgmentRiderConnection))).exceptionally(ex -> {
+        return judgmentRiderConnectionRepository.getJudgmentRiderConnectionsByRider(riderId).thenApplyAsync(judgmentRiderConnection -> ok(toJson(judgmentRiderConnection.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
                 case "IndexOutOfBoundsException":
@@ -43,6 +48,7 @@ public class JudgmentRiderConnectionController extends Controller {
         });
     }
 
+    @ApiOperation(value ="add new judgment rider connection")
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> addJudgmentRiderConnection() {
         JsonNode json = request().body().asJson();
@@ -65,10 +71,11 @@ public class JudgmentRiderConnectionController extends Controller {
         Executors.newCachedThreadPool().submit(() -> {
             try {
                 JudgmentRiderConnection judgmentRiderConnection = new JudgmentRiderConnection();
+                judgmentRiderConnection.setAppId(json.findPath("id").textValue());
                 judgmentRiderConnection.setRank(json.findPath("rank").intValue());
                 long riderId = json.findPath("riderId").longValue();
                 judgmentRiderConnection.setRider(riderRepository.getRider(riderId));
-                long judgmentId = json.findPath("judgmentId").longValue();
+                long judgmentId = json.findPath("judgementId").longValue();
                 judgmentRiderConnection.setJudgment(judgmentRepository.getJudgmentById(judgmentId));
                 completableFuture.complete(judgmentRiderConnection);
             } catch (Exception e) {
@@ -78,5 +85,10 @@ public class JudgmentRiderConnectionController extends Controller {
         });
 
         return completableFuture;
+    }
+
+    @ApiOperation(value ="delete a judgment rider connection by appId")
+    public CompletionStage<Result> deleteJudgmentRiderConnection(String appId) {
+        return judgmentRiderConnectionRepository.deleteJudgmentRiderConnection(appId).thenApply(judgmentRiderConnection -> ok("success")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 }

@@ -67,15 +67,14 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
     }
 
     @Override
-    public CompletionStage<JudgmentRiderConnection> deleteJudgmentRiderConnectionByRiderAndJudgmentName(long riderId, long judgmentId) {
-        return supplyAsync(() -> wrap(entityManager -> deleteJudgmentRiderConnectionByRiderAndJudgmentName(entityManager, riderId, judgmentId)), databaseExecutionContext);
+    public CompletionStage<JudgmentRiderConnection> deleteJudgmentRiderConnection(String judgmentId) {
+        return supplyAsync(() -> wrap(entityManager -> deleteJudgmentRiderConnection(entityManager, judgmentId)), databaseExecutionContext);
     }
 
-    private JudgmentRiderConnection deleteJudgmentRiderConnectionByRiderAndJudgmentName(EntityManager entityManager, long riderId, long judgmentId) {
-        TypedQuery<JudgmentRiderConnection> query = entityManager.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.rider.id = :riderId and rSC.judgment.id = :judgmentId" , JudgmentRiderConnection.class);
-        query.setParameter("riderId", riderId);
+    private JudgmentRiderConnection deleteJudgmentRiderConnection(EntityManager entityManager, String judgmentId) {
+        TypedQuery<JudgmentRiderConnection> query = entityManager.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.appId = :judgmentId" , JudgmentRiderConnection.class);
         query.setParameter("judgmentId", judgmentId);
-        JudgmentRiderConnection jRC = query.getResultList().get(0);
+        JudgmentRiderConnection jRC = query.getSingleResult();
         if(jRC != null){
             entityManager.remove(jRC);
         }

@@ -1,6 +1,8 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import models.Notification;
 import models.enums.NotificationType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -18,12 +20,14 @@ import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;
 
+@Api("Notification")
 public class NotificationController extends Controller {
     private final NotificationRepository notificationRepository;
 
     @Inject
     public NotificationController(NotificationRepository notificationRepository) { this.notificationRepository = notificationRepository; }
 
+    @ApiOperation(value ="get notifications of a specific stage", response = Notification.class)
     public CompletionStage<Result> getNotifications(long stageId) {
         return notificationRepository.getAllNotifications(stageId).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -38,7 +42,8 @@ public class NotificationController extends Controller {
         });
     }
 
-    public CompletionStage<Result> getNotificationsByTimestamp(Long stageId, Long timestamp) {
+    @ApiOperation(value ="get notifications of a specific stage at a timestamp", response = Notification.class)
+    public CompletionStage<Result> getNotificationsByStageAndTimestamp(Long stageId, Long timestamp) {
         return notificationRepository.getNotificationsByTimestamp(stageId, new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
@@ -52,6 +57,7 @@ public class NotificationController extends Controller {
         });
     }
 
+    @ApiOperation(value ="add a notification", response = Notification.class)
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> addNotification(Long stageId) {
         JsonNode json = request().body().asJson();

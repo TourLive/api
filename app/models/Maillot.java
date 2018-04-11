@@ -1,21 +1,27 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@SequenceGenerator(name = "key_gen_Maillot", sequenceName = "key_gen_Maillot",  initialValue = 1)
 public class Maillot {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Maillot")
     private Long id;
     private String type;
     private String name;
     private String color;
     private String partner;
+    @ManyToMany(mappedBy="riderMaillots", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
-    @JsonBackReference
+    @ManyToOne
     private Stage stage;
 
     public Long getId() {
@@ -54,11 +60,17 @@ public class Maillot {
         this.partner = partner;
     }
 
-    public Stage getStage() {
-        return stage;
-    }
+    public Stage getStage() { return stage; }
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public List<RiderStageConnection> getRiderStageConnections() {
+        return riderStageConnections;
+    }
+
+    public void setRiderStageConnections(List<RiderStageConnection> riderStageConnections) {
+        this.riderStageConnections = riderStageConnections;
     }
 }

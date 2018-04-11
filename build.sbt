@@ -14,6 +14,12 @@ libraryDependencies += guice
 libraryDependencies += javaJpa
 libraryDependencies += "org.hibernate" % "hibernate-core" % "5.2.15.Final"
 libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
+libraryDependencies += "io.swagger" %% "swagger-play2" % "1.6.0"
+libraryDependencies += "org.webjars" %% "webjars-play" % "2.6.3"
+libraryDependencies += "org.webjars" % "swagger-ui" % "2.2.0"
+libraryDependencies ++= Seq(
+  ws
+)
 
 // Test Database
 libraryDependencies += "com.h2database" % "h2" % "1.4.196"
@@ -33,4 +39,5 @@ jacocoExcludes := Seq("views*", "*Routes*")
 jacocoDirectory := baseDirectory.value /"target/jacoco"
 
 PlayKeys.externalizeResources := false
+PlayKeys.devSettings := Seq("play.server.http.idleTimeout" -> "infinite")
 

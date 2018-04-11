@@ -1,5 +1,7 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -7,10 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@SequenceGenerator(name = "key_gen_Rider", sequenceName = "key_gen_Rider",  initialValue = 1)
 public class Rider {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Rider")
     private Long id;
+
+    private Long riderId;
     private int startNr;
     private String name;
     private String country;
@@ -18,18 +23,26 @@ public class Rider {
     private String teamShortName;
     private boolean isUnknown;
 
-    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @OneToMany(mappedBy="rider", cascade= CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonBackReference
     private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
-    @JsonManagedReference
+    @JsonBackReference
     private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<JudgmentRiderConnection>();
-    @ManyToMany(mappedBy="riders")
-    @JsonManagedReference
+    @ManyToMany(mappedBy="riders", cascade= CascadeType.MERGE)
+    @JsonBackReference
     private List<RaceGroup> raceGroups = new ArrayList<RaceGroup>();
 
     public Long getId() {
         return id;
+    }
+
+    public Long getRiderId() {
+        return riderId;
+    }
+
+    public void setRiderId(Long riderId) {
+        this.riderId = riderId;
     }
 
     public int getStartNr() {
@@ -72,11 +85,11 @@ public class Rider {
         this.teamShortName = teamShortName;
     }
 
-    public boolean isUnkown() {
+    public boolean isUnknown() {
         return isUnknown;
     }
 
-    public void setUnkown(boolean unknown) {
+    public void setUnknown(boolean unknown) {
         isUnknown = unknown;
     }
 

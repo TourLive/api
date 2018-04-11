@@ -11,6 +11,9 @@ import java.util.stream.Stream;
 public interface RiderStageConnectionRepository {
     CompletionStage<Stream<RiderStageConnection>>  getAllRiderStageConnections(long stageId);
     CompletionStage<RiderStageConnection> getRiderStageConnectionByRiderAndStage(long stageId, long riderId);
+    CompletionStage<RiderStageConnection> getRiderStageConnection(long riderStageConnectionId);
+    CompletionStage<Stream<RiderStageConnection>> getRiderStageConnectionsByStageWithRiderMaillots(long stageId);
+    CompletionStage<RiderStageConnection> getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(long rSCId);
     void addRiderStageConnection(RiderStageConnection riderStageConnection);
     CompletionStage<RiderStageConnection> updateRiderStageConnection(RiderStageConnection riderStageConnection);
     void deleteAllRiderStageConnections();

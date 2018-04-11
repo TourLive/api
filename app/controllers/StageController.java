@@ -1,5 +1,9 @@
 package controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import models.Maillot;
+import models.Stage;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -12,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;
 
+@Api("Stage")
 public class StageController extends Controller {
     private final StageRepository stageRepository;
     private final RaceRepository raceRepository;
@@ -22,6 +27,7 @@ public class StageController extends Controller {
         this.raceRepository = raceRepository;
     }
 
+    @ApiOperation(value ="get all stages", response = Stage.class)
     public CompletionStage<Result> getStages() {
         return stageRepository.getAllStages().thenApplyAsync(stages -> ok(toJson(stages.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -37,6 +43,7 @@ public class StageController extends Controller {
     }
 
 
+    @ApiOperation(value ="get stage by id", response = Stage.class)
     public CompletionStage<Result> getStage(long stageId) {
         return stageRepository.getStage(stageId).thenApplyAsync(stage -> ok(toJson(stage))).exceptionally(ex -> {
             Result res;

@@ -46,12 +46,33 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     @Override
+    public CompletionStage<Stage> getStageByCnlabId(long stageId) {
+        return supplyAsync(() -> wrap (em -> getStageByCnlabId(em, stageId)), databaseExecutionContext);
+    }
+
+    private Stage getStageByCnlabId(EntityManager em, long stageId){
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
+        query.setParameter("stageId", stageId);
+        return query.getSingleResult();
+    }
+
+    @Override
+    public CompletionStage<Stream<Stage>> getAllStagesByRaceId(long raceId) {
+        return supplyAsync(() -> wrap (em -> getAllStagesByRaceId(em, raceId)), databaseExecutionContext);
+    }
+
+    private Stream<Stage> getAllStagesByRaceId(EntityManager em, long raceId){
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.race.id = :raceId" , Stage.class);
+        query.setParameter("raceId", raceId);
+        return query.getResultList().stream();
+    }
+
+    @Override
     public void addStage(Stage stage) {
         wrap(entityManager -> addStage(entityManager, stage));
     }
 
     private Stage addStage(EntityManager em, Stage stage) {
-        stage.setRace(em.merge(stage.getRace()));
         em.persist(stage);
         return null;
     }
@@ -81,6 +102,16 @@ public class StageRepositoryImpl implements StageRepository{
         if(stage != null){
             em.remove(stage);
         }
+        return null;
+    }
+
+    @Override
+    public void updateStage(Stage stage){
+        wrap(entityManager -> updateStage(entityManager, stage));
+    }
+
+    private Stage updateStage(EntityManager em, Stage stage){
+        em.merge(stage);
         return null;
     }
 

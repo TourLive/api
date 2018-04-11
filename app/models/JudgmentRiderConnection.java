@@ -5,22 +5,33 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import javax.persistence.*;
 
 @Entity
+@SequenceGenerator(name = "key_gen_JudgmentRiderConnection", sequenceName = "key_gen_JudgmentRiderConnection",  initialValue = 1)
 public class JudgmentRiderConnection {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_JudgmentRiderConnection")
     private Long id;
     private int rank;
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    private String appId;
+
+    @ManyToOne(cascade=CascadeType.MERGE)
     @JsonBackReference
     private Rider rider;
 
-    @ManyToOne(cascade=CascadeType.PERSIST)
+    @ManyToOne(cascade=CascadeType.MERGE)
     @JsonBackReference
     private Judgment judgment;
 
     public Long getId() {
         return id;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public int getRank() {

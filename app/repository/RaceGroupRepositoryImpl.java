@@ -1,6 +1,7 @@
 package repository;
 
 import models.RaceGroup;
+import models.enums.RaceGroupType;
 import play.db.jpa.JPAApi;
 import repository.interfaces.RaceGroupRepository;
 
@@ -40,6 +41,29 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
         return query.getSingleResult();
     }
 
+    @Override
+    public CompletionStage<RaceGroup> getRaceGroupByAppId(String id) {
+        return supplyAsync(() -> wrap(em -> getRaceGroupByAppId(em, id)), databaseExecutionContext);
+    }
+
+    private RaceGroup getRaceGroupByAppId(EntityManager entityManager, String id) {
+        TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.appId = :raceGroupId" , RaceGroup.class);
+        query.setParameter("raceGroupId", id);
+        return query.getSingleResult();
+    }
+
+    @Override
+    public RaceGroup getRaceGroupField(long stageId) {
+        return wrap(em -> getRaceGroupField(em, stageId));
+    }
+
+    private RaceGroup getRaceGroupField(EntityManager entityManager, long stageId) {
+        TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.raceGroupType = :type and rG.stage.id = :stageId" , RaceGroup.class);
+        query.setParameter("type", RaceGroupType.FELD);
+        query.setParameter("stageId", stageId);
+        return query.getSingleResult();
+    }
+
     private Stream<RaceGroup> getAllRaceGroups(EntityManager em, long stageId){
         TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.stage.id = :stageId" , RaceGroup.class);
         query.setParameter("stageId", stageId);
@@ -73,7 +97,9 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
 
     private Stream<RaceGroup> deleteAllRaceGroups(EntityManager entityManager) {
         List<RaceGroup> raceGroups = entityManager.createQuery("select rG from RaceGroup rG", RaceGroup.class).getResultList();
-        entityManager.remove(raceGroups);
+        for(RaceGroup rG : raceGroups){
+            entityManager.remove(rG);
+        }
         return null;
     }
 

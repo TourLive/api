@@ -1,6 +1,8 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.StageType;
 
 import javax.persistence.*;
@@ -9,33 +11,44 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@SequenceGenerator(name = "key_gen_Stage", sequenceName = "key_gen_Stage",  initialValue = 1)
 public class Stage {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Stage")
     private Long id;
+
+    private Long stageId;
     private Date startTime;
     private Date endTime;
-    private int distance;
+    private double distance;
     private StageType stageType;
     private String start;
     private String destination;
+    private String stageName;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
     private Race race;
+
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonBackReference
     private List<RiderStageConnection> riderStageConnections = new ArrayList<RiderStageConnection>();
-    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    @JsonBackReference
-    private List<Maillot> mailllots = new ArrayList<Maillot>();
+
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonBackReference
     private List<Notification> notifications = new ArrayList<Notification>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
-    @JsonBackReference
-    private List<RaceGroup> racegroups = new ArrayList<RaceGroup>();
+    @JsonIgnore
+    private transient List<RaceGroup> racegroups = new ArrayList<RaceGroup>();
+
+    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @JsonIgnore
+    private List<Maillot> mailllots = new ArrayList<Maillot>();
+
+    @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
+    @JsonIgnore
+    private List<Judgment> judgments = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -57,11 +70,11 @@ public class Stage {
         this.endTime = endTime;
     }
 
-    public int getDistance() {
+    public double getDistance() {
         return distance;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 
@@ -105,14 +118,6 @@ public class Stage {
         this.riderStageConnections = riderStageConnections;
     }
 
-    public List<Maillot> getMailllots() {
-        return mailllots;
-    }
-
-    public void setMailllots(List<Maillot> mailllots) {
-        this.mailllots = mailllots;
-    }
-
     public List<Notification> getNotifications() {
         return notifications;
     }
@@ -127,5 +132,37 @@ public class Stage {
 
     public void setRaceGroups(List<RaceGroup> racegroups) {
         this.racegroups = racegroups;
+    }
+
+    public Long getStageId() {
+        return stageId;
+    }
+
+    public void setStageId(Long stageId) {
+        this.stageId = stageId;
+    }
+
+    public List<Maillot> getMailllots() {
+        return mailllots;
+    }
+
+    public void setMailllots(List<Maillot> mailllots) {
+        this.mailllots = mailllots;
+    }
+
+    public List<Judgment> getJudgments() {
+        return judgments;
+    }
+
+    public void setJudgments(List<Judgment> judgments) {
+        this.judgments = judgments;
+    }
+
+    public String getStageName() {
+        return stageName;
+    }
+
+    public void setStageName(String stageName) {
+        this.stageName = stageName;
     }
 }

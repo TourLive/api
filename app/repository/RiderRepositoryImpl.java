@@ -35,12 +35,25 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     @Override
+    public Rider getRiderByCnlabId(long riderId) {
+        return wrap(entityManager -> getRiderByCnlabId(entityManager, riderId));
+    }
+
+    private Rider getRiderByCnlabId(EntityManager em, long riderId){
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        query.setParameter("riderId", riderId);
+        return query.getSingleResult();
+    }
+
+    @Override
     public Rider getRider(long riderId) {
         return wrap(entityManager -> getRider(entityManager, riderId));
     }
 
     private Rider getRider(EntityManager em, long riderId){
-        return em.find(Rider.class, riderId);
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id = :riderId" , Rider.class);
+        query.setParameter("riderId", riderId);
+        return query.getSingleResult();
     }
 
     @Override
@@ -49,7 +62,7 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private Stream<Rider> getAllRiders(EntityManager entityManager, long stageid) {
-        TypedQuery<Rider> query = entityManager.createQuery("select r from Rider r where r.riderStageConnections.stage.id = :stageid" , Rider.class);
+        TypedQuery<Rider> query = entityManager.createQuery("select r from Rider r inner join RiderStageConnection rc on r.id = rc.rider.id where rc.stage.id = :stageid" , Rider.class);
         query.setParameter("stageid", stageid);
         return query.getResultList().stream();
     }

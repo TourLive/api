@@ -17,6 +17,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class MaillotRepositoryImpl implements MaillotRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
+
     @Inject
     public MaillotRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
         this.jpaApi = jpaApi;
@@ -25,7 +26,7 @@ public class MaillotRepositoryImpl implements MaillotRepository {
 
     @Override
     public CompletionStage<Stream<Maillot>> getAllMaillots(long stageId) {
-        return supplyAsync(() -> wrap (entityManager -> getAllMaillots(entityManager, stageId)), databaseExecutionContext);
+        return supplyAsync(() -> wrap(entityManager -> getAllMaillots(entityManager, stageId)), databaseExecutionContext);
     }
 
     private Stream<Maillot> getAllMaillots(EntityManager em, long stageId){
@@ -35,33 +36,40 @@ public class MaillotRepositoryImpl implements MaillotRepository {
     }
 
     @Override
-    public CompletionStage<Maillot> getMaillot(long stageId, long maillotId) {
-        return supplyAsync(() -> wrap (em -> getMaillot(em, stageId, maillotId)), databaseExecutionContext);
+    public CompletionStage<Maillot> getMaillot(long maillotId) {
+        return supplyAsync(() -> wrap (em -> getMaillot(em, maillotId)), databaseExecutionContext);
     }
 
-    private Maillot getMaillot(EntityManager em, long stageId, long maillotId){
-        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.stage.id = :stageId and m.id = :maillotId" , Maillot.class);
-        query.setParameter("stageId", stageId);
-        query.setParameter("maillotId", maillotId);
-        return query.getSingleResult();
+    private Maillot getMaillot(EntityManager em, long maillotId){
+        return em.find(Maillot.class, maillotId);
     }
 
     @Override
     public void addMaillot(Maillot maillot) {
-        wrap(entityManager -> addRiderStageConnection(entityManager, maillot));
+        wrap(entityManager -> addMaillot(entityManager, maillot));
     }
 
-    private Maillot addRiderStageConnection(EntityManager entityManager, Maillot maillot){
+    private Maillot addMaillot(EntityManager entityManager, Maillot maillot){
         entityManager.persist(maillot);
         return null;
     }
 
     @Override
-    public void deleteAllMaillots() {
-        wrap(this::deleteAllRiderStageConnections);
+    public void updateMaillot(Maillot maillot) {
+        wrap(entityManager -> updateMaillot(entityManager, maillot));
     }
 
-    private Stream<Maillot> deleteAllRiderStageConnections(EntityManager entityManager){
+    private Maillot updateMaillot(EntityManager entityManager, Maillot maillot){
+        entityManager.merge(maillot);
+        return null;
+    }
+
+    @Override
+    public void deleteAllMaillots() {
+        wrap(this::deleteAllMaillots);
+    }
+
+    private Stream<Maillot> deleteAllMaillots(EntityManager entityManager){
         List<Maillot> maillots = entityManager.createQuery("select m from Maillot m", Maillot.class).getResultList();
         for(Maillot m : maillots){
             entityManager.remove(m);
