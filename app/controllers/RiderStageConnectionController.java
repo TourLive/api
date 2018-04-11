@@ -1,10 +1,9 @@
 package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import controllers.importUtilities.comparators.StartNrComparator;
+import controllers.importutilities.comparators.StartNrComparator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import models.JudgmentRiderConnection;
 import models.RiderStageConnection;
 import models.enums.TypeState;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -14,7 +13,6 @@ import play.mvc.Result;
 import repository.interfaces.RiderStageConnectionRepository;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;

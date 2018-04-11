@@ -29,13 +29,13 @@ public class RiderStageConnection {
     private Stage stage;
     @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
-    private List<RiderRanking> riderRankings = new ArrayList<RiderRanking>();
+    private List<RiderRanking> riderRankings = new ArrayList<>();
     @ManyToOne
     @JsonManagedReference
     private Rider rider;
     @ManyToMany(cascade= CascadeType.ALL)
     @JsonBackReference
-    private List<Maillot> riderMaillots = new ArrayList<Maillot>();
+    private List<Maillot> riderMaillots = new ArrayList<>();
 
     public Long getId() {
         return id;

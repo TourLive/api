@@ -1,12 +1,8 @@
 package controllers;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import views.html.index;
-
-import static play.libs.Json.toJson;
 
 public class Application extends Controller {
     public Result index() {

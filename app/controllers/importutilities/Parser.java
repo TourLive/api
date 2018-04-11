@@ -1,4 +1,4 @@
-package controllers.importUtilities;
+package controllers.importutilities;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -18,7 +18,7 @@ public final class Parser {
         return "Actual race id has beent set to " + UrlLinks.getRaceId();
     }
 
-    public static final Race ParseRace(JsonNode json){
+    public static final Race parseRace(JsonNode json){
         Race race = new Race();
         JsonNode actualRace = json.get(0);
         race.setId(UrlLinks.getRaceId());
@@ -26,14 +26,14 @@ public final class Parser {
         return race;
     }
 
-    public static final Setting ParseSettings(JsonNode json){
+    public static final Setting parseSettings(JsonNode json){
         Setting setting = new Setting();
         setting.setStageID(json.findPath("stageID").longValue());
         setting.setRaceID(json.findPath("raceID").longValue());
         return setting;
     }
 
-    public static final List<Stage> ParseStages(JsonNode json){
+    public static final List<Stage> parseStages(JsonNode json){
         ArrayList<Stage> stages = new ArrayList<>();
         for (JsonNode n : (ArrayNode)json) {
             Stage stage = new Stage();
@@ -50,7 +50,7 @@ public final class Parser {
         return stages;
     }
 
-    public static final List<Maillot> ParseMaillots(JsonNode json){
+    public static final List<Maillot> parseMaillots(JsonNode json){
         ArrayList<Maillot> maillots = new ArrayList<>();
         for (JsonNode n : (ArrayNode)json) {
             Maillot maillot = new Maillot();
@@ -63,7 +63,7 @@ public final class Parser {
         return maillots;
     }
 
-    public static final List<Rider> ParseRiders(JsonNode json){
+    public static final List<Rider> parseRiders(JsonNode json){
         ArrayList<Rider> riders = new ArrayList<>();
         for (JsonNode n : (ArrayNode)json.findPath("data")) {
             Rider rider = new Rider();
@@ -79,7 +79,7 @@ public final class Parser {
         return riders;
     }
 
-    public static final List<RiderStageConnection> ParseRiderStageConnections(JsonNode json){
+    public static final List<RiderStageConnection> parseRiderStageConnections(JsonNode json){
         ArrayList<RiderStageConnection> riderStageConnections = new ArrayList<>();
         for (JsonNode n : (ArrayNode)json.findPath("data")) {
             RiderStageConnection rSC = new RiderStageConnection();
@@ -99,7 +99,7 @@ public final class Parser {
         return riderStageConnections;
     }
 
-    public static final List<Reward> ParseRewards(JsonNode jsonNode){
+    public static final List<Reward> parseRewards(JsonNode jsonNode){
         ArrayList<Reward> rewards = new ArrayList<>();
         for (JsonNode n : (ArrayNode) jsonNode.findPath("rewards")) {
             Reward reward = new Reward();
@@ -133,8 +133,8 @@ public final class Parser {
         return rewards;
     }
 
-    public static final HashMap<Long, ArrayList<Judgment>> ParseJudgments(JsonNode jsonNode){
-        HashMap<Long, ArrayList<Judgment>> judgmentHashMap = new HashMap<Long, ArrayList<Judgment>>();
+    public static final HashMap<Long, ArrayList<Judgment>> parseJudgments(JsonNode jsonNode){
+        HashMap<Long, ArrayList<Judgment>> judgmentHashMap = new HashMap<>();
         for (JsonNode n : (ArrayNode) jsonNode.findPath("judgements")) {
             Judgment judgment = new Judgment();
             judgment.setDistance(n.findPath("rennkm").asDouble());
