@@ -68,14 +68,7 @@ public class NotificationController extends Controller {
                     } else {
                         res = internalServerError(ex.getMessage());
                     }
-                    switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                        case "IndexOutOfBoundsException":
-                            res = badRequest("No notifications are set in DB.");
-                        break;
-                    default:
-                        res = internalServerError(ex.getMessage());
-                    }
-                 return res;
+                    return res;
                 });
     }
 
