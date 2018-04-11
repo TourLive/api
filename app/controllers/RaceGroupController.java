@@ -33,6 +33,10 @@ public class RaceGroupController extends Controller {
     private final RaceGroupRepository raceGroupRepository;
     private final StageRepository stageRepository;
     private final RiderRepository riderRepository;
+    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
+    private static final String noResultException = "NoResultException";
+    private static final String actualGapTime = "actualGapTime";
+    private static final String historyGapTime = "historyGapTime";
 
     @Inject
     public RaceGroupController(RaceGroupRepository raceGroupRepository, StageRepository stageRepository, RiderRepository riderRepository) {
@@ -45,12 +49,10 @@ public class RaceGroupController extends Controller {
     public CompletionStage<Result> getAllRaceGroups(long stageId) {
         return raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()) {
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No racegroups are set in db");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+                res = badRequest("No racegroups are set in DB for this stage.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -60,12 +62,10 @@ public class RaceGroupController extends Controller {
     public CompletionStage<Result> getRaceGroup(long id) {
         return raceGroupRepository.getRaceGroupById(id).thenApplyAsync(raceGroup -> ok(toJson(raceGroup))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "NoResultException":
-                    res = badRequest("No racegroup with id: " + id + " is available in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(noResultException)){
+                res = badRequest("No racegroup with id: " + id + " is available in DB.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -118,11 +118,11 @@ public class RaceGroupController extends Controller {
                     RaceGroup raceGroup = new RaceGroup();
                     String raceGroupType = raceGroupJson.findPath("type").textValue();
                     raceGroup.setRaceGroupType(RaceGroupType.valueOf(raceGroupType));
-                    raceGroup.setHistoryGapTime(raceGroupJson.findPath("historyGapTime").longValue());
-                    raceGroup.setActualGapTime(raceGroupJson.findPath("actualGapTime").longValue());
+                    raceGroup.setHistoryGapTime(raceGroupJson.findPath(historyGapTime).longValue());
+                    raceGroup.setActualGapTime(raceGroupJson.findPath(actualGapTime).longValue());
                     raceGroup.setPosition(raceGroupJson.findPath("position").intValue());
                     raceGroup.setAppId(raceGroupJson.findPath("id").asText());
-                    ArrayList<Rider> riders = new ArrayList<Rider>();
+                    ArrayList<Rider> riders = new ArrayList<>();
                     for (JsonNode rider : (ArrayNode) raceGroupJson.findPath("riders")) {
                         riders.add(riderHashMap.get(rider.longValue()));
                     }
@@ -134,13 +134,11 @@ public class RaceGroupController extends Controller {
 
             } catch (Exception e) {
                 completableFuture.obtrudeException(e);
-                //throw e;
             }
         });
 
         return completableFuture;
     }
-
 
     @ApiOperation(value ="update specific racegroups time")
     @BodyParser.Of(BodyParser.Json.class)
@@ -162,63 +160,8 @@ public class RaceGroupController extends Controller {
 
         Executors.newCachedThreadPool().submit(() -> {
             try {
-                raceGroup.setActualGapTime(json.findPath("actualGapTime").longValue());
-                raceGroup.setHistoryGapTime(json.findPath("historyGapTime").longValue());
-                completableFuture.complete(raceGroup);
-
-            } catch (Exception e) {
-                completableFuture.obtrudeException(e);
-                throw e;
-            }
-        });
-
-        return completableFuture;
-    }
-
-    private CompletableFuture<RaceGroup> parseNewRaceGroup (JsonNode json) {
-        CompletableFuture<RaceGroup> completableFuture = new CompletableFuture<>();
-
-        Executors.newCachedThreadPool().submit(() -> {
-            try {
-                RaceGroup raceGroup = new RaceGroup();
-                String raceGroupType = json.findPath("type").textValue();
-                raceGroup.setRaceGroupType(RaceGroupType.valueOf(raceGroupType));
-                raceGroup.setHistoryGapTime(json.findPath("actualGapTime").longValue());
-                raceGroup.setActualGapTime(json.findPath("actualGapTime").longValue());
-                raceGroup.setPosition(json.findPath("actualGapTime").intValue());
-                raceGroup.setAppId(json.findPath("appId").textValue());
-                raceGroup.setRiders(null);
-                final Stage[] st = new Stage[1];
-                long stageId = json.findPath("stageId").longValue();
-                stageRepository.getStage(stageId).thenApply(stage -> st[0] = stage).toCompletableFuture().join();
-                raceGroup.setStage(st[0]);
-                completableFuture.complete(raceGroup);
-            } catch (Exception e) {
-                completableFuture.obtrudeException(e);
-                throw e;
-            }
-        });
-
-        return completableFuture;
-    }
-
-    private CompletableFuture<RaceGroup> parseUpdateRaceGroup (JsonNode json, long raceGroupId) {
-        CompletableFuture<RaceGroup> completableFuture = new CompletableFuture<>();
-
-        Executors.newCachedThreadPool().submit(() -> {
-            try {
-                RaceGroup raceGroup = new RaceGroup();
-                raceGroup.setId(raceGroupId);
-                String raceGroupType = json.findPath("type").textValue();
-                raceGroup.setRaceGroupType(RaceGroupType.valueOf(raceGroupType));
-                raceGroup.setHistoryGapTime(json.findPath("actualGapTime").longValue());
-                raceGroup.setActualGapTime(json.findPath("actualGapTime").longValue());
-                raceGroup.setPosition(json.findPath("actualGapTime").intValue());
-                raceGroup.setRiders(null);
-                final Stage[] st = new Stage[1];
-                long stageId = json.findPath("stageId").longValue();
-                stageRepository.getStage(stageId).thenApply(stage -> st[0] = stage).toCompletableFuture().join();
-                raceGroup.setStage(st[0]);
+                raceGroup.setActualGapTime(json.findPath(actualGapTime).longValue());
+                raceGroup.setHistoryGapTime(json.findPath(historyGapTime).longValue());
                 completableFuture.complete(raceGroup);
             } catch (Exception e) {
                 completableFuture.obtrudeException(e);
