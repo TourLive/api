@@ -16,22 +16,19 @@ import static play.libs.Json.toJson;
 @Api("Judgment")
 public class JudgmentController extends Controller {
     private final JudgmentRepository judgmentRepository;
+    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
 
     @Inject
     public JudgmentController(JudgmentRepository judgmentRepository) { this.judgmentRepository = judgmentRepository; }
 
     @ApiOperation(value ="get all judgments of a race", response = Judgment.class)
     public CompletionStage<Result> getJudgments() {
-        return judgmentRepository.getAllJudgments().thenApplyAsync(judgments -> {
-            return ok(toJson(judgments));
-        }).exceptionally(ex -> {
+        return judgmentRepository.getAllJudgments().thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No judgments are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+                res = badRequest("No judgments are set in DB.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -39,16 +36,12 @@ public class JudgmentController extends Controller {
 
     @ApiOperation(value ="get all judgments of a stage", response = Judgment.class)
     public CompletionStage<Result> getJudgmentsByStage(long stageId) {
-        return judgmentRepository.getJudgmentsByStage(stageId).thenApplyAsync(judgments -> {
-            return ok(toJson(judgments));
-        }).exceptionally(ex -> {
+        return judgmentRepository.getJudgmentsByStage(stageId).thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No judgments are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+                res = badRequest("No judgments are set in DB for the specific stage.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -56,16 +49,12 @@ public class JudgmentController extends Controller {
 
     @ApiOperation(value ="get all judgments of a rider", response = Judgment.class)
     public CompletionStage<Result> getJudgmentsByRider(long riderId) {
-        return judgmentRepository.getJudgmentsByRider(riderId).thenApplyAsync(judgments -> {
-            return ok(toJson(judgments));
-        }).exceptionally(ex -> {
+        return judgmentRepository.getJudgmentsByRider(riderId).thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No judgments are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+                res = badRequest("No judgments are set in DB for specific rider.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
