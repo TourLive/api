@@ -1,4 +1,4 @@
-package controllers.importUtilities.comparators;
+package controllers.importutilities.comparators;
 
 import models.RiderStageConnection;
 

@@ -1,4 +1,4 @@
-package controllers.importUtilities;
+package controllers.importutilities;
 
 public final class UrlLinks {
     private static long RACEID;

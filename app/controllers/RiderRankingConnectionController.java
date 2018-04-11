@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import models.RiderRanking;
-import models.RiderStageConnection;
 import models.enums.RankingType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;

@@ -1,10 +1,11 @@
 package models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class Race {
 
     @OneToMany(mappedBy = "race", orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
-    private List<Stage> stages = new ArrayList<Stage>();
+    private List<Stage> stages = new ArrayList<>();
 
     public Long getId() {
         return id;
