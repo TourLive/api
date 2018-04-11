@@ -45,8 +45,7 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     private Judgment getJudgmentById(EntityManager entityManager, long id) {
-        Judgment judgment = entityManager.find(Judgment.class, id);
-        return judgment;
+        return entityManager.find(Judgment.class, id);
     }
 
     @Override
@@ -55,8 +54,7 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     private Judgment getJudgmentByIdCompleted(EntityManager entityManager, long id) {
-        Judgment judgment = entityManager.find(Judgment.class, id);
-        return judgment;
+        return entityManager.find(Judgment.class, id);
     }
 
     private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){

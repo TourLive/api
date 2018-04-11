@@ -9,11 +9,11 @@ import javax.inject.Inject;
 public class DatabaseExecutionContext implements ExecutionContextExecutor {
     private final ExecutionContext executionContext;
 
-    private static final String name = "database.dispatcher";
+    private static final String NAME = "database.dispatcher";
 
     @Inject
     public DatabaseExecutionContext(ActorSystem actorSystem) {
-        this.executionContext = actorSystem.dispatchers().lookup(name);
+        this.executionContext = actorSystem.dispatchers().lookup(NAME);
     }
 
     @Override
