@@ -26,7 +26,7 @@ public class MaillotController extends Controller {
     @Inject
     public MaillotController(MaillotRepository maillotRepository) { this.maillotRepository = maillotRepository; }
 
-    @ApiOperation(value ="get all maillots of a race", response = Maillot.class)
+    @ApiOperation(value ="get all maillots of a stage", response = Maillot.class)
     public CompletionStage<Result> getMaillots(Long stageId) {
         return maillotRepository.getAllMaillots(stageId).thenApplyAsync(maillots -> {
             List<MaillotDTO> maillotDTOList = new ArrayList<>();
@@ -37,7 +37,7 @@ public class MaillotController extends Controller {
         }).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
-                res = badRequest("No notifications are set in DB for this race.");
+                res = badRequest("No maillots are set in DB for this stage.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
@@ -50,7 +50,7 @@ public class MaillotController extends Controller {
         return maillotRepository.getMaillot(maillotId).thenApplyAsync(maillot -> ok(toJson(new MaillotDTO(maillot)))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(nullPointerException)){
-                res = badRequest("No specific notification is set in DB for this id.");
+                res = badRequest("No specific maillot is set in DB for this id.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
