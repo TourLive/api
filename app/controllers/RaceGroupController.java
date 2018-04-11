@@ -7,7 +7,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import models.RaceGroup;
 import models.Rider;
-import models.Stage;
 import models.enums.RaceGroupType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
