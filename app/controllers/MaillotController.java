@@ -20,6 +20,8 @@ import static play.libs.Json.toJson;
 @Api("Maillot")
 public class MaillotController extends Controller {
     private final MaillotRepository maillotRepository;
+    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
+    private static final String nullPointerException = "NullPointerException";
 
     @Inject
     public MaillotController(MaillotRepository maillotRepository) { this.maillotRepository = maillotRepository; }
@@ -34,12 +36,10 @@ public class MaillotController extends Controller {
             return ok(toJson(maillotDTOList));
         }).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No notifications are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+                res = badRequest("No notifications are set in DB for this race.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
@@ -49,12 +49,10 @@ public class MaillotController extends Controller {
     public CompletionStage<Result> getMaillot(Long maillotId) {
         return maillotRepository.getMaillot(maillotId).thenApplyAsync(maillot -> ok(toJson(new MaillotDTO(maillot)))).exceptionally(ex -> {
             Result res;
-            switch (ExceptionUtils.getRootCause(ex).getClass().getSimpleName()){
-                case "IndexOutOfBoundsException":
-                    res = badRequest("No notifications are set in DB.");
-                    break;
-                default:
-                    res = internalServerError(ex.getMessage());
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(nullPointerException)){
+                res = badRequest("No specific notification is set in DB for this id.");
+            } else {
+                res = internalServerError(ex.getMessage());
             }
             return res;
         });
