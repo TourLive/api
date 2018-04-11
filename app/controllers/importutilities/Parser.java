@@ -133,7 +133,7 @@ public final class Parser {
         return rewards;
     }
 
-    public static final Map<Long, ArrayList<Judgment>> parseJudgments(JsonNode jsonNode){
+    public static final HashMap<Long, ArrayList<Judgment>> parseJudgments(JsonNode jsonNode){
         HashMap<Long, ArrayList<Judgment>> judgmentHashMap = new HashMap<>();
         for (JsonNode n : (ArrayNode) jsonNode.findPath("judgements")) {
             Judgment judgment = new Judgment();
