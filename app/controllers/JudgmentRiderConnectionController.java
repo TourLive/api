@@ -25,8 +25,8 @@ public class JudgmentRiderConnectionController extends Controller {
     private final JudgmentRiderConnectionRepository judgmentRiderConnectionRepository;
     private final RiderRepository riderRepository;
     private final JudgmentRepository judgmentRepository;
-    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
-    private static final String nullPointerException = "NullPointerException";
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
+    private static final String NULLPOINTEREXCEPTION = "NullPointerException";
 
     @Inject
     public JudgmentRiderConnectionController(JudgmentRiderConnectionRepository judgmentRiderConnectionRepository, RiderRepository riderRepository, JudgmentRepository judgmentRepository) {
@@ -39,7 +39,7 @@ public class JudgmentRiderConnectionController extends Controller {
     public CompletionStage<Result> getJudgmentRiderConnection(long riderId) {
         return judgmentRiderConnectionRepository.getJudgmentRiderConnectionsByRider(riderId).thenApplyAsync(judgmentRiderConnection -> ok(toJson(judgmentRiderConnection.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No judgmentRiderConnection are set in DB for specific rider.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -54,7 +54,7 @@ public class JudgmentRiderConnectionController extends Controller {
         JsonNode json = request().body().asJson();
         return parseJudgmentRiderConnection(json).thenApply(judgmentRiderConnectionRepository::addJudgmentRiderConnection).thenApply(judgmentRiderConnection -> ok("success")).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(nullPointerException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
                 res = badRequest("adding judgment rider connection failed.");
             } else {
                 res = internalServerError(ex.getMessage());

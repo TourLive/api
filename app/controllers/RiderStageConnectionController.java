@@ -24,8 +24,8 @@ import static play.libs.Json.toJson;
 @Api("RiderStageConnection")
 public class RiderStageConnectionController extends Controller {
     private final RiderStageConnectionRepository riderStageConnectionRepository;
-    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
-    private static final String nullPointerException = "NullPointerException";
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
+    private static final String NULLPOINTEREXCEPTION = "NullPointerException";
 
     @Inject
     public RiderStageConnectionController(RiderStageConnectionRepository riderStageConnectionRepository) {
@@ -41,7 +41,7 @@ public class RiderStageConnectionController extends Controller {
             return ok(toJson(returnValues));
         }).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No riderStageConnections are set in DB for this stage id.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -54,7 +54,7 @@ public class RiderStageConnectionController extends Controller {
     public CompletionStage<Result> getRiderStageConnection(long stageId, long riderId) {
         return riderStageConnectionRepository.getRiderStageConnectionByRiderAndStage(stageId, riderId).thenApplyAsync(riderStageConnection -> ok(toJson(riderStageConnection))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(nullPointerException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
                 res = badRequest("No riderStageConnections are set in DB for this stage id and rider id.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -69,7 +69,7 @@ public class RiderStageConnectionController extends Controller {
         JsonNode json = request().body().asJson();
         return parseRiderStageConnection(json, riderStageConnectionId).thenApply(riderStageConnectionRepository::updateRiderStageConnection).thenApplyAsync(rSC -> ok("success")).exceptionally(ex -> {
             Result res = null;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(nullPointerException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
                 res = badRequest("Update of riderStageConnection failed, because it was not found in DB.");
             } else {
                 res = internalServerError(ex.getMessage());

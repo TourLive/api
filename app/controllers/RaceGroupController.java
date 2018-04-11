@@ -32,10 +32,10 @@ public class RaceGroupController extends Controller {
     private final RaceGroupRepository raceGroupRepository;
     private final StageRepository stageRepository;
     private final RiderRepository riderRepository;
-    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
-    private static final String noResultException = "NoResultException";
-    private static final String actualGapTime = "actualGapTime";
-    private static final String historyGapTime = "historyGapTime";
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
+    private static final String NORESULTEXCEPTION = "NoResultException";
+    private static final String ACTUAL_GAP_TIME = "ACTUAL_GAP_TIME";
+    private static final String HISTORY_GAP_TIME = "HISTORY_GAP_TIME";
 
     @Inject
     public RaceGroupController(RaceGroupRepository raceGroupRepository, StageRepository stageRepository, RiderRepository riderRepository) {
@@ -48,7 +48,7 @@ public class RaceGroupController extends Controller {
     public CompletionStage<Result> getAllRaceGroups(long stageId) {
         return raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No racegroups are set in DB for this stage.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -61,7 +61,7 @@ public class RaceGroupController extends Controller {
     public CompletionStage<Result> getRaceGroup(long id) {
         return raceGroupRepository.getRaceGroupById(id).thenApplyAsync(raceGroup -> ok(toJson(raceGroup))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(noResultException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NORESULTEXCEPTION)){
                 res = badRequest("No racegroup with id: " + id + " is available in DB.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -117,8 +117,8 @@ public class RaceGroupController extends Controller {
                     RaceGroup raceGroup = new RaceGroup();
                     String raceGroupType = raceGroupJson.findPath("type").textValue();
                     raceGroup.setRaceGroupType(RaceGroupType.valueOf(raceGroupType));
-                    raceGroup.setHistoryGapTime(raceGroupJson.findPath(historyGapTime).longValue());
-                    raceGroup.setActualGapTime(raceGroupJson.findPath(actualGapTime).longValue());
+                    raceGroup.setHistoryGapTime(raceGroupJson.findPath(HISTORY_GAP_TIME).longValue());
+                    raceGroup.setActualGapTime(raceGroupJson.findPath(ACTUAL_GAP_TIME).longValue());
                     raceGroup.setPosition(raceGroupJson.findPath("position").intValue());
                     raceGroup.setAppId(raceGroupJson.findPath("id").asText());
                     ArrayList<Rider> riders = new ArrayList<>();
@@ -159,8 +159,8 @@ public class RaceGroupController extends Controller {
 
         Executors.newCachedThreadPool().submit(() -> {
             try {
-                raceGroup.setActualGapTime(json.findPath(actualGapTime).longValue());
-                raceGroup.setHistoryGapTime(json.findPath(historyGapTime).longValue());
+                raceGroup.setActualGapTime(json.findPath(ACTUAL_GAP_TIME).longValue());
+                raceGroup.setHistoryGapTime(json.findPath(HISTORY_GAP_TIME).longValue());
                 completableFuture.complete(raceGroup);
             } catch (Exception e) {
                 completableFuture.obtrudeException(e);

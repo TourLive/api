@@ -17,8 +17,8 @@ import static play.libs.Json.toJson;
 @Api("Race")
 public class RaceController extends Controller {
     private final RaceRepository raceRepository;
-    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
-    private static final String noResultException = "NoResultException";
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
+    private static final String NORESULTEXCEPTION = "NoResultException";
 
     @Inject
     public RaceController(RaceRepository raceRepository) {
@@ -29,7 +29,7 @@ public class RaceController extends Controller {
     public CompletionStage<Result> getAllRaces() {
         return raceRepository.getAllRaces().thenApplyAsync(races -> ok(toJson(races.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No races are set in DB.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -42,7 +42,7 @@ public class RaceController extends Controller {
     public CompletionStage<Result> getRace(Long raceId) {
         return raceRepository.getRace(raceId).thenApplyAsync(race -> ok(toJson(race))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(noResultException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NORESULTEXCEPTION)){
                 res = badRequest("Race with id: " + raceId + " is not available in DB.");
             } else {
                 res = internalServerError(ex.getMessage());

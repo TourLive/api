@@ -17,8 +17,8 @@ import static play.libs.Json.toJson;
 @Api("Stage")
 public class StageController extends Controller {
     private final StageRepository stageRepository;
-    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
-    private static final String noResultException = "NoResultException";
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
+    private static final String NORESULTEXCEPTION = "NoResultException";
 
     @Inject
     public StageController(StageRepository stageRepository) {
@@ -29,7 +29,7 @@ public class StageController extends Controller {
     public CompletionStage<Result> getStages() {
         return stageRepository.getAllStages().thenApplyAsync(stages -> ok(toJson(stages.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No stages are set in DB.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -43,7 +43,7 @@ public class StageController extends Controller {
     public CompletionStage<Result> getStage(long stageId) {
         return stageRepository.getStage(stageId).thenApplyAsync(stage -> ok(toJson(stage))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(noResultException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NORESULTEXCEPTION)){
                 res = badRequest("No Stage with id: " + stageId + ", is available in DB.");
             } else {
                 res = internalServerError(ex.getMessage());

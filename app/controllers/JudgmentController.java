@@ -16,7 +16,7 @@ import static play.libs.Json.toJson;
 @Api("Judgment")
 public class JudgmentController extends Controller {
     private final JudgmentRepository judgmentRepository;
-    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
 
     @Inject
     public JudgmentController(JudgmentRepository judgmentRepository) { this.judgmentRepository = judgmentRepository; }
@@ -25,7 +25,7 @@ public class JudgmentController extends Controller {
     public CompletionStage<Result> getJudgments() {
         return judgmentRepository.getAllJudgments().thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No judgments are set in DB.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -38,7 +38,7 @@ public class JudgmentController extends Controller {
     public CompletionStage<Result> getJudgmentsByStage(long stageId) {
         return judgmentRepository.getJudgmentsByStage(stageId).thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No judgments are set in DB for the specific stage.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -51,7 +51,7 @@ public class JudgmentController extends Controller {
     public CompletionStage<Result> getJudgmentsByRider(long riderId) {
         return judgmentRepository.getJudgmentsByRider(riderId).thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No judgments are set in DB for specific rider.");
             } else {
                 res = internalServerError(ex.getMessage());

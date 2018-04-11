@@ -16,7 +16,7 @@ import static play.libs.Json.toJson;
 @Api("Reward")
 public class RewardController extends Controller {
     private final RewardRepository rewardRepository;
-    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
 
     @Inject
     public RewardController(RewardRepository rewardRepository) { this.rewardRepository = rewardRepository; }
@@ -25,7 +25,7 @@ public class RewardController extends Controller {
     public CompletionStage<Result> getRewards() {
         return rewardRepository.getAllRewards().thenApplyAsync(rewards -> ok(toJson(rewards))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No rewards are set in DB.");
             } else {
                 res = internalServerError(ex.getMessage());

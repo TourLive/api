@@ -20,8 +20,8 @@ import static play.libs.Json.toJson;
 @Api("Maillot")
 public class MaillotController extends Controller {
     private final MaillotRepository maillotRepository;
-    private static final String indexOutOfBoundsException = "IndexOutOfBoundsException";
-    private static final String nullPointerException = "NullPointerException";
+    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
+    private static final String NULLPOINTEREXCEPTION = "NullPointerException";
 
     @Inject
     public MaillotController(MaillotRepository maillotRepository) { this.maillotRepository = maillotRepository; }
@@ -36,7 +36,7 @@ public class MaillotController extends Controller {
             return ok(toJson(maillotDTOList));
         }).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(indexOutOfBoundsException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No maillots are set in DB for this stage.");
             } else {
                 res = internalServerError(ex.getMessage());
@@ -49,7 +49,7 @@ public class MaillotController extends Controller {
     public CompletionStage<Result> getMaillot(Long maillotId) {
         return maillotRepository.getMaillot(maillotId).thenApplyAsync(maillot -> ok(toJson(new MaillotDTO(maillot)))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(nullPointerException)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
                 res = badRequest("No specific maillot is set in DB for this id.");
             } else {
                 res = internalServerError(ex.getMessage());
