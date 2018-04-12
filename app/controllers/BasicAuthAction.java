@@ -43,7 +43,7 @@ public class BasicAuthAction extends Action<Result> {
 
         if (!loginCorrect) {
             log.warn("Incorrect basic auth login, username=" + username);
-            return CompletableFuture.completedFuture(status(Http.Status.FORBIDDEN, "Forbidden"));
+            return CompletableFuture.completedFuture(status(Http.Status.FORBIDDEN, "Incorrect basic auth login, username= " + username));
         } else {
             context.request().withAttrs(context.request().attrs().put(Security.USERNAME, username));
             log.info("Successful basic auth login, username=" + username);
