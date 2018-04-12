@@ -49,6 +49,18 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     @Override
+    public CompletionStage<RiderStageConnection> getRiderStageConnectionByRiderStartNrAndStage(long stageId, int startNr) {
+        return supplyAsync(() -> wrap (em -> getRiderStageConnectionByRiderStartNrAndStage(em, stageId, startNr)), databaseExecutionContext);
+    }
+
+    private RiderStageConnection getRiderStageConnectionByRiderStartNrAndStage(EntityManager em, long stageId, int startNr){
+        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.startNr = :startNr and rSC.stage.id = :stageId" , RiderStageConnection.class);
+        query.setParameter("startNr", startNr);
+        query.setParameter(STAGE_ID, stageId);
+        return query.getSingleResult();
+    }
+
+    @Override
     public CompletionStage<RiderStageConnection> getRiderStageConnection(long riderStageConnectionId) {
         return supplyAsync(() -> wrap (em -> getRiderStageConnection(em, riderStageConnectionId)), databaseExecutionContext);
     }
