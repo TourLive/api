@@ -134,7 +134,7 @@ public class UpdateController extends Controller {
                 int startNr = Integer.valueOf(attributes.getNamedItem(ATTRIBUTE_NUMBER).getNodeValue());
                 int bonusPoints = Integer.valueOf(attributes.getNamedItem(ATTRIBUTE_CAPITAL).getNodeValue());
                 RiderStageConnection rSC = riderStageConnectionRepository.getRiderStageConnectionByRiderStartNrAndStage(stageId, startNr).toCompletableFuture().join();
-                rSC.setBonusPoints(rSC.getBonusPoints() + bonusPoints);
+                rSC.setBonusPoints(bonusPoints);
                 riderStageConnectionRepository.updateRiderStageConnection(rSC).toCompletableFuture().join();
             }
         } catch (Exception ex){
