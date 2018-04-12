@@ -51,7 +51,6 @@ public class UpdateController extends Controller {
                 break;
             }
         }
-        stageRepository.getStage(stageId + 1).toCompletableFuture().join();
         return updateStageWithXML(stageId, request().body().asXml()).thenApplyAsync(value -> ok("successfully updated stages")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
