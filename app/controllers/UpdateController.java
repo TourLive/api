@@ -1,6 +1,7 @@
 package controllers;
 
 import io.swagger.annotations.ApiOperation;
+import javassist.NotFoundException;
 import models.RiderStageConnection;
 import models.Stage;
 import org.w3c.dom.Document;
@@ -14,6 +15,7 @@ import repository.interfaces.RiderStageConnectionRepository;
 import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
+import java.text.ParseException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -91,7 +93,7 @@ public class UpdateController extends Controller {
         return completableFuture;
     }
 
-    private NodeList collectResultChildNodes(Node ranking) throws Exception {
+    private NodeList collectResultChildNodes(Node ranking) throws NotFoundException {
         NodeList children = ranking.getChildNodes();
         NodeList results = null;
         for(int i = 0; i < children.getLength(); i++){
@@ -99,20 +101,20 @@ public class UpdateController extends Controller {
             if(child.getNodeType() != ALLOWED_TYPE) continue;
             if(child.getLocalName().equals(RESULTS)){
                results = child.getChildNodes();
-                break;
+               break;
             }
         }
-        if(results == null) throw new Exception("failed to find results");
+        if(results == null) throw new NotFoundException("failed to find results");
         return results;
     }
 
-    private void updateTimes(long stageId, NodeList results){
+    private void updateTimes(long stageId, NodeList results) throws ParseException {
         try{
             for(int i = 0; i < results.getLength(); i++){
                 Node result = results.item(i);
                 if(result.getNodeType() != ALLOWED_TYPE) continue;
                 NamedNodeMap attributes = result.getAttributes();
-                int startNr = Integer.valueOf(attributes.getNamedItem(ATTRIBUTE_NUMBER).getNodeValue());
+                int startNr = Integer.parseInt(attributes.getNamedItem(ATTRIBUTE_NUMBER).getNodeValue());
                 long officialTime = convertTimeStringToLongInSeconds(attributes.getNamedItem(ATTRIBUTE_CAPITAL).getNodeValue());
                 long officialGap = convertTimeStringToLongInSeconds(attributes.getNamedItem(ATTRIBUTE_GAP).getNodeValue());
                 RiderStageConnection rSC = riderStageConnectionRepository.getRiderStageConnectionByRiderStartNrAndStage(stageId, startNr).toCompletableFuture().join();
@@ -121,24 +123,24 @@ public class UpdateController extends Controller {
                 riderStageConnectionRepository.updateRiderStageConnection(rSC).toCompletableFuture().join();
             }
         } catch (Exception ex){
-            throw ex;
+            throw new ParseException("Failed to parse the xml", 0);
         }
     }
 
-    private void updatePoints(long stageId, NodeList results){
+    private void updatePoints(long stageId, NodeList results) throws ParseException {
         try{
             for(int i = 0; i < results.getLength(); i++){
                 Node result = results.item(i);
                 if(result.getNodeType() != ALLOWED_TYPE) continue;
                 NamedNodeMap attributes = result.getAttributes();
-                int startNr = Integer.valueOf(attributes.getNamedItem(ATTRIBUTE_NUMBER).getNodeValue());
-                int bonusPoints = Integer.valueOf(attributes.getNamedItem(ATTRIBUTE_CAPITAL).getNodeValue());
+                int startNr = Integer.parseInt(attributes.getNamedItem(ATTRIBUTE_NUMBER).getNodeValue());
+                int bonusPoints = Integer.parseInt(attributes.getNamedItem(ATTRIBUTE_CAPITAL).getNodeValue());
                 RiderStageConnection rSC = riderStageConnectionRepository.getRiderStageConnectionByRiderStartNrAndStage(stageId, startNr).toCompletableFuture().join();
                 rSC.setBonusPoints(bonusPoints);
                 riderStageConnectionRepository.updateRiderStageConnection(rSC).toCompletableFuture().join();
             }
         } catch (Exception ex){
-            throw ex;
+            throw new ParseException("Failed to parse the xml", 0);
         }
     }
 
