@@ -19,7 +19,6 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-@Api("Stage")
 public class UpdateController extends Controller {
     private final StageRepository stageRepository;
     private final RiderStageConnectionRepository riderStageConnectionRepository;
