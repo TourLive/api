@@ -11,6 +11,7 @@ import org.w3c.dom.NodeList;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.RiderStageConnectionRepository;
 import repository.interfaces.StageRepository;
 
@@ -21,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
 
 public class UpdateController extends Controller {
     private final StageRepository stageRepository;
@@ -44,6 +46,7 @@ public class UpdateController extends Controller {
 
     @ApiOperation(value ="update actual and next stage by specific matsport-xml", response = Result.class)
     @BodyParser.Of(BodyParser.Xml.class)
+    @With(BasicAuthAction.class)
     public CompletionStage<Result> updateStage(long stageId) {
         nextStageAvailable = false;
         List<Stage> stages = stageRepository.getAllStagesByRaceId(stageRepository.getStage(stageId).toCompletableFuture().join().getRace().getId()).toCompletableFuture().join().collect(Collectors.toList());
