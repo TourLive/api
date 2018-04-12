@@ -3,19 +3,21 @@ package controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import models.RiderStageConnection;
+import models.Stage;
 import org.w3c.dom.*;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
-import repository.interfaces.RiderRepository;
 import repository.interfaces.RiderStageConnectionRepository;
 import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Api("Stage")
 public class UpdateController extends Controller {
@@ -27,12 +29,10 @@ public class UpdateController extends Controller {
     private static final String CODE_ITG = "ITG";
     private static final String CODE_IPG = "IPG";
     private static final short ALLOWED_TYPE = 1;
-    private static final String ATTRIUBTE_NUMBER = "number";
+    private static final String ATTRIBUTE_NUMBER = "number";
     private static final String ATTRIBUTE_CAPITAL = "capital";
     private static final String ATTRIBUTE_GAP = "gap";
-
-    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
-    private static final String NORESULTEXCEPTION = "NoResultException";
+    private boolean nextStageAvailable = false;
 
     @Inject
     public UpdateController(StageRepository stageRepository, RiderStageConnectionRepository riderStageConnectionRepository) {
@@ -43,6 +43,16 @@ public class UpdateController extends Controller {
     @ApiOperation(value ="update actual and next stage by specific matsport-xml", response = Result.class)
     @BodyParser.Of(BodyParser.Xml.class)
     public CompletionStage<Result> updateStage(long stageId) {
+        nextStageAvailable = false;
+        List<Stage> stages = stageRepository.getAllStagesByRaceId(stageRepository.getStage(stageId).toCompletableFuture().join().getRace().getId()).toCompletableFuture().join().collect(Collectors.toList());
+        for(Stage s : stages){
+            if(s.getId() == (stageId+1)){
+                nextStageAvailable = true;
+                break;
+            }
+        }
+        stageRepository.getStage(stageId + 1).toCompletableFuture().join();
+        nextStageAvailable = true;
         return updateStageWithXML(stageId, request().body().asXml()).thenApplyAsync(value -> ok("successfully updated stages")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
@@ -53,16 +63,21 @@ public class UpdateController extends Controller {
             try {
                 xml.getDocumentElement().normalize();
                 NodeList rankings = xml.getElementsByTagName(RANKING);
+                NodeList results = null;
                 for (int i = 0; i < rankings.getLength(); i++) {
                     Node ranking = rankings.item(i);
                     NamedNodeMap attributes = ranking.getAttributes();
                     Node code = attributes.getNamedItem(ATTRIBUTE_CODE);
                     switch (code.getNodeValue()){
                         case CODE_ITG:
-                            updateTimes(stageId, collectResultChildNodes(ranking));
+                            results = collectResultChildNodes(ranking);
+                            updateTimes(stageId, results);
+                            if(nextStageAvailable) updateTimes(stageId + 1, results);
                             break;
                         case CODE_IPG:
-                            updatePoints(ranking);
+                            results = collectResultChildNodes(ranking);
+                            updatePoints(stageId, results);
+                            if(nextStageAvailable) updatePoints(stageId + 1, results);
                             break;
                         default:
                             break;
@@ -99,7 +114,7 @@ public class UpdateController extends Controller {
                 Node result = results.item(i);
                 if(result.getNodeType() != ALLOWED_TYPE) continue;
                 NamedNodeMap attributes = result.getAttributes();
-                int startNr = Integer.valueOf(attributes.getNamedItem(ATTRIUBTE_NUMBER).getNodeValue());
+                int startNr = Integer.valueOf(attributes.getNamedItem(ATTRIBUTE_NUMBER).getNodeValue());
                 long officialTime = convertTimeStringToLongInSeconds(attributes.getNamedItem(ATTRIBUTE_CAPITAL).getNodeValue());
                 long officialGap = convertTimeStringToLongInSeconds(attributes.getNamedItem(ATTRIBUTE_GAP).getNodeValue());
                 RiderStageConnection rSC = riderStageConnectionRepository.getRiderStageConnectionByRiderStartNrAndStage(stageId, startNr).toCompletableFuture().join();
@@ -112,9 +127,18 @@ public class UpdateController extends Controller {
         }
     }
 
-    private void updatePoints(Node ranking){
+    private void updatePoints(long stageId, NodeList results){
         try{
-
+            for(int i = 0; i < results.getLength(); i++){
+                Node result = results.item(i);
+                if(result.getNodeType() != ALLOWED_TYPE) continue;
+                NamedNodeMap attributes = result.getAttributes();
+                int startNr = Integer.valueOf(attributes.getNamedItem(ATTRIBUTE_NUMBER).getNodeValue());
+                int bonusPoints = Integer.valueOf(attributes.getNamedItem(ATTRIBUTE_CAPITAL).getNodeValue());
+                RiderStageConnection rSC = riderStageConnectionRepository.getRiderStageConnectionByRiderStartNrAndStage(stageId, startNr).toCompletableFuture().join();
+                rSC.setBonusPoints(rSC.getBonusPoints() + bonusPoints);
+                riderStageConnectionRepository.updateRiderStageConnection(rSC).toCompletableFuture().join();
+            }
         } catch (Exception ex){
             throw ex;
         }
