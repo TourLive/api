@@ -92,10 +92,10 @@ public class UpdateController extends Controller {
     }
 
     private NodeList collectResultChildNodes(Node ranking) throws Exception {
-        NodeList childs = ranking.getChildNodes();
+        NodeList children = ranking.getChildNodes();
         NodeList results = null;
-        for(int i = 0; i < childs.getLength(); i++){
-            Node child = childs.item(i);
+        for(int i = 0; i < children.getLength(); i++){
+            Node child = children.item(i);
             if(child.getNodeType() != ALLOWED_TYPE) continue;
             if(child.getLocalName().equals(RESULTS)){
                results = child.getChildNodes();
