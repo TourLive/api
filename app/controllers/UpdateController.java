@@ -1,10 +1,12 @@
 package controllers;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import models.RiderStageConnection;
 import models.Stage;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -15,7 +17,6 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,6 @@ public class UpdateController extends Controller {
             }
         }
         stageRepository.getStage(stageId + 1).toCompletableFuture().join();
-        nextStageAvailable = true;
         return updateStageWithXML(stageId, request().body().asXml()).thenApplyAsync(value -> ok("successfully updated stages")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
