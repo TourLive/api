@@ -23,7 +23,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-
+@With(BasicAuthAction.class)
 public class UpdateController extends Controller {
     private final StageRepository stageRepository;
     private final RiderStageConnectionRepository riderStageConnectionRepository;
@@ -46,7 +46,6 @@ public class UpdateController extends Controller {
 
     @ApiOperation(value ="update actual and next stage by specific matsport-xml", response = Result.class)
     @BodyParser.Of(BodyParser.Xml.class)
-    @With(BasicAuthAction.class)
     public CompletionStage<Result> updateStage(long stageId) {
         nextStageAvailable = false;
         List<Stage> stages = stageRepository.getAllStagesByRaceId(stageRepository.getStage(stageId).toCompletableFuture().join().getRace().getId()).toCompletableFuture().join().collect(Collectors.toList());

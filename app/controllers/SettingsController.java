@@ -7,6 +7,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.SettingRepository;
 
 import java.util.concurrent.CompletableFuture;
@@ -14,6 +15,7 @@ import java.util.concurrent.CompletionStage;
 
 import static play.libs.Json.toJson;
 
+@With(BasicAuthAction.class)
 public class SettingsController extends Controller {
     private final SettingRepository settingRepository;
 

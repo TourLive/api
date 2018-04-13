@@ -12,6 +12,7 @@ import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.*;
 
 import javax.inject.Inject;
@@ -24,7 +25,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
+@With(BasicAuthAction.class)
 public class ImportController extends Controller {
     private final JudgmentRepository judgmentRepository;
     private final MaillotRepository maillotRepository;

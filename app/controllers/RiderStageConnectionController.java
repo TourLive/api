@@ -10,6 +10,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.RiderStageConnectionRepository;
 
 import javax.inject.Inject;
@@ -65,6 +66,7 @@ public class RiderStageConnectionController extends Controller {
 
     @ApiOperation(value = "update a existing rider stage connection")
     @BodyParser.Of(BodyParser.Json.class)
+    @With(BasicAuthAction.class)
     public CompletionStage<Result> updateRiderStageConnection(long riderStageConnectionId) {
         JsonNode json = request().body().asJson();
         return parseRiderStageConnection(json, riderStageConnectionId).thenApply(riderStageConnectionRepository::updateRiderStageConnection).thenApplyAsync(rSC -> ok("success")).exceptionally(ex -> {
