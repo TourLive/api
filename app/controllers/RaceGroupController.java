@@ -12,6 +12,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.RaceGroupRepository;
 import repository.interfaces.RiderRepository;
 import repository.interfaces.StageRepository;
@@ -72,6 +73,7 @@ public class RaceGroupController extends Controller {
 
     @ApiOperation(value ="manage racegroups")
     @BodyParser.Of(BodyParser.Json.class)
+    @With(BasicAuthAction.class)
     public CompletionStage<Result> manageRaceGroups(long stageId) {
         List<RaceGroup> dbRaceGroups = raceGroupRepository.getAllRaceGroups(stageId).toCompletableFuture().join().collect(Collectors.toList());
         HashMap<String, RaceGroup> stringRaceGroupHashMap = new HashMap<>();
@@ -141,6 +143,7 @@ public class RaceGroupController extends Controller {
 
     @ApiOperation(value ="update specific racegroups time")
     @BodyParser.Of(BodyParser.Json.class)
+    @With(BasicAuthAction.class)
     public CompletionStage<Result> updateRaceGroup(String raceGroupId, long stageId) {
         RaceGroup raceGroup = null;
         try{

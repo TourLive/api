@@ -9,6 +9,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.JudgmentRepository;
 import repository.interfaces.JudgmentRiderConnectionRepository;
 import repository.interfaces.RiderRepository;
@@ -50,6 +51,7 @@ public class JudgmentRiderConnectionController extends Controller {
 
     @ApiOperation(value ="add new judgment rider connection")
     @BodyParser.Of(BodyParser.Json.class)
+    @With(BasicAuthAction.class)
     public CompletionStage<Result> addJudgmentRiderConnection() {
         JsonNode json = request().body().asJson();
         return parseJudgmentRiderConnection(json).thenApply(judgmentRiderConnectionRepository::addJudgmentRiderConnection).thenApply(judgmentRiderConnection -> ok("success")).exceptionally(ex -> {

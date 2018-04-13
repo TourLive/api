@@ -9,6 +9,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.RiderRankingRepository;
 
 import javax.inject.Inject;
@@ -71,6 +72,7 @@ public class RiderRankingConnectionController extends Controller {
 
     @ApiOperation(value ="update a rider ranking")
     @BodyParser.Of(BodyParser.Json.class)
+    @With(BasicAuthAction.class)
     public CompletionStage<Result> updateRiderRanking(long riderRankingId) {
         JsonNode json = request().body().asJson();
         return parseRiderRanking(json, riderRankingId).thenApply(riderRankingRepository::updateRiderRanking).thenApplyAsync(rSC -> ok("success")).exceptionally(ex -> {

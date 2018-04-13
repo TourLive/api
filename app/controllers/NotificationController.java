@@ -9,6 +9,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.NotificationRepository;
 
 import javax.inject.Inject;
@@ -57,6 +58,7 @@ public class NotificationController extends Controller {
 
     @ApiOperation(value ="add a notification", response = Notification.class)
     @BodyParser.Of(BodyParser.Json.class)
+    @With(BasicAuthAction.class)
     public CompletionStage<Result> addNotification(Long stageId) {
         JsonNode json = request().body().asJson();
         return parseNotification(json).thenApply(notification -> notificationRepository.addNotification(stageId, notification)).

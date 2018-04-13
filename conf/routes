@@ -9,6 +9,7 @@ GET   /api                          controllers.Application.redirectDocs
 GET   /swagger.json                 controllers.ApiHelpController.getResources
 GET   /docs/*file                   controllers.Assets.at(path="/public/swagger-ui",file)
 GET   /status                       controllers.Application.statusPage
+POST  /login                        controllers.Application.login
 
 #Race Routes
 GET     /races                      controllers.RaceController.getAllRaces()

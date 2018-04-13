@@ -11,6 +11,7 @@ import org.w3c.dom.NodeList;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.RiderStageConnectionRepository;
 import repository.interfaces.StageRepository;
 
@@ -22,6 +23,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+@With(BasicAuthAction.class)
 public class UpdateController extends Controller {
     private final StageRepository stageRepository;
     private final RiderStageConnectionRepository riderStageConnectionRepository;
