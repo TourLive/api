@@ -1,9 +1,11 @@
 package controllers;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import com.google.common.hash.Hashing;
 import org.apache.commons.codec.binary.Base64;
 
 import play.Logger;
@@ -13,6 +15,9 @@ import play.mvc.Http;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security;
+import repository.interfaces.UserRepository;
+
+import javax.inject.Inject;
 
 public class BasicAuthAction extends Action<Result> {
     private static ALogger log = Logger.of(BasicAuthAction.class);
@@ -20,6 +25,11 @@ public class BasicAuthAction extends Action<Result> {
     private static final String AUTHORIZATION = "Authorization";
     private static final String WWW_AUTHENTICATE = "Authorization";
     private static final String FAIL = "Authorization failed";
+
+    private final UserRepository userRepository;
+
+    @Inject
+    public BasicAuthAction(UserRepository userRepository) { this.userRepository = userRepository; }
 
     @Override
     public CompletionStage<Result> call(Context context) {
@@ -43,7 +53,7 @@ public class BasicAuthAction extends Action<Result> {
 
         if (!loginCorrect) {
             log.warn("Incorrect basic auth login, username=" + username);
-            return CompletableFuture.completedFuture(status(Http.Status.FORBIDDEN, "Incorrect basic auth login, username= " + username));
+            return CompletableFuture.completedFuture(status(Http.Status.UNAUTHORIZED, "Incorrect basic auth login, username= " + username));
         } else {
             context.request().withAttrs(context.request().attrs().put(Security.USERNAME, username));
             log.info("Successful basic auth login, username=" + username);
@@ -68,7 +78,11 @@ public class BasicAuthAction extends Action<Result> {
     }
 
     private boolean checkLogin(String username, String password) {
-        /// change this
-        return username.equals("Administrator") && password.equals("password") ;
+        try{
+            userRepository.getUser(username, Hashing.sha256().hashString(password, StandardCharsets.UTF_8).toString());
+            return true;
+        } catch (Exception ex){
+            return false;
+        }
     }
 }
