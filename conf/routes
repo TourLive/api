@@ -49,6 +49,7 @@ GET     /rewards                                    controllers.RewardController
 
 #JudgmentRiderConnection Routes
 GET     /judgmentriderconnections/:riderId          controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
+GET     /judgmentriderconnections/stages/:stageId   controllers.JudgmentRiderConnectionController.getJudgmentRiderConnectionByStage(stageId : Long)
 POST    /judgmentriderconnections                   controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()
 DELETE  /judgmentriderconnections/:appId            controllers.JudgmentRiderConnectionController.deleteJudgmentRiderConnection(appId : String)
 
