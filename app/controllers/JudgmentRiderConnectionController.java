@@ -49,6 +49,19 @@ public class JudgmentRiderConnectionController extends Controller {
         });
     }
 
+    @ApiOperation(value ="get all judgment rider connections of a specific stage", response = JudgmentRiderConnection.class)
+    public CompletionStage<Result> getJudgmentRiderConnectionByStage(long stageId) {
+        return judgmentRiderConnectionRepository.getJudgmentRiderConnectionsByStage(stageId).thenApplyAsync(judgmentRiderConnection -> ok(toJson(judgmentRiderConnection.collect(Collectors.toList())))).exceptionally(ex -> {
+            Result res;
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+                res = badRequest("No judgmentRiderConnection are set in DB for specific rider.");
+            } else {
+                res = internalServerError(ex.getMessage());
+            }
+            return res;
+        });
+    }
+
     @ApiOperation(value ="add new judgment rider connection")
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
