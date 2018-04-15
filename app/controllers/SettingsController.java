@@ -15,7 +15,6 @@ import java.util.concurrent.CompletionStage;
 
 import static play.libs.Json.toJson;
 
-@With(BasicAuthAction.class)
 public class SettingsController extends Controller {
     private final SettingRepository settingRepository;
 
@@ -28,6 +27,7 @@ public class SettingsController extends Controller {
         return settingRepository.getSetting().thenApplyAsync(setting -> ok(toJson(setting))).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
+    @With(BasicAuthAction.class)
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> updateSettings() {
         JsonNode json = request().body().asJson();
