@@ -54,7 +54,7 @@ public class JudgmentRiderConnectionController extends Controller {
         return judgmentRiderConnectionRepository.getJudgmentRiderConnectionsByStage(stageId).thenApplyAsync(judgmentRiderConnection -> ok(toJson(judgmentRiderConnection.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
-                res = badRequest("No judgmentRiderConnection are set in DB for specific rider.");
+                res = badRequest("No judgmentRiderConnection are set in DB for specific stage.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
