@@ -1,7 +1,6 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.enums.RewardType;
 
 import javax.persistence.*;
@@ -22,7 +21,7 @@ public class Reward {
 
     @OneToMany(mappedBy="reward", cascade= CascadeType.ALL)
     @JsonIgnore
-    private List<Judgment> judgmentRiderConnections = new ArrayList<Judgment>();
+    private List<Judgment> judgmentRiderConnections = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -44,7 +43,7 @@ public class Reward {
         this.rewardType = rewardType;
     }
 
-    public ArrayList<Integer> getPoints() {
+    public List<Integer> getPoints() {
         String[] m = points.split(",");
         ArrayList<Integer> i = new ArrayList<>();
         for(String s : m){
@@ -53,7 +52,7 @@ public class Reward {
         return i;
     }
 
-    public void setPoints(ArrayList<Integer> points) {
+    public void setPoints(List<Integer> points) {
         String s = "";
         for(int i : points){
             s = s.concat(String.valueOf(i)+",");
@@ -61,7 +60,7 @@ public class Reward {
         this.points = s;
     }
 
-    public ArrayList<Integer> getMoney() {
+    public List<Integer> getMoney() {
         String[] m = money.split(",");
         ArrayList<Integer> i = new ArrayList<>();
         for(String s : m){
@@ -70,7 +69,7 @@ public class Reward {
         return i;
     }
 
-    public void setMoney(ArrayList<Integer> money) {
+    public void setMoney(List<Integer> money) {
         String s = "";
         for(int i : money){
             s = s.concat(String.valueOf(i)+",");

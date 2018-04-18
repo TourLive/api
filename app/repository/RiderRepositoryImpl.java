@@ -17,6 +17,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class RiderRepositoryImpl implements RiderRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
+    private static final String RIDER_ID = "riderId";
 
     @Inject
     public RiderRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
@@ -30,8 +31,7 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private List<Rider> getAllRiders(EntityManager em){
-        List<Rider> riders = em.createQuery("select r from Rider r", Rider.class).getResultList();
-        return riders;
+        return em.createQuery("select r from Rider r", Rider.class).getResultList();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class RiderRepositoryImpl implements RiderRepository {
 
     private Rider getRiderByCnlabId(EntityManager em, long riderId){
         TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
-        query.setParameter("riderId", riderId);
+        query.setParameter(RIDER_ID, riderId);
         return query.getSingleResult();
     }
 
@@ -52,7 +52,7 @@ public class RiderRepositoryImpl implements RiderRepository {
 
     private Rider getRider(EntityManager em, long riderId){
         TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id = :riderId" , Rider.class);
-        query.setParameter("riderId", riderId);
+        query.setParameter(RIDER_ID, riderId);
         return query.getSingleResult();
     }
 
@@ -106,7 +106,7 @@ public class RiderRepositoryImpl implements RiderRepository {
 
     private Rider deleteRider(EntityManager em, long riderId){
         TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id = :riderId" , Rider.class);
-        query.setParameter("riderId", riderId);
+        query.setParameter(RIDER_ID, riderId);
         Rider rider = query.getSingleResult();
         if(rider != null){
             em.remove(rider);

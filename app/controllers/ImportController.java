@@ -1,61 +1,58 @@
 package controllers;
 
-import controllers.importUtilities.*;
-import controllers.importUtilities.comparators.LeaderComparator;
-import controllers.importUtilities.comparators.PointsComparator;
-import controllers.importUtilities.comparators.MountainPointsComparator;
+import controllers.importutilities.Parser;
+import controllers.importutilities.UrlLinks;
+import controllers.importutilities.comparators.LeaderComparator;
+import controllers.importutilities.comparators.MountainPointsComparator;
+import controllers.importutilities.comparators.PointsComparator;
 import models.*;
 import models.enums.RaceGroupType;
 import models.enums.TypeState;
-import play.libs.ws.*;
+import play.libs.ws.WSClient;
+import play.libs.ws.WSRequest;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.*;
-import scala.concurrent.ExecutionContextExecutor;
+
 import javax.inject.Inject;
-import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
+@With(BasicAuthAction.class)
 public class ImportController extends Controller {
     private final JudgmentRepository judgmentRepository;
-    private final JudgmentRiderConnectionRepository judgmentRiderConnectionRepository;
     private final MaillotRepository maillotRepository;
-    private final NotificationRepository notificationRepository;
     private final RaceGroupRepository raceGroupRepository;
     private final RaceRepository raceRepository;
     private final RewardRepository rewardRepository;
-    private final RiderRankingRepository riderRankingRepository;
     private final RiderRepository riderRepository;
     private final RiderStageConnectionRepository riderStageConnectionRepository;
     private final StageRepository stageRepository;
     private final WSClient wsClient;
-    private final ExecutionContextExecutor executionContextExecutor;
+    private static final String SUCESSMESSAGE ="success";
 
     @Inject
-    public ImportController(JudgmentRepository judgmentRepository, JudgmentRiderConnectionRepository judgmentRiderConnectionRepository,
-                            MaillotRepository maillotRepository, NotificationRepository notificationRepository,
+    public ImportController(JudgmentRepository judgmentRepository, MaillotRepository maillotRepository,
                             RaceGroupRepository raceGroupRepository, RaceRepository raceRepository,
-                            RewardRepository rewardRepository, RiderRankingRepository riderRankingRepository,
-                            RiderRepository riderRepository, RiderStageConnectionRepository riderStageConnectionRepository,
-                            StageRepository stageRepository, WSClient wsClient, ExecutionContextExecutor executionContextExecutor) {
+                            RewardRepository rewardRepository, RiderRepository riderRepository,
+                            RiderStageConnectionRepository riderStageConnectionRepository,
+                            StageRepository stageRepository, WSClient wsClient) {
         this.judgmentRepository = judgmentRepository;
-        this.judgmentRiderConnectionRepository = judgmentRiderConnectionRepository;
         this.maillotRepository = maillotRepository;
-        this.notificationRepository = notificationRepository;
         this.raceGroupRepository = raceGroupRepository;
         this.raceRepository = raceRepository;
         this.rewardRepository = rewardRepository;
-        this.riderRankingRepository = riderRankingRepository;
         this.riderRepository = riderRepository;
         this.riderStageConnectionRepository = riderStageConnectionRepository;
         this.stageRepository = stageRepository;
         this.wsClient = wsClient;
-        this.executionContextExecutor = executionContextExecutor;
     }
 
     public CompletionStage<Result> importAllStaticData() {
@@ -65,31 +62,17 @@ public class ImportController extends Controller {
                 importMaillots().thenApply(maillot -> {
                     importRiders().thenApply(rider -> {
                         importRewards().thenApply(judgment -> {
-                            importJudgments().thenApply(reward -> {
-                                return ok("successfully imported judgments");
-                            }).exceptionally(ex -> {
-                                return internalServerError("importing judgments failed");
-                            });
+                            importJudgments().thenApply(reward -> ok("successfully imported judgments")).exceptionally(ex -> internalServerError("importing judgments failed"));
                             return ok("successfully imported rewards");
-                        }) .exceptionally(ex -> {
-                            return internalServerError("importing rewards failed");
-                        });
+                        }) .exceptionally(ex -> internalServerError("importing rewards failed"));
                         return ok("successfully imported riders");
-                    }) .exceptionally(ex -> {
-                        return internalServerError("importing riders failed");
-                    });
+                    }) .exceptionally(ex -> internalServerError("importing riders failed"));
                     return ok("successfully imported maillots");
-                }).exceptionally(ex -> {
-                    return internalServerError("importing maillots failed");
-                });
+                }).exceptionally(ex -> internalServerError("importing maillots failed"));
                return ok("successfully imported stages");
-            }) .exceptionally(ex -> {
-                return internalServerError("importing stages failed");
-            });
+            }) .exceptionally(ex -> internalServerError("importing stages failed"));
             return ok("successfully imported race");
-        }).exceptionally(ex -> {
-          return internalServerError("importing race failed");
-        });
+        }).exceptionally(ex -> internalServerError("importing race failed"));
     }
 
     private void deleteAllData(){
@@ -106,23 +89,20 @@ public class ImportController extends Controller {
     private CompletionStage<String> importRace(){
         WSRequest request = wsClient.url(UrlLinks.RACE);
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
-        CompletionStage<String> promiseRaceId = request.get().thenApply(res -> {
-            return Parser.setActualRaceId(res.asJson());
-        });
+        CompletionStage<String> promiseRaceId = request.get().thenApply(res -> Parser.setActualRaceId(res.asJson()));
         promiseRaceId.toCompletableFuture().join();
-        long test = UrlLinks.getRaceId();
         request = wsClient.url(UrlLinks.STAGES + UrlLinks.getRaceId());
-        CompletionStage<Race> promiseRace = request.get().thenApply(res -> Parser.ParseRace(res.asJson()));
+        CompletionStage<Race> promiseRace = request.get().thenApply(res -> Parser.parseRace(res.asJson()));
         Race race = promiseRace.toCompletableFuture().join();
         raceRepository.addRace(race);
-        return CompletableFuture.completedFuture("success");
+        return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 
     private CompletionStage<String> importStages(){
         WSRequest request = wsClient.url(UrlLinks.STAGES + UrlLinks.getRaceId());
         Race race = CompletableFuture.completedFuture(raceRepository.getRace(UrlLinks.getRaceId())).join().toCompletableFuture().join();
 
-        CompletionStage<List<Stage>> promiseStages = request.get().thenApply(res -> Parser.ParseStages(res.asJson()));
+        CompletionStage<List<Stage>> promiseStages = request.get().thenApply(res -> Parser.parseStages(res.asJson()));
         List<Stage> stages = promiseStages.toCompletableFuture().join();
         for(Stage s : stages) {
             stageRepository.addStage(s);
@@ -130,7 +110,7 @@ public class ImportController extends Controller {
             stage.setRace(race);
             stageRepository.updateStage(stage);
         }
-        return CompletableFuture.completedFuture("success");
+        return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 
     private CompletionStage<String> importMaillots(){
@@ -138,7 +118,7 @@ public class ImportController extends Controller {
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
         List<Stage> stages = CompletableFuture.completedFuture(stageRepository.getAllStagesByRaceId(UrlLinks.getRaceId())).join().toCompletableFuture().join().collect(Collectors.toList());
         for(Stage s : stages){
-            CompletionStage<List<Maillot>> promiseMaillot = request.get().thenApply(res -> Parser.ParseMaillots(res.asJson()));
+            CompletionStage<List<Maillot>> promiseMaillot = request.get().thenApply(res -> Parser.parseMaillots(res.asJson()));
             List<Maillot> test = promiseMaillot.toCompletableFuture().join();
             for(Maillot m : test){
                 maillotRepository.addMaillot(m);
@@ -147,7 +127,7 @@ public class ImportController extends Controller {
                 maillotRepository.updateMaillot(dbMaillot);
             }
         }
-        return CompletableFuture.completedFuture("success");
+        return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 
     private CompletionStage<String> importRiders(){
@@ -158,7 +138,7 @@ public class ImportController extends Controller {
             if(!oneTimeImportRiders){
                 WSRequest request = wsClient.url(UrlLinks.RIDERS + stage.getStageId());
                 request.setRequestTimeout(java.time.Duration.ofMillis(10000));
-                CompletionStage<List<Rider>> promiseRiders = request.get().thenApply(res -> Parser.ParseRiders(res.asJson()));
+                CompletionStage<List<Rider>> promiseRiders = request.get().thenApply(res -> Parser.parseRiders(res.asJson()));
                 riders = promiseRiders.toCompletableFuture().join();
                 for(Rider r : riders){
                     riderRepository.addRider(r);
@@ -170,13 +150,13 @@ public class ImportController extends Controller {
             createDefaultRaceGroup(stage).toCompletableFuture().join();
         }
 
-        return CompletableFuture.completedFuture("success");
+        return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 
     private CompletionStage<String>  createRiderStageConnections(Stage stage, List<Rider> riders){
         WSRequest request = wsClient.url(UrlLinks.RIDERS + stage.getStageId());
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
-        CompletionStage<List<RiderStageConnection>> promiseRiderStageConnections = request.get().thenApply(res -> Parser.ParseRiderStageConnections(res.asJson()));
+        CompletionStage<List<RiderStageConnection>> promiseRiderStageConnections = request.get().thenApply(res -> Parser.parseRiderStageConnections(res.asJson()));
         List<RiderStageConnection> riderStageConnections = promiseRiderStageConnections.toCompletableFuture().join();
         for(int i = 0; i < riderStageConnections.size(); i++){
             RiderStageConnection rSC = riderStageConnections.get(i);
@@ -188,7 +168,7 @@ public class ImportController extends Controller {
             dbRSC.setRider(dbRider);
             riderStageConnectionRepository.updateRiderStageConnection(dbRSC);
         }
-        return CompletableFuture.completedFuture("success");
+        return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 
     private CompletionStage<String> createMaillotRiderConnections(Stage stage){
@@ -232,7 +212,7 @@ public class ImportController extends Controller {
                     break;
             }
         }
-        return CompletableFuture.completedFuture("success");
+        return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 
 
@@ -254,28 +234,24 @@ public class ImportController extends Controller {
         dbRaceGroup.setRiders(activeRiders);
         dbRaceGroup.setStage(dbStage);
         raceGroupRepository.updateRaceGroup(dbRaceGroup).toCompletableFuture().join();
-        return CompletableFuture.completedFuture("success");
+        return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 
     private CompletionStage<String> importRewards(){
         WSRequest request = wsClient.url(UrlLinks.JUDGEMENTS + UrlLinks.getRaceId());
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
-        CompletionStage<List<Reward>> promiseRewards = request.get().thenApply(res -> {
-            return Parser.ParseRewards(res.asJson());
-        });
+        CompletionStage<List<Reward>> promiseRewards = request.get().thenApply(res -> Parser.parseRewards(res.asJson()));
         List<Reward> rewards = promiseRewards.toCompletableFuture().join();
         for(Reward r : rewards){
             rewardRepository.addReward(r);
         }
-        return CompletableFuture.completedFuture("success");
+        return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 
     private CompletionStage<String> importJudgments(){
         WSRequest request = wsClient.url(UrlLinks.JUDGEMENTS + UrlLinks.getRaceId());
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
-        CompletionStage<HashMap<Long, ArrayList<Judgment>>> promiseJudgments = request.get().thenApply(res -> {
-            return Parser.ParseJudgments(res.asJson());
-        });
+        CompletionStage<HashMap<Long, ArrayList<Judgment>>> promiseJudgments = request.get().thenApply(res -> Parser.parseJudgments(res.asJson()));
         HashMap<Long, ArrayList<Judgment>> judgments = promiseJudgments.toCompletableFuture().join();
         List<Reward> dbRewards = CompletableFuture.completedFuture(rewardRepository.getAllRewards()).join().toCompletableFuture().join().collect(Collectors.toList());
 
@@ -297,7 +273,7 @@ public class ImportController extends Controller {
                 judgmentRepository.updateJudgment(dbJ);
             }
         }
-        return CompletableFuture.completedFuture("success");
+        return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 }
 

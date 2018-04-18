@@ -46,6 +46,17 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
     }
 
     @Override
+    public CompletionStage<Stream<JudgmentRiderConnection>> getJudgmentRiderConnectionsByStage(long stageId) {
+        return supplyAsync(() -> wrap (em -> getJudgmentRiderConnectionsByStage(em, stageId)), databaseExecutionContext);
+    }
+
+    private Stream<JudgmentRiderConnection> getJudgmentRiderConnectionsByStage(EntityManager em, long stageId){
+        TypedQuery<JudgmentRiderConnection> query = em.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.judgment.stage.id = :stageId" , JudgmentRiderConnection.class);
+        query.setParameter("stageId", stageId);
+        return query.getResultList().stream();
+    }
+
+    @Override
     public CompletionStage<JudgmentRiderConnection> addJudgmentRiderConnection(JudgmentRiderConnection judgmentRiderConnection) {
         return supplyAsync(() -> wrap(entityManager -> addJudgmentRiderConnection(entityManager, judgmentRiderConnection)), databaseExecutionContext);
     }

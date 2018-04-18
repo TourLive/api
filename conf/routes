@@ -9,6 +9,7 @@ GET   /api                          controllers.Application.redirectDocs
 GET   /swagger.json                 controllers.ApiHelpController.getResources
 GET   /docs/*file                   controllers.Assets.at(path="/public/swagger-ui",file)
 GET   /status                       controllers.Application.statusPage
+POST  /login                        controllers.Application.login
 
 #Race Routes
 GET     /races                      controllers.RaceController.getAllRaces()
@@ -48,6 +49,7 @@ GET     /rewards                                    controllers.RewardController
 
 #JudgmentRiderConnection Routes
 GET     /judgmentriderconnections/:riderId          controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
+GET     /judgmentriderconnections/stages/:stageId   controllers.JudgmentRiderConnectionController.getJudgmentRiderConnectionByStage(stageId : Long)
 POST    /judgmentriderconnections                   controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()
 DELETE  /judgmentriderconnections/:appId            controllers.JudgmentRiderConnectionController.deleteJudgmentRiderConnection(appId : String)
 
@@ -67,6 +69,9 @@ GET     /import                             controllers.ImportController.importA
 # Settings Route
 GET     /settings                           controllers.SettingsController.getSettings
 PUT     /settings                           controllers.SettingsController.updateSettings
+
+# Update Route
+PUT    /update/:stageId                    controllers.UpdateController.updateStage(stageId : Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

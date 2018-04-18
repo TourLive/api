@@ -1,6 +1,7 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 
@@ -15,11 +16,11 @@ public class JudgmentRiderConnection {
     private String appId;
 
     @ManyToOne(cascade=CascadeType.MERGE)
-    @JsonBackReference
+    @JsonManagedReference
     private Rider rider;
 
     @ManyToOne(cascade=CascadeType.MERGE)
-    @JsonBackReference
+    @JsonManagedReference
     private Judgment judgment;
 
     public Long getId() {
