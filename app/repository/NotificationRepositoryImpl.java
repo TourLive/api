@@ -34,7 +34,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     private Stream<Notification> getAllNotifications(EntityManager em, long stageId){
         TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.stage.id = :stageId" , Notification.class);
         query.setParameter("stageId", stageId);
-        return em.createQuery("select n from Notification n", Notification.class).getResultList().stream();
+        return query.getResultList().stream();
     }
 
     @Override
