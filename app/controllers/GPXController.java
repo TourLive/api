@@ -1,6 +1,8 @@
 package controllers;
 
+import controllers.importutilities.comparators.GPXComparatorComparator;
 import io.swagger.annotations.ApiOperation;
+import javassist.NotFoundException;
 import models.GPXTrack;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -14,6 +16,7 @@ import repository.interfaces.GPXTrackRepository;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
@@ -26,6 +29,8 @@ public class GPXController extends Controller {
     private static final String TRKPT = "trkpt";
     private static final String LATITUDE ="lat";
     private static final String LONGITUDE ="lon";
+    private static final String HEIGHT = "ele";
+    private static final short ALLOWED_TYPE = 1;
 
     @Inject
     public GPXController(GPXTrackRepository gpxTrackRepository) {
@@ -53,6 +58,8 @@ public class GPXController extends Controller {
                     GPXTrack gpxTrack = new GPXTrack();
                     gpxTrack.setLatitude(Double.valueOf(attributes.getNamedItem(LATITUDE).getNodeValue()));
                     gpxTrack.setLongitude(Double.valueOf(attributes.getNamedItem(LONGITUDE).getNodeValue()));
+                    Node height = collectHeight(trkpt);
+                    gpxTrack.setHeight(Double.valueOf(height.getNodeValue()));
                     gpxTracks.add(gpxTrack);
                 }
                 gpxTrackRepository.addGPXTracksByStageId(stageId, gpxTracks);
@@ -66,9 +73,28 @@ public class GPXController extends Controller {
         return completableFuture;
     }
 
+    private Node collectHeight(Node parent) throws NotFoundException {
+        NodeList children = parent.getChildNodes();
+        Node result = null;
+        for(int i = 0; i < children.getLength(); i++){
+            Node child = children.item(i);
+            if(child.getNodeType() != ALLOWED_TYPE) continue;
+            if(child.getLocalName().equals(HEIGHT)){
+                result = child.getFirstChild();
+                break;
+            }
+        }
+        if(result == null) throw new NotFoundException("failed to find results");
+        return result;
+    }
+
     @ApiOperation(value ="get GPS-Coordinates for specific stage", response = Result.class)
     public CompletionStage<Result> getGPSTracksByStageId(long stageId) {
-        return gpxTrackRepository.getGPXTracksByStageId(stageId).thenApplyAsync(gpsTracks -> ok(toJson(gpsTracks.collect(Collectors.toList())))).exceptionally(ex -> internalServerError(ex.getMessage()));
+        return gpxTrackRepository.getGPXTracksByStageId(stageId).thenApplyAsync(gpsTracks -> {
+                List<GPXTrack> sortedGPXTracks = gpsTracks.collect(Collectors.toList());
+                sortedGPXTracks.sort(new GPXComparatorComparator());
+                return ok(toJson(sortedGPXTracks));
+        }).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
     @With(BasicAuthAction.class)
