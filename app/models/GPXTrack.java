@@ -12,10 +12,15 @@ public class GPXTrack {
     private Long id;
     private double latitude;
     private double longitude;
+    private double height;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
     private Stage stage;
+
+    public Long getId() {
+        return id;
+    }
 
     public double getLatitude() {
         return latitude;
@@ -31,6 +36,14 @@ public class GPXTrack {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
     }
 
     public Stage getStage() {
