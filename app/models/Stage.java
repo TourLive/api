@@ -2,6 +2,8 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import models.enums.StageType;
 
 import javax.persistence.*;
@@ -11,6 +13,7 @@ import java.util.List;
 
 @Entity
 @SequenceGenerator(name = "key_gen_Stage", sequenceName = "key_gen_Stage",  initialValue = 1)
+@ApiModel(value = "Stage", description="Model of stage")
 public class Stage {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Stage")
@@ -27,26 +30,32 @@ public class Stage {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private Race race;
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonIgnore
+    @ApiModelProperty(hidden=true)
     private transient List<RaceGroup> racegroups = new ArrayList<>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonIgnore
+    @ApiModelProperty(hidden=true)
     private List<Maillot> mailllots = new ArrayList<>();
 
     @OneToMany(mappedBy="stage", cascade= CascadeType.ALL)
     @JsonIgnore
+    @ApiModelProperty(hidden=true)
     private List<Judgment> judgments = new ArrayList<>();
 
     public Long getId() {
@@ -101,6 +110,7 @@ public class Stage {
         this.destination = destination;
     }
 
+    @ApiModelProperty(hidden=true)
     public Race getRace() {
         return race;
     }
@@ -109,6 +119,7 @@ public class Stage {
         this.race = race;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<RiderStageConnection> getRiderStageConnections() {
         return riderStageConnections;
     }
@@ -117,6 +128,7 @@ public class Stage {
         this.riderStageConnections = riderStageConnections;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<Notification> getNotifications() {
         return notifications;
     }
@@ -125,6 +137,7 @@ public class Stage {
         this.notifications = notifications;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<RaceGroup> getRaceGroups() {
         return racegroups;
     }
@@ -141,6 +154,7 @@ public class Stage {
         this.stageId = stageId;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<Maillot> getMailllots() {
         return mailllots;
     }
@@ -153,6 +167,7 @@ public class Stage {
         return judgments;
     }
 
+    @ApiModelProperty(hidden=true)
     public void setJudgments(List<Judgment> judgments) {
         this.judgments = judgments;
     }

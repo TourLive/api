@@ -1,6 +1,8 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import models.enums.NotificationType;
 
 import javax.persistence.*;
@@ -8,6 +10,7 @@ import java.sql.Timestamp;
 
 @Entity
 @SequenceGenerator(name = "key_gen_Notification", sequenceName = "key_gen_Notification",  initialValue = 1)
+@ApiModel(value = "Notification", description="Model of notification")
 public class Notification {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Notification")
@@ -18,6 +21,7 @@ public class Notification {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private Stage stage;
 
     public Long getId() {
@@ -48,6 +52,7 @@ public class Notification {
         this.notificationType = notificationType;
     }
 
+    @ApiModelProperty(hidden=true)
     public Stage getStage() {
         return stage;
     }

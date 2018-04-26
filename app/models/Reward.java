@@ -1,6 +1,8 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import models.enums.RewardType;
 
 import javax.persistence.*;
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Entity
 @SequenceGenerator(name = "key_gen_Reward", sequenceName = "key_gen_Reward",  initialValue = 1)
+@ApiModel(value = "Reward", description="Model of reward")
 public class Reward {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Reward")
@@ -21,6 +24,7 @@ public class Reward {
 
     @OneToMany(mappedBy="reward", cascade= CascadeType.ALL)
     @JsonIgnore
+    @ApiModelProperty(hidden=true)
     private List<Judgment> judgmentRiderConnections = new ArrayList<>();
 
     public Long getId() {
@@ -77,6 +81,7 @@ public class Reward {
         this.money = s;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<Judgment> getJudgmentRiderConnections() {
         return judgmentRiderConnections;
     }
