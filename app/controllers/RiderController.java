@@ -25,7 +25,7 @@ public class RiderController extends Controller {
         this.riderRepository = riderRepository;
     }
 
-    @ApiOperation(value ="get riders of a specific stage", response = Rider.class)
+    @ApiOperation(value ="get riders of a specific stage", response = Rider.class, responseContainer = "List")
     public CompletionStage<Result> getRiders(long stageId) {
         return riderRepository.getAllRiders(stageId).thenApplyAsync(riders -> ok(toJson(riders.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;

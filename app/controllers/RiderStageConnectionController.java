@@ -34,7 +34,7 @@ public class RiderStageConnectionController extends Controller {
     }
 
 
-    @ApiOperation(value ="get all rider stage connections of a stage", response = RiderStageConnection.class)
+    @ApiOperation(value ="get all rider stage connections of a stage", response = RiderStageConnection.class, responseContainer = "List")
     public CompletionStage<Result> getRiderStageConnections(long stageId) {
         return riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> {
             List<RiderStageConnection> returnValues = riderStageConnections.collect(Collectors.toList());

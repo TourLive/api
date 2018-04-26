@@ -45,7 +45,7 @@ public class RaceGroupController extends Controller {
         this.riderRepository = riderRepository;
     }
 
-    @ApiOperation(value ="get all racegroups of a stage", response = RaceGroup.class)
+    @ApiOperation(value ="get all racegroups of a stage", response = RaceGroup.class, responseContainer = "List")
     public CompletionStage<Result> getAllRaceGroups(long stageId) {
         return raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;

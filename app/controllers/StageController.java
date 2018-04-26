@@ -25,7 +25,7 @@ public class StageController extends Controller {
         this.stageRepository = stageRepository;
     }
 
-    @ApiOperation(value ="get all stages", response = Stage.class)
+    @ApiOperation(value ="get all stages", response = Stage.class, responseContainer = "List")
     public CompletionStage<Result> getStages() {
         return stageRepository.getAllStages().thenApplyAsync(stages -> ok(toJson(stages.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;

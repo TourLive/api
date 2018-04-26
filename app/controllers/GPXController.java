@@ -1,7 +1,7 @@
 package controllers;
 
 import controllers.importutilities.comparators.GPXComparatorComparator;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import javassist.NotFoundException;
 import models.GPXTrack;
 import org.w3c.dom.Document;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;
 
+@Api("GPX Tracks")
 public class GPXController extends Controller {
     private final GPXTrackRepository gpxTrackRepository;
     private static final String TRKPT = "trkpt";
@@ -38,7 +39,9 @@ public class GPXController extends Controller {
     }
 
     @With(BasicAuthAction.class)
-    @ApiOperation(value ="import GPS-Coordinates for specific stage", response = Result.class)
+    @ApiOperation(value ="Import GPX-Coordinates for specific stage", response = Result.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error on importing/adding gpx tracks") })
     @BodyParser.Of(BodyParser.Xml.class)
     public CompletionStage<Result> addGPSTracksForStageById(long stageId) {
         return updateGPXTracksWithXML(stageId, request().body().asXml()).thenApplyAsync(res -> ok("successfully imported GPS Tracks for Stage")).exceptionally(ex -> internalServerError(ex.getMessage()));
@@ -89,6 +92,8 @@ public class GPXController extends Controller {
     }
 
     @ApiOperation(value ="get GPS-Coordinates for specific stage", response = Result.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "No gpx tracks of specified stage id found") })
     public CompletionStage<Result> getGPSTracksByStageId(long stageId) {
         return gpxTrackRepository.getGPXTracksByStageId(stageId).thenApplyAsync(gpsTracks -> {
                 List<GPXTrack> sortedGPXTracks = gpsTracks.collect(Collectors.toList());
@@ -97,6 +102,8 @@ public class GPXController extends Controller {
         }).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "failed deleting gpx tracks for specified stage id") })
     @With(BasicAuthAction.class)
     @ApiOperation(value ="delete GPS-Coordinates for specific stage", response = Result.class)
     public CompletionStage<Result> deleteGPSTracksForStageById(long stageId) {

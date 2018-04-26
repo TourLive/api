@@ -36,7 +36,7 @@ public class JudgmentRiderConnectionController extends Controller {
         this.judgmentRepository = judgmentRepository;
     }
 
-    @ApiOperation(value ="get all judgment rider connections of a specific rider", response = JudgmentRiderConnection.class)
+    @ApiOperation(value ="get all judgment rider connections of a specific rider", response = JudgmentRiderConnection.class, responseContainer = "List")
     public CompletionStage<Result> getJudgmentRiderConnection(long riderId) {
         return judgmentRiderConnectionRepository.getJudgmentRiderConnectionsByRider(riderId).thenApplyAsync(judgmentRiderConnection -> ok(toJson(judgmentRiderConnection.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -49,7 +49,7 @@ public class JudgmentRiderConnectionController extends Controller {
         });
     }
 
-    @ApiOperation(value ="get all judgment rider connections of a specific stage", response = JudgmentRiderConnection.class)
+    @ApiOperation(value ="get all judgment rider connections of a specific stage", response = JudgmentRiderConnection.class, responseContainer = "List")
     public CompletionStage<Result> getJudgmentRiderConnectionByStage(long stageId) {
         return judgmentRiderConnectionRepository.getJudgmentRiderConnectionsByStage(stageId).thenApplyAsync(judgmentRiderConnection -> ok(toJson(judgmentRiderConnection.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;

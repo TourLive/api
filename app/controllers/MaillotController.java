@@ -2,6 +2,8 @@ package controllers;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import models.Maillot;
 import models.MaillotDTO;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -26,7 +28,10 @@ public class MaillotController extends Controller {
     @Inject
     public MaillotController(MaillotRepository maillotRepository) { this.maillotRepository = maillotRepository; }
 
-    @ApiOperation(value ="get all maillots of a stage", response = Maillot.class)
+    @ApiOperation(value ="get all maillots of a stage", response = MaillotDTO.class, responseContainer = "List")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "No maillots are set in DB for this stage."),
+            @ApiResponse(code = 500, message = "Error on getting maillots of the specified stage") })
     public CompletionStage<Result> getMaillots(Long stageId) {
         return maillotRepository.getAllMaillots(stageId).thenApplyAsync(maillots -> {
             List<MaillotDTO> maillotDTOList = new ArrayList<>();
@@ -45,7 +50,10 @@ public class MaillotController extends Controller {
         });
     }
 
-    @ApiOperation(value ="get maillot by id", response = Maillot.class)
+    @ApiOperation(value ="get maillot by id", response = MaillotDTO.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "No specific maillot is set in DB for this id."),
+            @ApiResponse(code = 500, message = "Error on getting maillot by id") })
     public CompletionStage<Result> getMaillot(Long maillotId) {
         return maillotRepository.getMaillot(maillotId).thenApplyAsync(maillot -> ok(toJson(new MaillotDTO(maillot)))).exceptionally(ex -> {
             Result res;

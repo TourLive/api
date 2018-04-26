@@ -1,5 +1,6 @@
 package controllers;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javassist.NotFoundException;
 import models.RiderStageConnection;
@@ -23,6 +24,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+@Api("Update")
 @With(BasicAuthAction.class)
 public class UpdateController extends Controller {
     private final StageRepository stageRepository;
