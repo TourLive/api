@@ -64,7 +64,7 @@ public class RiderStageConnectionController extends Controller {
         });
     }
 
-    @ApiOperation(value = "update a existing rider stage connection")
+    @ApiOperation(value = "update a existing rider stage connection", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
     public CompletionStage<Result> updateRiderStageConnection(long riderStageConnectionId) {

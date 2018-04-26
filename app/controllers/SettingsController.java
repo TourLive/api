@@ -28,14 +28,14 @@ public class SettingsController extends Controller {
         this.settingRepository = settingRepository;
     }
 
-    @ApiOperation(value ="Get the current settings for the tourlive applications", response = Result.class)
+    @ApiOperation(value ="Get the current settings for the tourlive applications", response = String.class)
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Error on getting the current settings") })
     public CompletionStage<Result> getSettings() {
         return settingRepository.getSetting().thenApplyAsync(setting -> ok(toJson(setting))).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 
-    @ApiOperation(value ="Update the current settings for the tourlive applications", response = Result.class)
+    @ApiOperation(value ="Update the current settings for the tourlive applications", response = String.class)
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Error on updating the current settings") })
     @With(BasicAuthAction.class)

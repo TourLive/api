@@ -71,7 +71,7 @@ public class RaceGroupController extends Controller {
         });
     }
 
-    @ApiOperation(value ="manage racegroups")
+    @ApiOperation(value ="manage racegroups", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
     public CompletionStage<Result> manageRaceGroups(long stageId) {
@@ -141,7 +141,7 @@ public class RaceGroupController extends Controller {
         return completableFuture;
     }
 
-    @ApiOperation(value ="update specific racegroups time")
+    @ApiOperation(value ="update specific racegroups time", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
     public CompletionStage<Result> updateRaceGroup(String raceGroupId, long stageId) {

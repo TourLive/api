@@ -62,7 +62,7 @@ public class JudgmentRiderConnectionController extends Controller {
         });
     }
 
-    @ApiOperation(value ="add new judgment rider connection")
+    @ApiOperation(value ="add new judgment rider connection", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
     public CompletionStage<Result> addJudgmentRiderConnection() {
@@ -100,7 +100,7 @@ public class JudgmentRiderConnectionController extends Controller {
         return completableFuture;
     }
 
-    @ApiOperation(value ="delete a judgment rider connection by appId")
+    @ApiOperation(value ="delete a judgment rider connection by appId", response = String.class)
     public CompletionStage<Result> deleteJudgmentRiderConnection(String appId) {
         return judgmentRiderConnectionRepository.deleteJudgmentRiderConnection(appId).thenApply(judgmentRiderConnection -> ok("success")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
