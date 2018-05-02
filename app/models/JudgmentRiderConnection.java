@@ -2,11 +2,13 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.swagger.annotations.ApiModel;
 
 import javax.persistence.*;
 
 @Entity
 @SequenceGenerator(name = "key_gen_JudgmentRiderConnection", sequenceName = "key_gen_JudgmentRiderConnection",  initialValue = 1)
+@ApiModel(value = "JudgmentRiderConnection", description="Model of judgment rider connection")
 public class JudgmentRiderConnection {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_JudgmentRiderConnection")

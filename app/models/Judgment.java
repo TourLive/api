@@ -3,6 +3,8 @@ package models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Entity
 @SequenceGenerator(name = "key_gen_Judgment", sequenceName = "key_gen_Judgment",  initialValue = 1)
+@ApiModel(value = "Judgment", description="Model of judgment")
 public class Judgment {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Judgment")
@@ -21,6 +24,7 @@ public class Judgment {
 
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<>();
 
     @ManyToOne(cascade=CascadeType.PERSIST)
@@ -29,6 +33,7 @@ public class Judgment {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private Stage stage;
 
     public Long getId() {
@@ -51,6 +56,7 @@ public class Judgment {
         this.distance = distance;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<JudgmentRiderConnection> getJudgmentRiderConnections() {
         return judgmentRiderConnections;
     }
@@ -67,6 +73,7 @@ public class Judgment {
         this.reward = reward;
     }
 
+    @ApiModelProperty(hidden=true)
     public Stage getStage() {
         return stage;
     }

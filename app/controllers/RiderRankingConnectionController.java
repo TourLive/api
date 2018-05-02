@@ -31,7 +31,7 @@ public class RiderRankingConnectionController extends Controller {
     }
 
 
-    @ApiOperation(value ="get all riderrankings of a rider stage connection", response = RiderRanking.class)
+    @ApiOperation(value ="get all riderrankings of a rider stage connection", response = RiderRanking.class, responseContainer = "List")
     public CompletionStage<Result> getRiderRankings(long riderStageConnectionId) {
         return riderRankingRepository.getAllRiderRankings(riderStageConnectionId).thenApplyAsync(riderRankings -> ok(toJson(riderRankings.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -44,7 +44,7 @@ public class RiderRankingConnectionController extends Controller {
         });
     }
 
-    @ApiOperation(value ="get the riderrankings by ranking type and rider stage connection id", response = RiderRanking.class)
+    @ApiOperation(value ="get the riderrankings by ranking type and rider stage connection id", response = RiderRanking.class, responseContainer = "List")
     public CompletionStage<Result> getRiderRankingsByType(long riderStageConnectionId, String rankingType) {
         return riderRankingRepository.getAllRiderRankingsByType(riderStageConnectionId, rankingType).thenApplyAsync(riderRankings -> ok(toJson(riderRankings.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -57,7 +57,7 @@ public class RiderRankingConnectionController extends Controller {
         });
     }
 
-    @ApiOperation(value ="get all riderrankings by ranking type and rider", response = RiderRanking.class)
+    @ApiOperation(value ="get all riderrankings by ranking type and rider", response = RiderRanking.class, responseContainer = "List")
     public CompletionStage<Result> getRiderRankingByRiderAndType(long riderId, String rankingType) {
         return riderRankingRepository.getRiderRankingByRiderAndType(riderId, rankingType).thenApplyAsync(riderRanking -> ok(toJson(riderRanking))).exceptionally(ex -> {
             Result res;

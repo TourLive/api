@@ -30,7 +30,7 @@ public class NotificationController extends Controller {
     @Inject
     public NotificationController(NotificationRepository notificationRepository) { this.notificationRepository = notificationRepository; }
 
-    @ApiOperation(value ="get notifications of a specific stage", response = Notification.class)
+    @ApiOperation(value ="get notifications of a specific stage", response = Notification.class, responseContainer = "List")
     public CompletionStage<Result> getNotifications(long stageId) {
         return notificationRepository.getAllNotifications(stageId).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -43,7 +43,7 @@ public class NotificationController extends Controller {
         });
     }
 
-    @ApiOperation(value ="get notifications of a specific stage at a timestamp", response = Notification.class)
+    @ApiOperation(value ="get notifications of a specific stage at a timestamp", response = Notification.class, responseContainer = "List")
     public CompletionStage<Result> getNotificationsByStageAndTimestamp(Long stageId, Long timestamp) {
         return notificationRepository.getNotificationsByTimestamp(stageId, new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;

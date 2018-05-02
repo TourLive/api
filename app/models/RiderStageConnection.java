@@ -2,6 +2,8 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import models.enums.TypeState;
 
 import javax.persistence.*;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Entity
 @SequenceGenerator(name = "key_gen_RiderStageConnections", sequenceName = "key_gen_RiderStageConnections", initialValue = 1)
+@ApiModel(value = "RiderStageConnection", description="Model of rider stage connection")
 public class RiderStageConnection {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_RiderStageConnections")
@@ -26,6 +29,7 @@ public class RiderStageConnection {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private Stage stage;
     @OneToMany(mappedBy="riderStageConnection", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
@@ -35,6 +39,7 @@ public class RiderStageConnection {
     private Rider rider;
     @ManyToMany(cascade= CascadeType.ALL)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private List<Maillot> riderMaillots = new ArrayList<>();
 
     public Long getId() {
@@ -115,6 +120,7 @@ public class RiderStageConnection {
         this.typeState = typeState;
     }
 
+    @ApiModelProperty(hidden=true)
     public Stage getStage() {
         return stage;
     }
@@ -139,6 +145,7 @@ public class RiderStageConnection {
         this.rider = rider;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<Maillot> getRiderMaillots() {
         return riderMaillots;
     }

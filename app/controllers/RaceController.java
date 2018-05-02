@@ -25,7 +25,7 @@ public class RaceController extends Controller {
         this.raceRepository = raceRepository;
     }
 
-    @ApiOperation(value ="get all races", response = Race.class)
+    @ApiOperation(value ="get all races", response = Race.class, responseContainer = "List")
     public CompletionStage<Result> getAllRaces() {
         return raceRepository.getAllRaces().thenApplyAsync(races -> ok(toJson(races.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;

@@ -1,11 +1,13 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
 
 import javax.persistence.*;
 
 @Entity
 @SequenceGenerator(name = "key_gen_Settings", sequenceName = "key_gen_Settings",  initialValue = 1)
+@ApiModel(value = "Setting", description="Model of setting")
 public class Setting {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO, generator = "key_gen_Settings")
