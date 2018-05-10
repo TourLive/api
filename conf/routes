@@ -32,7 +32,7 @@ PUT     /racegroups/:raceGroupId/stages/:stageId         controllers.RaceGroupCo
 #Notifcation Routes
 GET     /notifications/stages/:stageId              controllers.NotificationController.getNotifications(stageId : Long)
 GET     /notifications/stages/:stageId/:timestamp   controllers.NotificationController.getNotificationsByStageAndTimestamp(timestamp : Long, stageId : Long)
-POST    /notifications/:stageId                     controllers.NotificationController.addNotification(stageId : Long)
+POST    /notifications/stages/:stageId                     controllers.NotificationController.addNotification(stageId : Long)
 
 #RiderStageConnection Routes
 GET     /riderstageconnections/stages/:stageId              controllers.RiderStageConnectionController.getRiderStageConnections(stageId : Long)

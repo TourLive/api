@@ -83,7 +83,7 @@ public class NotificationController extends Controller {
                 Notification notification = new Notification();
                 notification.setMessage(json.findPath("message").textValue());
                 notification.setNotificationType(NotificationType.valueOf(json.findPath("typeState").asText()));
-                notification.setTimestamp(new Timestamp(json.findPath("timestampe").asLong()));
+                notification.setTimestamp(new Timestamp(System.currentTimeMillis()));
                 completableFuture.complete(notification);
                 return notification;
             } catch (Exception e){
