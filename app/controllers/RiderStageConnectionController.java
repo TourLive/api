@@ -34,7 +34,7 @@ public class RiderStageConnectionController extends Controller {
     }
 
 
-    @ApiOperation(value ="get all rider stage connections of a stage", response = RiderStageConnection.class)
+    @ApiOperation(value ="get all rider stage connections of a stage", response = RiderStageConnection.class, responseContainer = "List")
     public CompletionStage<Result> getRiderStageConnections(long stageId) {
         return riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> {
             List<RiderStageConnection> returnValues = riderStageConnections.collect(Collectors.toList());
@@ -64,7 +64,7 @@ public class RiderStageConnectionController extends Controller {
         });
     }
 
-    @ApiOperation(value = "update a existing rider stage connection")
+    @ApiOperation(value = "update a existing rider stage connection", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
     public CompletionStage<Result> updateRiderStageConnection(long riderStageConnectionId) {

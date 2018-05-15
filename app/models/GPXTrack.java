@@ -1,11 +1,14 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 
 @Entity
 @SequenceGenerator(name = "key_gen_GPXTrack", sequenceName = "key_gen_GPXTrack",  initialValue = 1)
+@ApiModel(value = "GPXTrack", description="Model of gpx track")
 public class GPXTrack {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_GPXTrack")
@@ -16,6 +19,7 @@ public class GPXTrack {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private Stage stage;
 
     public Long getId() {
@@ -46,6 +50,7 @@ public class GPXTrack {
         this.height = height;
     }
 
+    @ApiModelProperty(hidden=true)
     public Stage getStage() {
         return stage;
     }

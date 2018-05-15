@@ -1,9 +1,12 @@
 package models;
 
+import io.swagger.annotations.ApiModel;
+
 import javax.persistence.*;
 
 @Entity
 @SequenceGenerator(name = "key_gen_User", sequenceName = "key_gen_User",  initialValue = 1)
+@ApiModel(value = "UserAccount", description="Model of user account")
 public class UserAccount {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO, generator = "key_gen_User")

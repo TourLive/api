@@ -21,7 +21,7 @@ public class JudgmentController extends Controller {
     @Inject
     public JudgmentController(JudgmentRepository judgmentRepository) { this.judgmentRepository = judgmentRepository; }
 
-    @ApiOperation(value ="get all judgments of a race", response = Judgment.class)
+    @ApiOperation(value ="get all judgments of a race", response = Judgment.class, responseContainer = "List")
     public CompletionStage<Result> getJudgments() {
         return judgmentRepository.getAllJudgments().thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;
@@ -34,7 +34,7 @@ public class JudgmentController extends Controller {
         });
     }
 
-    @ApiOperation(value ="get all judgments of a stage", response = Judgment.class)
+    @ApiOperation(value ="get all judgments of a stage", response = Judgment.class, responseContainer = "List")
     public CompletionStage<Result> getJudgmentsByStage(long stageId) {
         return judgmentRepository.getJudgmentsByStage(stageId).thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;
@@ -47,7 +47,7 @@ public class JudgmentController extends Controller {
         });
     }
 
-    @ApiOperation(value ="get all judgments of a rider", response = Judgment.class)
+    @ApiOperation(value ="get all judgments of a rider", response = Judgment.class, responseContainer = "List")
     public CompletionStage<Result> getJudgmentsByRider(long riderId) {
         return judgmentRepository.getJudgmentsByRider(riderId).thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;

@@ -1,12 +1,15 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import models.enums.RankingType;
 
 import javax.persistence.*;
 
 @Entity
 @SequenceGenerator(name = "key_gen_RiderRankings", sequenceName = "key_gen_RiderRankings", initialValue = 1)
+@ApiModel(value = "RiderRanking", description="Model of rider ranking")
 public class RiderRanking {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_RiderRankings")
@@ -16,6 +19,7 @@ public class RiderRanking {
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private RiderStageConnection riderStageConnection;
 
     public Long getId() {
@@ -40,6 +44,7 @@ public class RiderRanking {
         this.rankingType = rankingType;
     }
 
+    @ApiModelProperty(hidden=true)
     public RiderStageConnection getRiderStageConnection() {
         return riderStageConnection;
     }

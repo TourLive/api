@@ -45,7 +45,7 @@ public class RaceGroupController extends Controller {
         this.riderRepository = riderRepository;
     }
 
-    @ApiOperation(value ="get all racegroups of a stage", response = RaceGroup.class)
+    @ApiOperation(value ="get all racegroups of a stage", response = RaceGroup.class, responseContainer = "List")
     public CompletionStage<Result> getAllRaceGroups(long stageId) {
         return raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -71,7 +71,7 @@ public class RaceGroupController extends Controller {
         });
     }
 
-    @ApiOperation(value ="manage racegroups")
+    @ApiOperation(value ="manage racegroups", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
     public CompletionStage<Result> manageRaceGroups(long stageId) {
@@ -141,7 +141,7 @@ public class RaceGroupController extends Controller {
         return completableFuture;
     }
 
-    @ApiOperation(value ="update specific racegroups time")
+    @ApiOperation(value ="update specific racegroups time", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
     public CompletionStage<Result> updateRaceGroup(String raceGroupId, long stageId) {

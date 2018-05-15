@@ -1,6 +1,8 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import models.enums.RaceGroupType;
 
 import javax.persistence.*;
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Entity
 @SequenceGenerator(name = "key_gen_RaceGroup", sequenceName = "key_gen_RaceGroup",  initialValue = 1)
+@ApiModel(value = "Racegroup", description="Model of racegroup")
 public class RaceGroup {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_RaceGroup")
@@ -21,6 +24,7 @@ public class RaceGroup {
 
     @ManyToOne(cascade=CascadeType.MERGE)
     @JsonIgnore
+    @ApiModelProperty(hidden=true)
     private Stage stage;
 
     @ManyToMany(cascade= CascadeType.MERGE, fetch = FetchType.EAGER)
@@ -75,6 +79,7 @@ public class RaceGroup {
         this.riders = riders;
     }
 
+    @ApiModelProperty(hidden=true)
     public Stage getStage() {
         return stage;
     }

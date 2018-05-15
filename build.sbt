@@ -16,7 +16,7 @@ libraryDependencies += "org.hibernate" % "hibernate-core" % "5.2.15.Final"
 libraryDependencies += "org.postgresql" % "postgresql" % "42.1.4"
 libraryDependencies += "io.swagger" %% "swagger-play2" % "1.6.0"
 libraryDependencies += "org.webjars" %% "webjars-play" % "2.6.3"
-libraryDependencies += "org.webjars" % "swagger-ui" % "2.2.0"
+libraryDependencies += "org.webjars" % "swagger-ui" % "3.13.6"
 libraryDependencies ++= Seq(
   ws
 )

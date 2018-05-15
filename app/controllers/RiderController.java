@@ -1,7 +1,6 @@
 package controllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import models.Rider;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.mvc.Controller;
@@ -25,7 +24,7 @@ public class RiderController extends Controller {
         this.riderRepository = riderRepository;
     }
 
-    @ApiOperation(value ="get riders of a specific stage", response = Rider.class)
+    @ApiOperation(value ="get riders of a specific stage", response = Rider.class, responseContainer = "List")
     public CompletionStage<Result> getRiders(long stageId) {
         return riderRepository.getAllRiders(stageId).thenApplyAsync(riders -> ok(toJson(riders.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;

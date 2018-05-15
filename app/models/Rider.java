@@ -1,6 +1,8 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -8,6 +10,7 @@ import java.util.List;
 
 @Entity
 @SequenceGenerator(name = "key_gen_Rider", sequenceName = "key_gen_Rider",  initialValue = 1)
+@ApiModel(value = "Rider", description="Model of rider")
 public class Rider {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Rider")
@@ -23,12 +26,15 @@ public class Rider {
 
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private List<JudgmentRiderConnection> judgmentRiderConnections = new ArrayList<>();
     @ManyToMany(mappedBy="riders", cascade= CascadeType.MERGE)
     @JsonBackReference
+    @ApiModelProperty(hidden=true)
     private List<RaceGroup> raceGroups = new ArrayList<>();
 
     public Long getId() {
@@ -91,6 +97,7 @@ public class Rider {
         isUnknown = unknown;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<RiderStageConnection> getRiderStageConnections() {
         return riderStageConnections;
     }
@@ -99,6 +106,7 @@ public class Rider {
         this.riderStageConnections = riderStageConnections;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<JudgmentRiderConnection> getJudgmentRiderConnections() {
         return judgmentRiderConnections;
     }
@@ -107,6 +115,7 @@ public class Rider {
         this.judgmentRiderConnections = judgmentRiderConnections;
     }
 
+    @ApiModelProperty(hidden=true)
     public List<RaceGroup> getRaceGroups() {
         return raceGroups;
     }

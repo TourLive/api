@@ -21,7 +21,7 @@ public class RewardController extends Controller {
     @Inject
     public RewardController(RewardRepository rewardRepository) { this.rewardRepository = rewardRepository; }
 
-    @ApiOperation(value ="get all rewards", response = Reward.class)
+    @ApiOperation(value ="get all rewards", response = Reward.class, responseContainer = "List")
     public CompletionStage<Result> getRewards() {
         return rewardRepository.getAllRewards().thenApplyAsync(rewards -> ok(toJson(rewards))).exceptionally(ex -> {
             Result res;
