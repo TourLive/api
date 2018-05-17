@@ -48,7 +48,7 @@ public class MaillotController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), GlobalConstants.CACHE_DURATION);
+        }), GlobalConstants.LONG_CACHE_DURATION);
     }
 
     @ApiOperation(value ="get maillot by id", response = MaillotDTO.class)
@@ -64,6 +64,6 @@ public class MaillotController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), GlobalConstants.CACHE_DURATION);
+        }), GlobalConstants.LONG_CACHE_DURATION);
     }
 }

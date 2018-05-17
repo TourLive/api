@@ -32,7 +32,7 @@ public class RiderController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), GlobalConstants.CACHE_DURATION);
+        }), GlobalConstants.LONG_CACHE_DURATION);
     }
 
     @ApiOperation(value ="get rider by id", response = Rider.class)
@@ -45,6 +45,6 @@ public class RiderController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), GlobalConstants.CACHE_DURATION);
+        }), GlobalConstants.LONG_CACHE_DURATION);
     }
 }

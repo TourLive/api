@@ -25,7 +25,7 @@ public class RaceController extends Controller {
     public RaceController(RaceRepository raceRepository, AsyncCacheApi cache) { this.raceRepository = raceRepository; this.cache = cache; }
 
     @ApiOperation(value ="get all races", response = Race.class, responseContainer = "List")
-    @Cached(key="races", duration = GlobalConstants.CACHE_DURATION)
+    @Cached(key="races", duration = GlobalConstants.LONG_CACHE_DURATION)
     public CompletionStage<Result> getAllRaces() {
         return raceRepository.getAllRaces().thenApplyAsync(races -> ok(toJson(races.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -48,6 +48,6 @@ public class RaceController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), GlobalConstants.CACHE_DURATION);
+        }), GlobalConstants.LONG_CACHE_DURATION);
     }
 }

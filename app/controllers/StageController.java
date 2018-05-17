@@ -28,7 +28,7 @@ public class StageController extends Controller {
     }
 
     @ApiOperation(value ="get all stages", response = Stage.class, responseContainer = "List")
-    @Cached(key="stages", duration = CACHE_DURATION)
+    @Cached(key="stages", duration = GlobalConstants.LONG_CACHE_DURATION)
     public CompletionStage<Result> getStages() {
         return stageRepository.getAllStages().thenApplyAsync(stages -> ok(toJson(stages.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
@@ -52,6 +52,6 @@ public class StageController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), GlobalConstants.CACHE_DURATION);
+        }), GlobalConstants.LONG_CACHE_DURATION);
     }
 }

@@ -24,7 +24,7 @@ public class JudgmentController extends Controller {
     public JudgmentController(JudgmentRepository judgmentRepository, AsyncCacheApi cache) { this.judgmentRepository = judgmentRepository; this.cache = cache;}
 
     @ApiOperation(value ="get all judgments of a race", response = Judgment.class, responseContainer = "List")
-    @Cached(key = "judgments", duration = GlobalConstants.CACHE_DURATION)
+    @Cached(key = "judgments", duration = GlobalConstants.LONG_CACHE_DURATION)
     public CompletionStage<Result> getJudgments() {
         return judgmentRepository.getAllJudgments().thenApplyAsync(judgments -> ok(toJson(judgments))).exceptionally(ex -> {
             Result res;
@@ -47,7 +47,7 @@ public class JudgmentController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), GlobalConstants.CACHE_DURATION);
+        }), GlobalConstants.LONG_CACHE_DURATION);
     }
 
     @ApiOperation(value ="get all judgments of a rider", response = Judgment.class, responseContainer = "List")
