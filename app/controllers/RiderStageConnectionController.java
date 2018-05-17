@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import models.RiderStageConnection;
 import models.enums.TypeState;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import play.cache.AsyncCacheApi;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -27,16 +28,19 @@ public class RiderStageConnectionController extends Controller {
     private final RiderStageConnectionRepository riderStageConnectionRepository;
     private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
     private static final String NULLPOINTEREXCEPTION = "NullPointerException";
+    private static final int CACHE_DURATION = 10;
+    private final AsyncCacheApi cache;
 
     @Inject
-    public RiderStageConnectionController(RiderStageConnectionRepository riderStageConnectionRepository) {
+    public RiderStageConnectionController(RiderStageConnectionRepository riderStageConnectionRepository, AsyncCacheApi cache) {
         this.riderStageConnectionRepository = riderStageConnectionRepository;
+        this.cache = cache;
     }
 
 
     @ApiOperation(value ="get all rider stage connections of a stage", response = RiderStageConnection.class, responseContainer = "List")
     public CompletionStage<Result> getRiderStageConnections(long stageId) {
-        return riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> {
+        return cache.getOrElseUpdate("riderstageconnections/"+stageId, () -> riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> {
             List<RiderStageConnection> returnValues = riderStageConnections.collect(Collectors.toList());
             returnValues.sort(new StartNrComparator());
             return ok(toJson(returnValues));
@@ -48,12 +52,12 @@ public class RiderStageConnectionController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), CACHE_DURATION);
     }
 
     @ApiOperation(value ="get the rider stage connection of a rider in a specific stage", response = RiderStageConnection.class)
     public CompletionStage<Result> getRiderStageConnection(long stageId, long riderId) {
-        return riderStageConnectionRepository.getRiderStageConnectionByRiderAndStage(stageId, riderId).thenApplyAsync(riderStageConnection -> ok(toJson(riderStageConnection))).exceptionally(ex -> {
+        return cache.getOrElseUpdate("riderstageconnection/stage/"+stageId + "/rider" + riderId, () -> riderStageConnectionRepository.getRiderStageConnectionByRiderAndStage(stageId, riderId).thenApplyAsync(riderStageConnection -> ok(toJson(riderStageConnection))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
                 res = badRequest("No riderStageConnections are set in DB for this stage id and rider id.");
@@ -61,7 +65,7 @@ public class RiderStageConnectionController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), CACHE_DURATION);
     }
 
     @ApiOperation(value = "update a existing rider stage connection", response = String.class)
