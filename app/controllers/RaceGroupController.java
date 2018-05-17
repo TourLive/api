@@ -9,6 +9,7 @@ import models.RaceGroup;
 import models.Rider;
 import models.enums.RaceGroupType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import play.cache.AsyncCacheApi;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -37,17 +38,20 @@ public class RaceGroupController extends Controller {
     private static final String NORESULTEXCEPTION = "NoResultException";
     private static final String ACTUAL_GAP_TIME = "ACTUAL_GAP_TIME";
     private static final String HISTORY_GAP_TIME = "HISTORY_GAP_TIME";
+    private static final int CACHE_DURATION = 10;
+    private final AsyncCacheApi cache;
 
     @Inject
-    public RaceGroupController(RaceGroupRepository raceGroupRepository, StageRepository stageRepository, RiderRepository riderRepository) {
+    public RaceGroupController(RaceGroupRepository raceGroupRepository, StageRepository stageRepository, RiderRepository riderRepository, AsyncCacheApi cache) {
         this.raceGroupRepository = raceGroupRepository;
         this.stageRepository = stageRepository;
         this.riderRepository = riderRepository;
+        this.cache = cache;
     }
 
     @ApiOperation(value ="get all racegroups of a stage", response = RaceGroup.class, responseContainer = "List")
     public CompletionStage<Result> getAllRaceGroups(long stageId) {
-        return raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
+        return cache.getOrElseUpdate("racegroups/stages/"+stageId, () -> raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No racegroups are set in DB for this stage.");
@@ -55,12 +59,12 @@ public class RaceGroupController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), CACHE_DURATION);
     }
 
     @ApiOperation(value ="get a racegroup by id", response = RaceGroup.class)
     public CompletionStage<Result> getRaceGroup(long id) {
-        return raceGroupRepository.getRaceGroupById(id).thenApplyAsync(raceGroup -> ok(toJson(raceGroup))).exceptionally(ex -> {
+        return cache.getOrElseUpdate("racegroup/"+id, () -> raceGroupRepository.getRaceGroupById(id).thenApplyAsync(raceGroup -> ok(toJson(raceGroup))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NORESULTEXCEPTION)){
                 res = badRequest("No racegroup with id: " + id + " is available in DB.");
@@ -68,7 +72,7 @@ public class RaceGroupController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), CACHE_DURATION);
     }
 
     @ApiOperation(value ="manage racegroups", response = String.class)
