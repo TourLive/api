@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import models.Notification;
 import models.enums.NotificationType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import play.cache.AsyncCacheApi;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -26,13 +27,15 @@ public class NotificationController extends Controller {
     private final NotificationRepository notificationRepository;
     private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
     private static final String NULLPOINTEREXCEPTION = "NullPointerException";
+    private static final int CACHE_DURATION = 10;
+    private final AsyncCacheApi cache;
 
     @Inject
-    public NotificationController(NotificationRepository notificationRepository) { this.notificationRepository = notificationRepository; }
+    public NotificationController(NotificationRepository notificationRepository, AsyncCacheApi cache) { this.notificationRepository = notificationRepository; this.cache = cache; }
 
     @ApiOperation(value ="get notifications of a specific stage", response = Notification.class, responseContainer = "List")
     public CompletionStage<Result> getNotifications(long stageId) {
-        return notificationRepository.getAllNotifications(stageId).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
+        return cache.getOrElseUpdate("notifications/"+stageId, () -> notificationRepository.getAllNotifications(stageId).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No notifications are set in DB for this stage.");
@@ -40,12 +43,12 @@ public class NotificationController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), CACHE_DURATION);
     }
 
     @ApiOperation(value ="get notifications of a specific stage at a timestamp", response = Notification.class, responseContainer = "List")
     public CompletionStage<Result> getNotificationsByStageAndTimestamp(Long stageId, Long timestamp) {
-        return notificationRepository.getNotificationsByTimestamp(stageId, new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
+        return cache.getOrElseUpdate("notifications/"+stageId+"/"+timestamp, () ->notificationRepository.getNotificationsByTimestamp(stageId, new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No notifications are set in DB for this stage with this specific timestamp.");
@@ -53,7 +56,7 @@ public class NotificationController extends Controller {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), CACHE_DURATION);
     }
 
     @ApiOperation(value ="add a notification", response = Notification.class)
