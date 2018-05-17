@@ -8,6 +8,7 @@ import controllers.importutilities.comparators.PointsComparator;
 import models.*;
 import models.enums.RaceGroupType;
 import models.enums.TypeState;
+import play.cache.AsyncCacheApi;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
 import play.mvc.Controller;
@@ -37,13 +38,14 @@ public class ImportController extends Controller {
     private final StageRepository stageRepository;
     private final WSClient wsClient;
     private static final String SUCESSMESSAGE ="success";
+    private final AsyncCacheApi cache;
 
     @Inject
     public ImportController(JudgmentRepository judgmentRepository, MaillotRepository maillotRepository,
                             RaceGroupRepository raceGroupRepository, RaceRepository raceRepository,
                             RewardRepository rewardRepository, RiderRepository riderRepository,
                             RiderStageConnectionRepository riderStageConnectionRepository,
-                            StageRepository stageRepository, WSClient wsClient) {
+                            StageRepository stageRepository, WSClient wsClient, AsyncCacheApi cache) {
         this.judgmentRepository = judgmentRepository;
         this.maillotRepository = maillotRepository;
         this.raceGroupRepository = raceGroupRepository;
@@ -53,6 +55,7 @@ public class ImportController extends Controller {
         this.riderStageConnectionRepository = riderStageConnectionRepository;
         this.stageRepository = stageRepository;
         this.wsClient = wsClient;
+        this.cache = cache;
     }
 
     public CompletionStage<Result> importAllStaticData() {
@@ -84,6 +87,7 @@ public class ImportController extends Controller {
         riderStageConnectionRepository.deleteAllRiderStageConnections();
         stageRepository.deleteAllStages();
         raceRepository.deleteAllRaces();
+        cache.removeAll();
     }
 
     private CompletionStage<String> importRace(){

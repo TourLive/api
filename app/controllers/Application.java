@@ -3,14 +3,17 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.hash.Hashing;
 import io.swagger.annotations.*;
+import play.cache.AsyncCacheApi;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.UserRepository;
 import views.html.index;
 
 import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletionStage;
 
 @SwaggerDefinition(
         consumes = {"application/json", "application/xml"},
@@ -23,8 +26,13 @@ import java.nio.charset.StandardCharsets;
 @Api("Application")
 public class Application extends Controller {
     private final UserRepository userRepository;
+    private final AsyncCacheApi cache;
+
     @Inject
-    public Application(UserRepository userRepository) { this.userRepository = userRepository; }
+    public Application(UserRepository userRepository, AsyncCacheApi cache) {
+        this.userRepository = userRepository;
+        this.cache = cache;
+    }
 
     @ApiOperation(value ="Index Page")
     public Result index() {
@@ -53,5 +61,11 @@ public class Application extends Controller {
         } catch (Exception ex){
             return badRequest(ex.getMessage());
         }
+    }
+
+    @With(BasicAuthAction.class)
+    @ApiOperation(value ="deletes all caches of the application", response = Result.class)
+    public CompletionStage<Result> deleteCache() {
+        return cache.removeAll().thenApplyAsync(something -> ok("Succesfully deleted caches")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 }

@@ -27,9 +27,6 @@ public class JudgmentRiderConnectionController extends Controller {
     private final JudgmentRiderConnectionRepository judgmentRiderConnectionRepository;
     private final RiderRepository riderRepository;
     private final JudgmentRepository judgmentRepository;
-    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
-    private static final String NULLPOINTEREXCEPTION = "NullPointerException";
-    private static final int CACHE_DURATION = 10;
     private final AsyncCacheApi cache;
 
     @Inject
@@ -44,26 +41,26 @@ public class JudgmentRiderConnectionController extends Controller {
     public CompletionStage<Result> getJudgmentRiderConnection(long riderId) {
         return cache.getOrElseUpdate("judgmentRiderConnections/"+riderId, () -> judgmentRiderConnectionRepository.getJudgmentRiderConnectionsByRider(riderId).thenApplyAsync(judgmentRiderConnection -> ok(toJson(judgmentRiderConnection.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No judgmentRiderConnection are set in DB for specific rider.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="get all judgment rider connections of a specific stage", response = JudgmentRiderConnection.class, responseContainer = "List")
     public CompletionStage<Result> getJudgmentRiderConnectionByStage(long stageId) {
         return cache.getOrElseUpdate("judgmentRiderConnections/stages/"+stageId, () -> judgmentRiderConnectionRepository.getJudgmentRiderConnectionsByStage(stageId).thenApplyAsync(judgmentRiderConnection -> ok(toJson(judgmentRiderConnection.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No judgmentRiderConnection are set in DB for specific stage.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="add new judgment rider connection", response = String.class)
@@ -73,7 +70,7 @@ public class JudgmentRiderConnectionController extends Controller {
         JsonNode json = request().body().asJson();
         return parseJudgmentRiderConnection(json).thenApply(judgmentRiderConnectionRepository::addJudgmentRiderConnection).thenApply(judgmentRiderConnection -> ok("success")).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.NULLPOINTEREXCEPTION)){
                 res = badRequest("adding judgment rider connection failed.");
             } else {
                 res = internalServerError(ex.getMessage());
