@@ -25,9 +25,6 @@ import static play.libs.Json.toJson;
 @Api("Notification")
 public class NotificationController extends Controller {
     private final NotificationRepository notificationRepository;
-    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
-    private static final String NULLPOINTEREXCEPTION = "NullPointerException";
-    private static final int CACHE_DURATION = 10;
     private final AsyncCacheApi cache;
 
     @Inject
@@ -37,26 +34,26 @@ public class NotificationController extends Controller {
     public CompletionStage<Result> getNotifications(long stageId) {
         return cache.getOrElseUpdate("notifications/"+stageId, () -> notificationRepository.getAllNotifications(stageId).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No notifications are set in DB for this stage.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="get notifications of a specific stage at a timestamp", response = Notification.class, responseContainer = "List")
     public CompletionStage<Result> getNotificationsByStageAndTimestamp(Long stageId, Long timestamp) {
         return cache.getOrElseUpdate("notifications/"+stageId+"/"+timestamp, () ->notificationRepository.getNotificationsByTimestamp(stageId, new Timestamp(timestamp)).thenApplyAsync(notifications -> ok(toJson(notifications.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No notifications are set in DB for this stage with this specific timestamp.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="add a notification", response = Notification.class)
@@ -68,7 +65,7 @@ public class NotificationController extends Controller {
                 thenApplyAsync(dbNotification -> ok(toJson(dbNotification)))
                 .exceptionally(ex -> {
                     Result res;
-                    if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
+                    if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.NULLPOINTEREXCEPTION)){
                         res = badRequest("adding notification failed.");
                     } else {
                         res = internalServerError(ex.getMessage());

@@ -34,11 +34,8 @@ public class RaceGroupController extends Controller {
     private final RaceGroupRepository raceGroupRepository;
     private final StageRepository stageRepository;
     private final RiderRepository riderRepository;
-    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
-    private static final String NORESULTEXCEPTION = "NoResultException";
     private static final String ACTUAL_GAP_TIME = "ACTUAL_GAP_TIME";
     private static final String HISTORY_GAP_TIME = "HISTORY_GAP_TIME";
-    private static final int CACHE_DURATION = 10;
     private final AsyncCacheApi cache;
 
     @Inject
@@ -53,26 +50,26 @@ public class RaceGroupController extends Controller {
     public CompletionStage<Result> getAllRaceGroups(long stageId) {
         return cache.getOrElseUpdate("racegroups/stages/"+stageId, () -> raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No racegroups are set in DB for this stage.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="get a racegroup by id", response = RaceGroup.class)
     public CompletionStage<Result> getRaceGroup(long id) {
         return cache.getOrElseUpdate("racegroup/"+id, () -> raceGroupRepository.getRaceGroupById(id).thenApplyAsync(raceGroup -> ok(toJson(raceGroup))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NORESULTEXCEPTION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.NORESULTEXCEPTION)){
                 res = badRequest("No racegroup with id: " + id + " is available in DB.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="manage racegroups", response = String.class)

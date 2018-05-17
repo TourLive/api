@@ -24,9 +24,6 @@ import static play.libs.Json.toJson;
 @Api("Maillot")
 public class MaillotController extends Controller {
     private final MaillotRepository maillotRepository;
-    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
-    private static final String NULLPOINTEREXCEPTION = "NullPointerException";
-    private static final int CACHE_DURATION = 10;
     private final AsyncCacheApi cache;
 
     @Inject
@@ -45,13 +42,13 @@ public class MaillotController extends Controller {
             return ok(toJson(maillotDTOList));
         }).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No maillots are set in DB for this stage.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="get maillot by id", response = MaillotDTO.class)
@@ -61,12 +58,12 @@ public class MaillotController extends Controller {
     public CompletionStage<Result> getMaillot(Long maillotId) {
         return cache.getOrElseUpdate("maillots/maillot/"+maillotId, () ->maillotRepository.getMaillot(maillotId).thenApplyAsync(maillot -> ok(toJson(new MaillotDTO(maillot)))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.NULLPOINTEREXCEPTION)){
                 res = badRequest("No specific maillot is set in DB for this id.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 }

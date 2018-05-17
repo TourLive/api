@@ -24,8 +24,6 @@ import static play.libs.Json.toJson;
 @Api("RiderRanking")
 public class RiderRankingConnectionController extends Controller {
     private final RiderRankingRepository riderRankingRepository;
-    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
-    private static final int CACHE_DURATION = 10;
     private final AsyncCacheApi cache;
 
     @Inject
@@ -39,39 +37,39 @@ public class RiderRankingConnectionController extends Controller {
     public CompletionStage<Result> getRiderRankings(long riderStageConnectionId) {
         return cache.getOrElseUpdate("riderrankings/"+riderStageConnectionId, () -> riderRankingRepository.getAllRiderRankings(riderStageConnectionId).thenApplyAsync(riderRankings -> ok(toJson(riderRankings.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No rider rankings are set in DB for this riderStageConnection Id.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="get the riderrankings by ranking type and rider stage connection id", response = RiderRanking.class, responseContainer = "List")
     public CompletionStage<Result> getRiderRankingsByType(long riderStageConnectionId, String rankingType) {
         return cache.getOrElseUpdate("riderrankings/"+riderStageConnectionId +"/type"+rankingType, () -> riderRankingRepository.getAllRiderRankingsByType(riderStageConnectionId, rankingType).thenApplyAsync(riderRankings -> ok(toJson(riderRankings.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No rider rankings are set in DB for this riderStageConnection id and Type.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="get all riderrankings by ranking type and rider", response = RiderRanking.class, responseContainer = "List")
     public CompletionStage<Result> getRiderRankingByRiderAndType(long riderId, String rankingType) {
         return cache.getOrElseUpdate("riderrankings/rider/"+riderId +"/type/"+rankingType, () -> riderRankingRepository.getRiderRankingByRiderAndType(riderId, rankingType).thenApplyAsync(riderRanking -> ok(toJson(riderRanking))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No rider rankings are set in DB for this rider id and type.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        }), CACHE_DURATION);
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="update a rider ranking")
@@ -81,7 +79,7 @@ public class RiderRankingConnectionController extends Controller {
         JsonNode json = request().body().asJson();
         return parseRiderRanking(json, riderRankingId).thenApply(riderRankingRepository::updateRiderRanking).thenApplyAsync(rSC -> ok("success")).exceptionally(ex -> {
             Result res = null;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("The specific riderRanking with the id was not found in DB.");
             } else {
                 res = internalServerError(ex.getMessage());
