@@ -71,7 +71,7 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
         entityManager.persist(judgmentRiderConnection);
         Log log = new Log();
         JudgmentRiderConnection dbJRC = entityManager.find(JudgmentRiderConnection.class, judgmentRiderConnection.getId());
-        log.setMessage(dbJRC.getJudgment().getName());
+        log.setMessage(dbJRC.getJudgment().getName() +" am Kilometer: "+ dbJRC.getJudgment().getDistance() + " mit dem " + dbJRC.getRank() +". Rang");
         log.setNotificationType(NotificationType.REWARD);
         log.setRiderId(dbJRC.getRider().getRiderId());
         log.setTimestamp(new Timestamp(timestamp));
