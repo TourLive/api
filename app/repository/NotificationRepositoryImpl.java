@@ -95,7 +95,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 
     private void generateLogForARaceGroup(long stageId, Notification notification){
         // Means that some racegroup has changed -> check all RaceGroups and add Rider Log if rider was not in same racegroup before
-        List<RaceGroup> raceGroups = raceGroupRepository.getAllRaceGroups(stageId).thenApply(rGps -> rGps.collect(Collectors.toList())).toCompletableFuture().join();
+        List<RaceGroup> raceGroups = raceGroupRepository.getAllRaceGroupsSync(stageId);
         for(RaceGroup raceGroup : raceGroups){
             for(Rider r : raceGroup.getRiders()){
                 Log lastLogForRider = logRepository.getLastLogOfAStageAndRiderNotificationType(stageId, r.getRiderId(), notification.getNotificationType());

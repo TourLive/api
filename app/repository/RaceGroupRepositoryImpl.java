@@ -11,6 +11,7 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -66,6 +67,17 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     }
 
     private Stream<RaceGroup> getAllRaceGroups(EntityManager em, long stageId){
+        TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.stage.id = :stageId" , RaceGroup.class);
+        query.setParameter("stageId", stageId);
+        return query.getResultList().stream();
+    }
+
+    @Override
+    public List<RaceGroup> getAllRaceGroupsSync(long stageId) {
+        return wrap (entityManager -> getAllRaceGroupsSync(entityManager, stageId)).collect(Collectors.toList());
+    }
+
+    private Stream<RaceGroup> getAllRaceGroupsSync(EntityManager em, long stageId){
         TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.stage.id = :stageId" , RaceGroup.class);
         query.setParameter("stageId", stageId);
         return query.getResultList().stream();
