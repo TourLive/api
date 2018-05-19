@@ -89,6 +89,7 @@ public class RaceGroupController extends Controller {
                     raceGroup.setId(stringRaceGroupHashMap.get(raceGroup.getAppId()).getId());
                     dbRaceGroups.remove(stringRaceGroupHashMap.get(raceGroup.getAppId()));
                 } else {
+                    raceGroup.setAppId(raceGroup.getAppId());
                     dbRaceGroups.remove(raceGroup);
                 }
                 raceGroupRepository.updateRaceGroup(raceGroup);

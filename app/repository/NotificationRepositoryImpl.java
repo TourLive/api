@@ -62,7 +62,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
 
     @Override
     public CompletionStage<Notification> addNotification(long stageId, Notification notification) {
-        supplyAsync(() -> wrap(em -> generateLogs(em, stageId, notification)), databaseExecutionContext);
+        supplyAsync(() -> wrap(em -> generateLogs(stageId, notification)), databaseExecutionContext);
         return supplyAsync(() -> wrap(em -> addNotification(em, stageId, notification)), databaseExecutionContext);
     }
 
@@ -72,13 +72,13 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         return notification;
     }
 
-    private Log generateLogs(EntityManager em, long stageId, Notification notification){
+    private Log generateLogs(long stageId, Notification notification){
         switch (notification.getNotificationType()){
             case RIDER:
-                generateLogForARider(em, stageId, notification);
+                generateLogForARider(stageId, notification);
                 break;
             case RACEGROUP:
-                generateLogForARaceGroup(em, stageId, notification);
+                generateLogForARaceGroup(stageId, notification);
                 break;
             default:
                 break;
@@ -86,36 +86,36 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         return null;
     }
 
-    private void generateLogForARider(EntityManager em, long stageId, Notification notification){
+    private void generateLogForARider(long stageId, Notification notification){
         // Means that state of rider has changed -> ARZT, STURZ; DEFEKT; DNS; QUIT
         RiderStageConnection con = riderStageConnectionRepository.getRiderStageConnectionByRiderAndStage(stageId, Long.valueOf(notification.getReferencedId())).toCompletableFuture().join();
         Rider r = riderRepository.getRider(Long.valueOf(notification.getReferencedId()));
-        createLogAndPersist(em, con.getTypeState().toString(), stageId, r.getRiderId(), notification);
+        createLogAndPersist(con.getTypeState().toString(), stageId, r.getRiderId(), notification);
     }
 
-    private void generateLogForARaceGroup(EntityManager em, long stageId, Notification notification){
+    private void generateLogForARaceGroup(long stageId, Notification notification){
         // Means that some racegroup has changed -> check all RaceGroups and add Rider Log if rider was not in same racegroup before
         List<RaceGroup> raceGroups = raceGroupRepository.getAllRaceGroups(stageId).thenApply(rGps -> rGps.collect(Collectors.toList())).toCompletableFuture().join();
         for(RaceGroup raceGroup : raceGroups){
             for(Rider r : raceGroup.getRiders()){
                 Log lastLogForRider = logRepository.getLastLogOfAStageAndRiderNotificationType(stageId, r.getRiderId(), notification.getNotificationType());
-                if(lastLogForRider != null && r.getRaceGroups().get(0).getAppId() == raceGroup.getAppId()){
+                if(lastLogForRider != null && lastLogForRider.getReferencedId() == raceGroup.getAppId()){
                     break;
                 }
                 // no log present yet or rider has changed racegroup -> create log
-                createLogAndPersist(em, raceGroup.getRaceGroupType().toString(), stageId, r.getRiderId(), notification);
+                createLogAndPersist(raceGroup.getRaceGroupType().toString(), stageId, r.getRiderId(), notification);
             }
         }
     }
 
-    private void createLogAndPersist(EntityManager em, String message, long stageId, long riderId, Notification notification){
+    private void createLogAndPersist(String message, long stageId, long riderId, Notification notification){
         Log log = new Log();
         log.setMessage(message);
         log.setNotificationType(notification.getNotificationType());
         log.setRiderId(riderId);
-        log.setStage(em.find(Stage.class, stageId));
         log.setTimestamp(notification.getTimestamp());
-        logRepository.addLog(log);
+        log.setReferencedId(notification.getReferencedId());
+        logRepository.addLog(stageId, log);
     }
 
 

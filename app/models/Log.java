@@ -19,6 +19,8 @@ public class Log {
     private Timestamp timestamp;
     private NotificationType notificationType;
     private Long riderId;
+    @ApiModelProperty(hidden=true)
+    private String referencedId;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
@@ -65,4 +67,12 @@ public class Log {
     public void setRiderId(Long riderId) { this.riderId = riderId; }
 
     public Long getRiderId(){ return riderId;}
+
+    public String getReferencedId() {
+        return referencedId;
+    }
+
+    public void setReferencedId(String referencedId) {
+        this.referencedId = referencedId;
+    }
 }

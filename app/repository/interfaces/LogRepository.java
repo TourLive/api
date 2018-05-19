@@ -18,7 +18,7 @@ public interface LogRepository {
     CompletionStage<Stream<Log>> getAllLogsOfAStageAndRider(long stageId, long riderId);
     CompletionStage<Stream<Log>> getAllLogsOfAStageAndRiderAndNotificationType(long stageId, long riderId, NotificationType type);
     Log getLastLogOfAStageAndRiderNotificationType(long stageId, long riderId, NotificationType type);
-    CompletionStage<Log> addLog(Log log);
+    CompletionStage<Log> addLog(long stageId, Log log);
     CompletionStage<Stream<Log>> deleteAllLogsOfAStage(long stageId);
     CompletionStage<Stream<Log>> deleteAllLogs();
 }
