@@ -18,6 +18,7 @@ public class Notification {
     private String message;
     private Timestamp timestamp;
     private NotificationType notificationType;
+    private String referencedId;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
     @JsonBackReference
@@ -59,5 +60,13 @@ public class Notification {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public String getReferencedId() {
+        return referencedId;
+    }
+
+    public void setReferencedId(String referencedId) {
+        this.referencedId = referencedId;
     }
 }

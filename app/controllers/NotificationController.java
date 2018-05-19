@@ -61,7 +61,7 @@ public class NotificationController extends Controller {
     @With(BasicAuthAction.class)
     public CompletionStage<Result> addNotification(Long stageId) {
         JsonNode json = request().body().asJson();
-        return parseNotification(json).thenApply(notification -> notificationRepository.addNotification(stageId, notification)).
+        return parseNotification(json).thenApplyAsync(notification -> notificationRepository.addNotification(stageId, notification)).
                 thenApplyAsync(dbNotification -> ok(toJson(dbNotification)))
                 .exceptionally(ex -> {
                     Result res;
@@ -83,6 +83,7 @@ public class NotificationController extends Controller {
                 Notification notification = new Notification();
                 notification.setMessage(json.findPath("message").textValue());
                 notification.setNotificationType(NotificationType.valueOf(json.findPath("typeState").asText()));
+                notification.setReferencedId(json.findPath("id").textValue());
                 notification.setTimestamp(new Timestamp(System.currentTimeMillis()));
                 completableFuture.complete(notification);
                 return notification;
