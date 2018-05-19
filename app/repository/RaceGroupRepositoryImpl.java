@@ -27,6 +27,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     private final DatabaseExecutionContext databaseExecutionContext;
     private static final String RACEGROUP_ID = "raceGroupId";
     private final LogRepository logRepository;
+    private static final String STAGE_ID = "stageId";
 
     @Inject
     public RaceGroupRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, LogRepository logRepository) {
@@ -70,13 +71,13 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     private RaceGroup getRaceGroupField(EntityManager entityManager, long stageId) {
         TypedQuery<RaceGroup> query = entityManager.createQuery("select rG from RaceGroup rG where rG.raceGroupType = :type and rG.stage.id = :stageId" , RaceGroup.class);
         query.setParameter("type", RaceGroupType.FELD);
-        query.setParameter("stageId", stageId);
+        query.setParameter(STAGE_ID, stageId);
         return query.getSingleResult();
     }
 
     private Stream<RaceGroup> getAllRaceGroups(EntityManager em, long stageId){
         TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.stage.id = :stageId" , RaceGroup.class);
-        query.setParameter("stageId", stageId);
+        query.setParameter(STAGE_ID, stageId);
         return query.getResultList().stream();
     }
 
@@ -87,7 +88,7 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
 
     private Stream<RaceGroup> getAllRaceGroupsSync(EntityManager em, long stageId){
         TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.stage.id = :stageId" , RaceGroup.class);
-        query.setParameter("stageId", stageId);
+        query.setParameter(STAGE_ID, stageId);
         return query.getResultList().stream();
     }
 

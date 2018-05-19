@@ -21,13 +21,14 @@ import static play.libs.Json.toJson;
 public class LogController extends Controller {
     private final LogRepository logRepository;
     private final AsyncCacheApi cache;
+    private static final String LOGS ="logs/";
 
     @Inject
     public LogController(LogRepository logRepository, AsyncCacheApi cache) { this.logRepository = logRepository; this.cache = cache; }
 
     @ApiOperation(value ="get logs of a specific stage", response = Log.class, responseContainer = "List")
     public CompletionStage<Result> getLogsOfAStage(long stageId) {
-        return cache.getOrElseUpdate("logs/"+stageId, () -> logRepository.getAllLogsOfAStage(stageId).thenApplyAsync(logs -> ok(toJson(logs.collect(Collectors.toList())))).exceptionally(ex -> {
+        return cache.getOrElseUpdate(LOGS+stageId, () -> logRepository.getAllLogsOfAStage(stageId).thenApplyAsync(logs -> ok(toJson(logs.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No logs are set in DB for this stage.");
@@ -40,7 +41,7 @@ public class LogController extends Controller {
 
     @ApiOperation(value ="get logs of a specific stage and rider", response = Log.class, responseContainer = "List")
     public CompletionStage<Result> getLogsOfAStageAndRider(long stageId, long riderId) {
-        return cache.getOrElseUpdate("logs/"+stageId +"/rider" + riderId, () -> logRepository.getAllLogsOfAStageAndRider(stageId, riderId).thenApplyAsync(logs -> ok(toJson(logs.collect(Collectors.toList())))).exceptionally(ex -> {
+        return cache.getOrElseUpdate( LOGS+stageId +"/rider" + riderId, () -> logRepository.getAllLogsOfAStageAndRider(stageId, riderId).thenApplyAsync(logs -> ok(toJson(logs.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No logs are set in DB for this stage and rider.");
@@ -53,7 +54,7 @@ public class LogController extends Controller {
 
     @ApiOperation(value ="get logs of a specific stage and rider", response = Log.class, responseContainer = "List")
     public CompletionStage<Result> getLogsOfAStageAndRiderAndNotificationType(long stageId, long riderId, String type) {
-        return cache.getOrElseUpdate("logs/"+stageId +"/rider" + riderId + "/type" + type, () -> logRepository.getAllLogsOfAStageAndRiderAndNotificationType(stageId, riderId, NotificationType.valueOf(type)).thenApplyAsync(logs -> ok(toJson(logs.collect(Collectors.toList())))).exceptionally(ex -> {
+        return cache.getOrElseUpdate(LOGS+stageId +"/rider" + riderId + "/type" + type, () -> logRepository.getAllLogsOfAStageAndRiderAndNotificationType(stageId, riderId, NotificationType.valueOf(type)).thenApplyAsync(logs -> ok(toJson(logs.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No logs are set in DB for this stage and rider with this type.");
