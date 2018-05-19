@@ -64,6 +64,24 @@ public class LogRepositoryImpl implements LogRepository {
     }
 
     @Override
+    public Log getLastLogOfAStageAndRiderNotificationType(long stageId, long riderId, NotificationType type) {
+        return wrap(entityManager -> getLastLogOfAStageAndRiderNotificationTypeSync(entityManager, stageId, riderId, type));
+    }
+
+    private Log getLastLogOfAStageAndRiderNotificationTypeSync(EntityManager em, long stageId, long riderId, NotificationType type){
+        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId and l.riderId =: riderId and l.notificationType =: typeOf order by l.timestamp desc " , Log.class);
+        query.setParameter("stageId", stageId);
+        query.setParameter("riderId", riderId);
+        query.setParameter("typeOf", type);
+        try{
+            return query.getSingleResult();
+        }
+        catch (Exception ex){
+            return null;
+        }
+    }
+
+    @Override
     public CompletionStage<Log> addLog(Log log) {
         return supplyAsync(() -> wrap(em -> addLogAsync(em, log)), databaseExecutionContext);
     }

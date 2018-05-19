@@ -1,11 +1,9 @@
 package repository;
 
 import models.*;
+import models.enums.NotificationType;
 import play.db.jpa.JPAApi;
-import repository.interfaces.LogRepository;
-import repository.interfaces.NotificationRepository;
-import repository.interfaces.RiderRepository;
-import repository.interfaces.RiderStageConnectionRepository;
+import repository.interfaces.*;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -14,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
@@ -24,14 +23,18 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     private final LogRepository logRepository;
     private final RiderStageConnectionRepository riderStageConnectionRepository;
     private final RiderRepository riderRepository;
+    private final RaceGroupRepository raceGroupRepository;
 
     @Inject
-    public NotificationRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, LogRepository logRepository, RiderStageConnectionRepository riderStageConnectionRepository, RiderRepository riderRepository) {
+    public NotificationRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, LogRepository logRepository,
+                                      RiderStageConnectionRepository riderStageConnectionRepository, RiderRepository riderRepository,
+                                      RaceGroupRepository raceGroupRepository) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
         this.logRepository = logRepository;
         this.riderStageConnectionRepository = riderStageConnectionRepository;
         this.riderRepository = riderRepository;
+        this.raceGroupRepository = raceGroupRepository;
     }
 
     @Override
@@ -87,17 +90,32 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         // Means that state of rider has changed -> ARZT, STURZ; DEFEKT; DNS; QUIT
         RiderStageConnection con = riderStageConnectionRepository.getRiderStageConnectionByRiderAndStage(stageId, Long.valueOf(notification.getReferencedId())).toCompletableFuture().join();
         Rider r = riderRepository.getRider(Long.valueOf(notification.getReferencedId()));
-        Log log = new Log();
-        log.setMessage(con.getTypeState().toString());
-        log.setNotificationType(notification.getNotificationType());
-        log.setRiderId(r.getRiderId());
-        log.setStage(em.find(Stage.class, stageId));
-        log.setTimestamp(notification.getTimestamp());
-        logRepository.addLog(log);
+        createLogAndPersist(em, con.getTypeState().toString(), stageId, r.getRiderId(), notification);
     }
 
     private void generateLogForARaceGroup(EntityManager em, long stageId, Notification notification){
         // Means that some racegroup has changed -> check all RaceGroups and add Rider Log if rider was not in same racegroup before
+        List<RaceGroup> raceGroups = raceGroupRepository.getAllRaceGroups(stageId).thenApply(rGps -> rGps.collect(Collectors.toList())).toCompletableFuture().join();
+        for(RaceGroup raceGroup : raceGroups){
+            for(Rider r : raceGroup.getRiders()){
+                Log lastLogForRider = logRepository.getLastLogOfAStageAndRiderNotificationType(stageId, r.getRiderId(), notification.getNotificationType());
+                if(lastLogForRider != null && r.getRaceGroups().get(0).getAppId() == raceGroup.getAppId()){
+                    break;
+                }
+                // no log present yet or rider has changed racegroup -> create log
+                createLogAndPersist(em, raceGroup.getRaceGroupType().toString(), stageId, r.getRiderId(), notification);
+            }
+        }
+    }
+
+    private void createLogAndPersist(EntityManager em, String message, long stageId, long riderId, Notification notification){
+        Log log = new Log();
+        log.setMessage(message);
+        log.setNotificationType(notification.getNotificationType());
+        log.setRiderId(riderId);
+        log.setStage(em.find(Stage.class, stageId));
+        log.setTimestamp(notification.getTimestamp());
+        logRepository.addLog(log);
     }
 
 
