@@ -66,9 +66,9 @@ public class JudgmentRiderConnectionController extends Controller {
     @ApiOperation(value ="add new judgment rider connection", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
-    public CompletionStage<Result> addJudgmentRiderConnection() {
+    public CompletionStage<Result> addJudgmentRiderConnection(long stageId, long timestamp) {
         JsonNode json = request().body().asJson();
-        return parseJudgmentRiderConnection(json).thenApply(judgmentRiderConnectionRepository::addJudgmentRiderConnection).thenApply(judgmentRiderConnection -> ok("success")).exceptionally(ex -> {
+        return parseJudgmentRiderConnection(json).thenApply(jRC -> judgmentRiderConnectionRepository.addJudgmentRiderConnection(jRC, stageId, timestamp)).thenApply(judgmentRiderConnection -> ok("success")).exceptionally(ex -> {
             Result res;
             if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.NULLPOINTEREXCEPTION)){
                 res = badRequest("adding judgment rider connection failed.");

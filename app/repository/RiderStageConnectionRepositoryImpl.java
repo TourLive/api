@@ -1,12 +1,16 @@
 package repository;
 
+import models.Log;
 import models.RiderStageConnection;
+import models.enums.NotificationType;
 import play.db.jpa.JPAApi;
+import repository.interfaces.LogRepository;
 import repository.interfaces.RiderStageConnectionRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -18,11 +22,13 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
     private static final String STAGE_ID = "stageId";
+    private final LogRepository logRepository;
 
     @Inject
-    public RiderStageConnectionRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
+    public RiderStageConnectionRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, LogRepository logRepository) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
+        this.logRepository = logRepository;
     }
 
     @Override
@@ -115,6 +121,23 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
             riderStageConnection.setStage(dbRSC.getStage());
         }
         entityManager.merge(riderStageConnection);
+        return null;
+    }
+
+    @Override
+    public CompletionStage<RiderStageConnection> logRiderState(RiderStageConnection riderStageConnection, long timestamp) {
+        return supplyAsync(() -> wrap(entityManager -> logRiderState(entityManager, riderStageConnection, timestamp)));
+    }
+
+    private RiderStageConnection logRiderState(EntityManager entityManager, RiderStageConnection riderStageConnection, long timestamp){
+        Log log = new Log();
+        RiderStageConnection dbRiderStageConnection = entityManager.find(RiderStageConnection.class, riderStageConnection.getId());
+        log.setMessage(riderStageConnection.getTypeState().toString());
+        log.setNotificationType(NotificationType.RIDER);
+        log.setRiderId(dbRiderStageConnection.getRider().getRiderId());
+        log.setTimestamp(new Timestamp(timestamp));
+        log.setReferencedId(riderStageConnection.getId().toString());
+        logRepository.addLog(dbRiderStageConnection.getStage().getId(), log);
         return null;
     }
 
