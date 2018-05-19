@@ -19,6 +19,7 @@ import repository.interfaces.RiderRepository;
 import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +76,7 @@ public class RaceGroupController extends Controller {
     @ApiOperation(value ="manage racegroups", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
-    public CompletionStage<Result> manageRaceGroups(long stageId) {
+    public CompletionStage<Result> manageRaceGroups(long stageId, long timestamp) {
         List<RaceGroup> dbRaceGroups = raceGroupRepository.getAllRaceGroups(stageId).toCompletableFuture().join().collect(Collectors.toList());
         HashMap<String, RaceGroup> stringRaceGroupHashMap = new HashMap<>();
         for(RaceGroup raceGroup : dbRaceGroups){
@@ -92,10 +93,10 @@ public class RaceGroupController extends Controller {
                     raceGroup.setAppId(raceGroup.getAppId());
                     dbRaceGroups.remove(raceGroup);
                 }
-                raceGroupRepository.updateRaceGroup(raceGroup);
+                raceGroupRepository.updateRaceGroup(raceGroup, timestamp);
             } else {
                 // New RaceGroup
-                raceGroupRepository.addRaceGroup(raceGroup);
+                raceGroupRepository.addRaceGroup(raceGroup, timestamp);
             }
         }
         // Delete old RaceGroups
@@ -155,7 +156,7 @@ public class RaceGroupController extends Controller {
             raceGroup.setAppId(raceGroupId);
         }
         raceGroup = parseRaceGroup(request().body().asJson(), raceGroup).toCompletableFuture().join();
-        raceGroupRepository.updateRaceGroup(raceGroup);
+        raceGroupRepository.updateRaceGroup(raceGroup, System.currentTimeMillis());
         return CompletableFuture.completedFuture(ok());
     }
 

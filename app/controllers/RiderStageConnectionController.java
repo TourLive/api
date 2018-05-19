@@ -81,6 +81,22 @@ public class RiderStageConnectionController extends Controller {
         });
     }
 
+    @ApiOperation(value = "log state change of a rider", response = String.class)
+    @BodyParser.Of(BodyParser.Json.class)
+    @With(BasicAuthAction.class)
+    public CompletionStage<Result> logRiderStateChanged(long riderStageConnectionId, long timestamp) {
+        JsonNode json = request().body().asJson();
+        return parseRiderStageConnection(json, riderStageConnectionId).thenApply(rsc -> riderStageConnectionRepository.logRiderState(rsc, timestamp)).thenApplyAsync(rSC -> ok("success")).exceptionally(ex -> {
+            Result res = null;
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.NULLPOINTEREXCEPTION)){
+                res = badRequest("Update of riderStageConnection failed, because it was not found in DB.");
+            } else {
+                res = internalServerError(ex.getMessage());
+            }
+            return res;
+        });
+    }
+
     private CompletableFuture<RiderStageConnection> parseRiderStageConnection(JsonNode json, long riderStageConnectionId){
         CompletableFuture<RiderStageConnection> completableFuture
                 = new CompletableFuture<>();

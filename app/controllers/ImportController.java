@@ -233,11 +233,11 @@ public class ImportController extends Controller {
         raceGroup.setHistoryGapTime(0);
         raceGroup.setPosition(1);
         raceGroup.setRaceGroupType(RaceGroupType.FELD);
-        raceGroupRepository.addRaceGroup(raceGroup).toCompletableFuture().join();
+        raceGroupRepository.addRaceGroup(raceGroup, System.currentTimeMillis()).toCompletableFuture().join();
         RaceGroup dbRaceGroup = CompletableFuture.completedFuture(raceGroupRepository.getRaceGroupById(raceGroup.getId())).join().toCompletableFuture().join();
         dbRaceGroup.setRiders(activeRiders);
         dbRaceGroup.setStage(dbStage);
-        raceGroupRepository.updateRaceGroup(dbRaceGroup).toCompletableFuture().join();
+        raceGroupRepository.updateRaceGroup(dbRaceGroup, System.currentTimeMillis()).toCompletableFuture().join();
         return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 

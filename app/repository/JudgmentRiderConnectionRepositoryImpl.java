@@ -1,12 +1,16 @@
 package repository;
 
 import models.JudgmentRiderConnection;
+import models.Log;
+import models.enums.NotificationType;
 import play.db.jpa.JPAApi;
 import repository.interfaces.JudgmentRiderConnectionRepository;
+import repository.interfaces.LogRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -17,11 +21,13 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConnectionRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
+    private final LogRepository logRepository;
 
     @Inject
-    public JudgmentRiderConnectionRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
+    public JudgmentRiderConnectionRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext, LogRepository logRepository) {
         this.jpaApi = jpaApi;
         this.databaseExecutionContext = databaseExecutionContext;
+        this.logRepository = logRepository;
     }
 
     @Override
@@ -57,12 +63,20 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
     }
 
     @Override
-    public CompletionStage<JudgmentRiderConnection> addJudgmentRiderConnection(JudgmentRiderConnection judgmentRiderConnection) {
-        return supplyAsync(() -> wrap(entityManager -> addJudgmentRiderConnection(entityManager, judgmentRiderConnection)), databaseExecutionContext);
+    public CompletionStage<JudgmentRiderConnection> addJudgmentRiderConnection(JudgmentRiderConnection judgmentRiderConnection, long stageId, long timestamp) {
+        return supplyAsync(() -> wrap(entityManager -> addJudgmentRiderConnection(entityManager, judgmentRiderConnection, stageId, timestamp)), databaseExecutionContext);
     }
 
-    private JudgmentRiderConnection addJudgmentRiderConnection(EntityManager entityManager, JudgmentRiderConnection judgmentRiderConnection) {
+    private JudgmentRiderConnection addJudgmentRiderConnection(EntityManager entityManager, JudgmentRiderConnection judgmentRiderConnection, long stageId, long timestamp) {
         entityManager.persist(judgmentRiderConnection);
+        Log log = new Log();
+        JudgmentRiderConnection dbJRC = entityManager.find(JudgmentRiderConnection.class, judgmentRiderConnection.getId());
+        log.setMessage(dbJRC.getJudgment().getName());
+        log.setNotificationType(NotificationType.REWARD);
+        log.setRiderId(dbJRC.getRider().getRiderId());
+        log.setTimestamp(new Timestamp(timestamp));
+        log.setReferencedId(judgmentRiderConnection.getAppId());
+        logRepository.addLog(stageId, log);
         return judgmentRiderConnection;
     }
 

@@ -11,6 +11,7 @@ import repository.interfaces.LogRepository;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
@@ -34,7 +35,7 @@ public class LogRepositoryImpl implements LogRepository {
     }
 
     private Stream<Log> getAllLogsOfAStageAsync(EntityManager em, long stageId){
-        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId" , Log.class);
+        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId order by l.timestamp desc" , Log.class);
         query.setParameter("stageId", stageId);
         return query.getResultList().stream();
     }
@@ -45,7 +46,7 @@ public class LogRepositoryImpl implements LogRepository {
     }
 
     private Stream<Log> getAllLogsOfAStageAndRiderAsync(EntityManager em, long stageId, long riderId){
-        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId and l.riderId =:riderId" , Log.class);
+        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId and l.riderId =:riderId order by l.timestamp desc" , Log.class);
         query.setParameter("stageId", stageId);
         query.setParameter("riderId", riderId);
         return query.getResultList().stream();
@@ -57,7 +58,7 @@ public class LogRepositoryImpl implements LogRepository {
     }
 
     private Stream<Log> getAllLogsOfAStageAndRiderAndNotificationTypeAsync(EntityManager em, long stageId, long riderId, NotificationType type){
-        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId and l.riderId =:riderId and l.notificationType =:typeOf" , Log.class);
+        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId and l.riderId =:riderId and l.notificationType =:typeOf order by l.timestamp desc" , Log.class);
         query.setParameter("stageId", stageId);
         query.setParameter("riderId", riderId);
         query.setParameter("typeOf", type);
@@ -70,12 +71,12 @@ public class LogRepositoryImpl implements LogRepository {
     }
 
     private Log getLastLogOfAStageAndRiderNotificationTypeSync(EntityManager em, long stageId, long riderId, NotificationType type){
-        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId and l.riderId =:riderId and l.notificationType =:typeOf order by l.timestamp desc " , Log.class);
+        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId and l.riderId =:riderId and l.notificationType =:typeOf order by l.timestamp desc", Log.class);
         query.setParameter("stageId", stageId);
         query.setParameter("riderId", riderId);
         query.setParameter("typeOf", type);
         try{
-            return query.getSingleResult();
+            return query.getResultList().get(0);
         }
         catch (Exception ex){
             return null;

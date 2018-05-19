@@ -16,8 +16,8 @@ public interface RaceGroupRepository {
     CompletionStage<RaceGroup> getRaceGroupById(long id);
     CompletionStage<RaceGroup> getRaceGroupByAppId(String id);
     RaceGroup getRaceGroupField(long stageId);
-    CompletionStage<RaceGroup> addRaceGroup(RaceGroup raceGroup);
-    CompletionStage<RaceGroup> updateRaceGroup(RaceGroup raceGroup);
+    CompletionStage<RaceGroup> addRaceGroup(RaceGroup raceGroup, long timestamp);
+    CompletionStage<RaceGroup> updateRaceGroup(RaceGroup raceGroup, long timestamp);
     void deleteAllRaceGroups();
     void deleteRaceGroupById(long id);
 }
