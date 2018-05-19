@@ -72,8 +72,8 @@ public class LogRepositoryImpl implements LogRepository {
     }
 
     @Override
-    public void deleteAllLogsOfAStage(long stageId) {
-        supplyAsync(() -> wrap(em -> deleteAllLogsOfAStageAsync(em, stageId)), databaseExecutionContext);
+    public CompletionStage<Stream<Log>> deleteAllLogsOfAStage(long stageId) {
+        return supplyAsync(() -> wrap(em -> deleteAllLogsOfAStageAsync(em, stageId)), databaseExecutionContext);
     }
 
     private Stream<Log> deleteAllLogsOfAStageAsync(EntityManager em, long stageId){
@@ -87,8 +87,8 @@ public class LogRepositoryImpl implements LogRepository {
     }
 
     @Override
-    public void deleteAllLogs() {
-        supplyAsync(() -> wrap(this::deleteAllLogsAsync));
+    public CompletionStage<Stream<Log>> deleteAllLogs() {
+        return supplyAsync(() -> wrap(this::deleteAllLogsAsync));
     }
 
     private Stream<Log> deleteAllLogsAsync(EntityManager em){

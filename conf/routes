@@ -31,9 +31,17 @@ POST    /racegroups/stages/:stageId                      controllers.RaceGroupCo
 PUT     /racegroups/:raceGroupId/stages/:stageId         controllers.RaceGroupController.updateRaceGroup(raceGroupId : String, stageId : Long)
 
 #Notifcation Routes
-GET     /notifications/stages/:stageId              controllers.NotificationController.getNotifications(stageId : Long)
-GET     /notifications/stages/:stageId/:timestamp   controllers.NotificationController.getNotificationsByStageAndTimestamp(stageId : Long, timestamp : Long)
-POST    /notifications/stages/:stageId                     controllers.NotificationController.addNotification(stageId : Long)
+GET     /notifications/stages/:stageId                   controllers.NotificationController.getNotifications(stageId : Long)
+GET     /notifications/stages/:stageId/:timestamp        controllers.NotificationController.getNotificationsByStageAndTimestamp(stageId : Long, timestamp : Long)
+POST    /notifications/stages/:stageId                   controllers.NotificationController.addNotification(stageId : Long)
+
+#Log Routes
+GET     /logs/stages/:stageId                            controllers.LogController.getLogsOfAStage(stageId : Long)
+GET     /logs/stages/:stageId/:riderId                   controllers.LogController.getLogsOfAStageAndRider(stageId : Long, riderId : Long)
+GET     /logs/stages/:stageId/:riderId/:typeOf           controllers.LogController.getLogsOfAStageAndRiderAndNotificationType(stageId : Long, riderId : Long, typeOf : String)
+DELETE  /logs/stages/:stageId                            controllers.LogController.deleteLogsOfAStage(stageId : Long)
+DELETE  /logs                                            controllers.LogController.deleteAllLogs()
+
 
 #RiderStageConnection Routes
 GET     /riderstageconnections/stages/:stageId              controllers.RiderStageConnectionController.getRiderStageConnections(stageId : Long)

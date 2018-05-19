@@ -7,6 +7,7 @@ import repository.LogRepositoryImpl;
 import repository.NotificationRepositoryImpl;
 
 import java.sql.Timestamp;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Stream;
 
@@ -16,6 +17,6 @@ public interface LogRepository {
     CompletionStage<Stream<Log>> getAllLogsOfAStageAndRider(long stageId, long riderId);
     CompletionStage<Stream<Log>> getAllLogsOfAStageAndRiderAndNotificationType(long stageId, long riderId, NotificationType type);
     CompletionStage<Log> addLog(Log notification);
-    void deleteAllLogsOfAStage(long stageId);
-    void deleteAllLogs();
+    CompletionStage<Stream<Log>> deleteAllLogsOfAStage(long stageId);
+    CompletionStage<Stream<Log>> deleteAllLogs();
 }
