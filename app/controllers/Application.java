@@ -7,7 +7,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
 import play.cache.AsyncCacheApi;
-import play.mvc.*;
+import play.mvc.BodyParser;
+import play.mvc.Controller;
+import play.mvc.Result;
+import play.mvc.With;
 import repository.interfaces.UserRepository;
 import views.html.index;
 
@@ -18,10 +21,7 @@ import java.util.concurrent.CompletionStage;
 @SwaggerDefinition(
         consumes = {"application/json", "application/xml"},
         produces = {"application/json", "application/xml"},
-        schemes = {SwaggerDefinition.Scheme.HTTP, SwaggerDefinition.Scheme.HTTPS},
-        tags = {
-                @Tag(name = "Private", description = "Tag used to denote operations as private")
-        }
+        schemes = {SwaggerDefinition.Scheme.HTTP, SwaggerDefinition.Scheme.HTTPS}
 )
 @Api("Application")
 public class Application extends Controller {
