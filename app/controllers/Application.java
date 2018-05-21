@@ -7,10 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
 import play.cache.AsyncCacheApi;
-import play.mvc.BodyParser;
-import play.mvc.Controller;
-import play.mvc.Result;
-import play.mvc.With;
+import play.mvc.*;
 import repository.interfaces.UserRepository;
 import views.html.index;
 
@@ -44,7 +41,8 @@ public class Application extends Controller {
 
     @ApiOperation(value ="Swagger Documentation")
     public Result redirectDocs() {
-        return  redirect("/assets/lib/swagger-ui/index.html?url=http://localhost:9000/swagger.json");
+        String hostname = request().host();
+        return  redirect("/assets/lib/swagger-ui/index.html?url=http://" + hostname + "/swagger.json");
     }
 
     @ApiOperation(value ="Status Page", response = String.class)
