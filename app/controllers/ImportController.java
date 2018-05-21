@@ -5,6 +5,10 @@ import controllers.importutilities.UrlLinks;
 import controllers.importutilities.comparators.LeaderComparator;
 import controllers.importutilities.comparators.MountainPointsComparator;
 import controllers.importutilities.comparators.PointsComparator;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import models.*;
 import models.enums.RaceGroupType;
 import models.enums.TypeState;
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @With(BasicAuthAction.class)
+@Api("Import")
 public class ImportController extends Controller {
     private final JudgmentRepository judgmentRepository;
     private final MaillotRepository maillotRepository;
@@ -58,6 +63,9 @@ public class ImportController extends Controller {
         this.cache = cache;
     }
 
+    @ApiOperation(value ="Import of race date from cnlab API", response = Result.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error on importing data from api") })
     public CompletionStage<Result> importAllStaticData() {
         deleteAllData();
         return importRace().thenApply(race -> {

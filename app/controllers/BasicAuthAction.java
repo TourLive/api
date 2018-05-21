@@ -1,13 +1,7 @@
 package controllers;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 
 import com.google.common.hash.Hashing;
 import org.apache.commons.codec.binary.Base64;
-
 import play.Logger;
 import play.Logger.ALogger;
 import play.mvc.Action;
@@ -18,6 +12,11 @@ import play.mvc.Security;
 import repository.interfaces.UserRepository;
 
 import javax.inject.Inject;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 public class BasicAuthAction extends Action<Result> {
     private static ALogger log = Logger.of(BasicAuthAction.class);
@@ -34,14 +33,16 @@ public class BasicAuthAction extends Action<Result> {
     @Override
     public CompletionStage<Result> call(Context context) {
         Optional<String> authHeader = context.request().header(AUTHORIZATION);
-        if (authHeader == null) {
+        if (!authHeader.isPresent()) {
             context.response().setHeader(WWW_AUTHENTICATE, FAIL);
             return CompletableFuture.completedFuture(status(Http.Status.UNAUTHORIZED, "Needs authorization"));
         }
 
-        String[] credentials;
+        String[] credentials = new String[100];
         try {
-            credentials = parseAuthHeader(authHeader.get());
+            if (authHeader.isPresent()) {
+                credentials = parseAuthHeader(authHeader.get());
+            }
         } catch (Exception e) {
             log.warn("Cannot parse basic auth info", e);
             return CompletableFuture.completedFuture(status(Http.Status.FORBIDDEN, "Invalid auth header"));

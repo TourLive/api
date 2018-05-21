@@ -2,7 +2,9 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.hash.Hashing;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.SwaggerDefinition;
 import play.cache.AsyncCacheApi;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -18,10 +20,7 @@ import java.util.concurrent.CompletionStage;
 @SwaggerDefinition(
         consumes = {"application/json", "application/xml"},
         produces = {"application/json", "application/xml"},
-        schemes = {SwaggerDefinition.Scheme.HTTP, SwaggerDefinition.Scheme.HTTPS},
-        tags = {
-                @Tag(name = "Private", description = "Tag used to denote operations as private")
-        }
+        schemes = {SwaggerDefinition.Scheme.HTTP, SwaggerDefinition.Scheme.HTTPS}
 )
 @Api("Application")
 public class Application extends Controller {
@@ -41,7 +40,8 @@ public class Application extends Controller {
 
     @ApiOperation(value ="Swagger Documentation")
     public Result redirectDocs() {
-        return  redirect("/assets/lib/swagger-ui/index.html?url=http://localhost:9000/swagger.json");
+        String hostname = request().host();
+        return  redirect("/assets/lib/swagger-ui/index.html?url=http://" + hostname + "/swagger.json");
     }
 
     @ApiOperation(value ="Status Page", response = String.class)

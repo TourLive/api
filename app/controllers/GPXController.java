@@ -1,7 +1,10 @@
 package controllers;
 
 import controllers.importutilities.comparators.GPXComparatorComparator;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import javassist.NotFoundException;
 import models.GPXTrack;
 import org.w3c.dom.Document;

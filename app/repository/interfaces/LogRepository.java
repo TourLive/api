@@ -2,13 +2,9 @@ package repository.interfaces;
 
 import com.google.inject.ImplementedBy;
 import models.Log;
-import models.Notification;
 import models.enums.NotificationType;
 import repository.LogRepositoryImpl;
-import repository.NotificationRepositoryImpl;
 
-import java.sql.Timestamp;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Stream;
 

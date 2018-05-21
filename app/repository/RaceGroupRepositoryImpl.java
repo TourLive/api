@@ -1,7 +1,6 @@
 package repository;
 
 import models.Log;
-import models.Notification;
 import models.RaceGroup;
 import models.Rider;
 import models.enums.NotificationType;
