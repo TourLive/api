@@ -41,7 +41,7 @@ public class Application extends Controller {
     @ApiOperation(value ="Swagger Documentation")
     public Result redirectDocs() {
         String hostname = request().host();
-        return  redirect("/assets/lib/swagger-ui/index.html?url=http://" + hostname + "/swagger.json");
+        return  redirect("/assets/lib/swagger-ui/index.html?url=https://" + hostname + "/swagger.json");
     }
 
     @ApiOperation(value ="Status Page", response = String.class)
