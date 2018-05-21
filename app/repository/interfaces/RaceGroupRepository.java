@@ -1,7 +1,6 @@
 package repository.interfaces;
 
 import com.google.inject.ImplementedBy;
-import models.Race;
 import models.RaceGroup;
 import repository.RaceGroupRepositoryImpl;
 

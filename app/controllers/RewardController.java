@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import models.Reward;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.terracotta.context.annotations.ContextAttribute;
 import play.cache.Cached;
 import play.mvc.Controller;
 import play.mvc.Result;

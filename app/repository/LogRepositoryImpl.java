@@ -1,17 +1,14 @@
 package repository;
 
 import models.Log;
-import models.Notification;
 import models.Stage;
 import models.enums.NotificationType;
-import net.sf.ehcache.search.expression.Not;
 import play.db.jpa.JPAApi;
 import repository.interfaces.LogRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;

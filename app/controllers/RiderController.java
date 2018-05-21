@@ -1,6 +1,7 @@
 package controllers;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import models.Rider;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.cache.AsyncCacheApi;

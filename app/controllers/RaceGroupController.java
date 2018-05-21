@@ -19,7 +19,6 @@ import repository.interfaces.RiderRepository;
 import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiResponses;
 import models.Maillot;
 import models.MaillotDTO;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import play.api.libs.ws.ahc.cache.CachingAsyncHttpClient;
 import play.cache.AsyncCacheApi;
 import play.mvc.Controller;
 import play.mvc.Result;

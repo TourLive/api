@@ -1,8 +1,9 @@
 package repository;
 
-import models.*;
+import models.Notification;
+import models.Stage;
 import play.db.jpa.JPAApi;
-import repository.interfaces.*;
+import repository.interfaces.NotificationRepository;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
