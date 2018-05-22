@@ -41,6 +41,7 @@ public class ImportController extends Controller {
     private final RiderRepository riderRepository;
     private final RiderStageConnectionRepository riderStageConnectionRepository;
     private final StageRepository stageRepository;
+    private final LogRepository logRepository;
     private final WSClient wsClient;
     private static final String SUCESSMESSAGE ="success";
     private final AsyncCacheApi cache;
@@ -50,7 +51,7 @@ public class ImportController extends Controller {
                             RaceGroupRepository raceGroupRepository, RaceRepository raceRepository,
                             RewardRepository rewardRepository, RiderRepository riderRepository,
                             RiderStageConnectionRepository riderStageConnectionRepository,
-                            StageRepository stageRepository, WSClient wsClient, AsyncCacheApi cache) {
+                            StageRepository stageRepository, LogRepository logRepository, WSClient wsClient, AsyncCacheApi cache) {
         this.judgmentRepository = judgmentRepository;
         this.maillotRepository = maillotRepository;
         this.raceGroupRepository = raceGroupRepository;
@@ -59,6 +60,7 @@ public class ImportController extends Controller {
         this.riderRepository = riderRepository;
         this.riderStageConnectionRepository = riderStageConnectionRepository;
         this.stageRepository = stageRepository;
+        this.logRepository = logRepository;
         this.wsClient = wsClient;
         this.cache = cache;
     }
@@ -87,6 +89,7 @@ public class ImportController extends Controller {
     }
 
     private void deleteAllData(){
+        logRepository.deleteAllLogs();
         judgmentRepository.deleteAllJudgment();
         rewardRepository.deleteAllRewards();
         maillotRepository.deleteAllMaillots();
@@ -241,6 +244,7 @@ public class ImportController extends Controller {
         raceGroup.setHistoryGapTime(0);
         raceGroup.setPosition(1);
         raceGroup.setRaceGroupType(RaceGroupType.FELD);
+        raceGroup.setAppId("RACE-GROUP-FIELD-ID-FIXED");
         raceGroupRepository.addRaceGroup(raceGroup, System.currentTimeMillis()).toCompletableFuture().join();
         RaceGroup dbRaceGroup = CompletableFuture.completedFuture(raceGroupRepository.getRaceGroupById(raceGroup.getId())).join().toCompletableFuture().join();
         dbRaceGroup.setRiders(activeRiders);
