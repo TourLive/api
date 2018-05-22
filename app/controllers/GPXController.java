@@ -73,6 +73,7 @@ public class GPXController extends Controller {
                 }
                 gpxTrackRepository.addGPXTracksByStageId(stageId, gpxTracks);
                 completableFuture.complete("success");
+                cache.remove("/gpxtracks/stages" + stageId);
 
             } catch (Exception e) {
                 completableFuture.obtrudeException(e);
