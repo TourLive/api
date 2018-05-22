@@ -10,6 +10,7 @@ GET   /swagger.json                 controllers.ApiHelpController.getResources
 GET   /docs/*file                   controllers.Assets.at(path="/public/swagger-ui",file)
 GET   /status                       controllers.Application.statusPage
 POST  /login                        controllers.Application.login
+DELETE /cache                       controllers.Application.deleteCache
 
 #Race Routes
 GET     /races                      controllers.RaceController.getAllRaces()
@@ -26,18 +27,27 @@ GET     /riders/:riderId            controllers.RiderController.getRider(riderId
 #Racegroup Routes
 GET     /racegroups/stages/:stageId                      controllers.RaceGroupController.getAllRaceGroups(stageId : Long)
 GET     /racegroups/:raceGroupId                         controllers.RaceGroupController.getRaceGroup(raceGroupId: Long)
-POST    /racegroups/stages/:stageId                      controllers.RaceGroupController.manageRaceGroups(stageId : Long)
+POST    /racegroups/stages/:stageId/:timestamp           controllers.RaceGroupController.manageRaceGroups(stageId : Long, timestamp : Long)
 PUT     /racegroups/:raceGroupId/stages/:stageId         controllers.RaceGroupController.updateRaceGroup(raceGroupId : String, stageId : Long)
 
 #Notifcation Routes
-GET     /notifications/stages/:stageId              controllers.NotificationController.getNotifications(stageId : Long)
-GET     /notifications/stages/:stageId/:timestamp   controllers.NotificationController.getNotificationsByStageAndTimestamp(stageId : Long, timestamp : Long)
-POST    /notifications/stages/:stageId                     controllers.NotificationController.addNotification(stageId : Long)
+GET     /notifications/stages/:stageId                   controllers.NotificationController.getNotifications(stageId : Long)
+GET     /notifications/stages/:stageId/:timestamp        controllers.NotificationController.getNotificationsByStageAndTimestamp(stageId : Long, timestamp : Long)
+POST    /notifications/stages/:stageId                   controllers.NotificationController.addNotification(stageId : Long)
+
+#Log Routes
+GET     /logs/stages/:stageId                            controllers.LogController.getLogsOfAStage(stageId : Long)
+GET     /logs/stages/:stageId/:riderId                   controllers.LogController.getLogsOfAStageAndRider(stageId : Long, riderId : Long)
+GET     /logs/stages/:stageId/:riderId/:typeOf           controllers.LogController.getLogsOfAStageAndRiderAndNotificationType(stageId : Long, riderId : Long, typeOf : String)
+DELETE  /logs/stages/:stageId                            controllers.LogController.deleteLogsOfAStage(stageId : Long)
+DELETE  /logs                                            controllers.LogController.deleteAllLogs()
+
 
 #RiderStageConnection Routes
 GET     /riderstageconnections/stages/:stageId              controllers.RiderStageConnectionController.getRiderStageConnections(stageId : Long)
 GET     /riderstageconnections/stages/:stageId/:riderId     controllers.RiderStageConnectionController.getRiderStageConnection(stageId : Long, riderId : Long)
 PUT     /riderstageconnections/:rSCId                       controllers.RiderStageConnectionController.updateRiderStageConnection(rSCId : Long)
+POST    /riderstageconnections/:rSCId/:timestamp            controllers.RiderStageConnectionController.logRiderStateChanged(rSCId : Long, timestamp: Long)
 
 #Judgment Routes
 GET     /judgments                                  controllers.JudgmentController.getJudgments()
@@ -48,10 +58,10 @@ GET     /judgments/riders/:riderId                  controllers.JudgmentControll
 GET     /rewards                                    controllers.RewardController.getRewards()
 
 #JudgmentRiderConnection Routes
-GET     /judgmentriderconnections/:riderId          controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
-GET     /judgmentriderconnections/stages/:stageId   controllers.JudgmentRiderConnectionController.getJudgmentRiderConnectionByStage(stageId : Long)
-POST    /judgmentriderconnections                   controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection()
-DELETE  /judgmentriderconnections/:appId            controllers.JudgmentRiderConnectionController.deleteJudgmentRiderConnection(appId : String)
+GET     /judgmentriderconnections/:riderId                      controllers.JudgmentRiderConnectionController.getJudgmentRiderConnection(riderId : Long)
+GET     /judgmentriderconnections/stages/:stageId               controllers.JudgmentRiderConnectionController.getJudgmentRiderConnectionByStage(stageId : Long)
+POST    /judgmentriderconnections/stages/:stageId/:timestamp    controllers.JudgmentRiderConnectionController.addJudgmentRiderConnection(stageId: Long, timestamp : Long)
+DELETE  /judgmentriderconnections/:appId                        controllers.JudgmentRiderConnectionController.deleteJudgmentRiderConnection(appId : String)
 
 #Maillot Routes
 GET     /maillots/stages/:stageId                   controllers.MaillotController.getMaillots(stageId : Long)

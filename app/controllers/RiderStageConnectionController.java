@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import models.RiderStageConnection;
 import models.enums.TypeState;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import play.cache.AsyncCacheApi;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -25,43 +26,43 @@ import static play.libs.Json.toJson;
 @Api("RiderStageConnection")
 public class RiderStageConnectionController extends Controller {
     private final RiderStageConnectionRepository riderStageConnectionRepository;
-    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
-    private static final String NULLPOINTEREXCEPTION = "NullPointerException";
+    private final AsyncCacheApi cache;
 
     @Inject
-    public RiderStageConnectionController(RiderStageConnectionRepository riderStageConnectionRepository) {
+    public RiderStageConnectionController(RiderStageConnectionRepository riderStageConnectionRepository, AsyncCacheApi cache) {
         this.riderStageConnectionRepository = riderStageConnectionRepository;
+        this.cache = cache;
     }
 
 
     @ApiOperation(value ="get all rider stage connections of a stage", response = RiderStageConnection.class, responseContainer = "List")
     public CompletionStage<Result> getRiderStageConnections(long stageId) {
-        return riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> {
+        return cache.getOrElseUpdate("riderstageconnections/"+stageId, () -> riderStageConnectionRepository.getAllRiderStageConnections(stageId).thenApplyAsync(riderStageConnections -> {
             List<RiderStageConnection> returnValues = riderStageConnections.collect(Collectors.toList());
             returnValues.sort(new StartNrComparator());
             return ok(toJson(returnValues));
         }).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No riderStageConnections are set in DB for this stage id.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="get the rider stage connection of a rider in a specific stage", response = RiderStageConnection.class)
     public CompletionStage<Result> getRiderStageConnection(long stageId, long riderId) {
-        return riderStageConnectionRepository.getRiderStageConnectionByRiderAndStage(stageId, riderId).thenApplyAsync(riderStageConnection -> ok(toJson(riderStageConnection))).exceptionally(ex -> {
+        return cache.getOrElseUpdate("riderstageconnection/stage/"+stageId + "/rider" + riderId, () -> riderStageConnectionRepository.getRiderStageConnectionByRiderAndStage(stageId, riderId).thenApplyAsync(riderStageConnection -> ok(toJson(riderStageConnection))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No riderStageConnections are set in DB for this stage id and rider id.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value = "update a existing rider stage connection", response = String.class)
@@ -71,7 +72,23 @@ public class RiderStageConnectionController extends Controller {
         JsonNode json = request().body().asJson();
         return parseRiderStageConnection(json, riderStageConnectionId).thenApply(riderStageConnectionRepository::updateRiderStageConnection).thenApplyAsync(rSC -> ok("success")).exceptionally(ex -> {
             Result res = null;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NULLPOINTEREXCEPTION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.NULLPOINTEREXCEPTION)){
+                res = badRequest("Update of riderStageConnection failed, because it was not found in DB.");
+            } else {
+                res = internalServerError(ex.getMessage());
+            }
+            return res;
+        });
+    }
+
+    @ApiOperation(value = "log state change of a rider", response = String.class)
+    @BodyParser.Of(BodyParser.Json.class)
+    @With(BasicAuthAction.class)
+    public CompletionStage<Result> logRiderStateChanged(long riderStageConnectionId, long timestamp) {
+        JsonNode json = request().body().asJson();
+        return parseRiderStageConnection(json, riderStageConnectionId).thenApply(rsc -> riderStageConnectionRepository.logRiderState(rsc, timestamp)).thenApplyAsync(rSC -> ok("success")).exceptionally(ex -> {
+            Result res = null;
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.NULLPOINTEREXCEPTION)){
                 res = badRequest("Update of riderStageConnection failed, because it was not found in DB.");
             } else {
                 res = internalServerError(ex.getMessage());

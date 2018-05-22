@@ -9,6 +9,7 @@ import models.RaceGroup;
 import models.Rider;
 import models.enums.RaceGroupType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import play.cache.AsyncCacheApi;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -33,48 +34,48 @@ public class RaceGroupController extends Controller {
     private final RaceGroupRepository raceGroupRepository;
     private final StageRepository stageRepository;
     private final RiderRepository riderRepository;
-    private static final String INDEXOUTOFBOUNDEXCEPETION = "IndexOutOfBoundsException";
-    private static final String NORESULTEXCEPTION = "NoResultException";
     private static final String ACTUAL_GAP_TIME = "ACTUAL_GAP_TIME";
     private static final String HISTORY_GAP_TIME = "HISTORY_GAP_TIME";
+    private final AsyncCacheApi cache;
 
     @Inject
-    public RaceGroupController(RaceGroupRepository raceGroupRepository, StageRepository stageRepository, RiderRepository riderRepository) {
+    public RaceGroupController(RaceGroupRepository raceGroupRepository, StageRepository stageRepository, RiderRepository riderRepository, AsyncCacheApi cache) {
         this.raceGroupRepository = raceGroupRepository;
         this.stageRepository = stageRepository;
         this.riderRepository = riderRepository;
+        this.cache = cache;
     }
 
     @ApiOperation(value ="get all racegroups of a stage", response = RaceGroup.class, responseContainer = "List")
     public CompletionStage<Result> getAllRaceGroups(long stageId) {
-        return raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
+        return cache.getOrElseUpdate("racegroups/stages/"+stageId, () -> raceGroupRepository.getAllRaceGroups(stageId).thenApplyAsync(raceGroups -> ok(toJson(raceGroups.collect(Collectors.toList())))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(INDEXOUTOFBOUNDEXCEPETION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.INDEXOUTOFBOUNDEXCEPETION)){
                 res = badRequest("No racegroups are set in DB for this stage.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="get a racegroup by id", response = RaceGroup.class)
     public CompletionStage<Result> getRaceGroup(long id) {
-        return raceGroupRepository.getRaceGroupById(id).thenApplyAsync(raceGroup -> ok(toJson(raceGroup))).exceptionally(ex -> {
+        return cache.getOrElseUpdate("racegroup/"+id, () -> raceGroupRepository.getRaceGroupById(id).thenApplyAsync(raceGroup -> ok(toJson(raceGroup))).exceptionally(ex -> {
             Result res;
-            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(NORESULTEXCEPTION)){
+            if(ExceptionUtils.getRootCause(ex).getClass().getSimpleName().equals(GlobalConstants.NORESULTEXCEPTION)){
                 res = badRequest("No racegroup with id: " + id + " is available in DB.");
             } else {
                 res = internalServerError(ex.getMessage());
             }
             return res;
-        });
+        }), GlobalConstants.CACHE_DURATION);
     }
 
     @ApiOperation(value ="manage racegroups", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
-    public CompletionStage<Result> manageRaceGroups(long stageId) {
+    public CompletionStage<Result> manageRaceGroups(long stageId, long timestamp) {
         List<RaceGroup> dbRaceGroups = raceGroupRepository.getAllRaceGroups(stageId).toCompletableFuture().join().collect(Collectors.toList());
         HashMap<String, RaceGroup> stringRaceGroupHashMap = new HashMap<>();
         for(RaceGroup raceGroup : dbRaceGroups){
@@ -88,12 +89,13 @@ public class RaceGroupController extends Controller {
                     raceGroup.setId(stringRaceGroupHashMap.get(raceGroup.getAppId()).getId());
                     dbRaceGroups.remove(stringRaceGroupHashMap.get(raceGroup.getAppId()));
                 } else {
+                    raceGroup.setAppId(raceGroup.getAppId());
                     dbRaceGroups.remove(raceGroup);
                 }
-                raceGroupRepository.updateRaceGroup(raceGroup);
+                raceGroupRepository.updateRaceGroup(raceGroup, timestamp);
             } else {
                 // New RaceGroup
-                raceGroupRepository.addRaceGroup(raceGroup);
+                raceGroupRepository.addRaceGroup(raceGroup, timestamp);
             }
         }
         // Delete old RaceGroups
@@ -153,7 +155,7 @@ public class RaceGroupController extends Controller {
             raceGroup.setAppId(raceGroupId);
         }
         raceGroup = parseRaceGroup(request().body().asJson(), raceGroup).toCompletableFuture().join();
-        raceGroupRepository.updateRaceGroup(raceGroup);
+        raceGroupRepository.updateRaceGroup(raceGroup, System.currentTimeMillis());
         return CompletableFuture.completedFuture(ok());
     }
 

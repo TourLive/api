@@ -9,15 +9,17 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@SequenceGenerator(name = "key_gen_Notification", sequenceName = "key_gen_Notification",  initialValue = 1)
-@ApiModel(value = "Notification", description="Model of notification")
-public class Notification {
+@SequenceGenerator(name = "key_gen_Log", sequenceName = "key_gen_Log",  initialValue = 1)
+@ApiModel(value = "Log", description="Model of log")
+public class Log {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Notification")
+    @GeneratedValue(strategy=GenerationType.AUTO, generator = "key_gen_Log")
     private Long id;
     private String message;
     private Timestamp timestamp;
     private NotificationType notificationType;
+    private Long riderId;
+    @ApiModelProperty(hidden=true)
     private String referencedId;
 
     @ManyToOne(cascade=CascadeType.PERSIST)
@@ -61,6 +63,10 @@ public class Notification {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+
+    public void setRiderId(Long riderId) { this.riderId = riderId; }
+
+    public Long getRiderId(){ return riderId;}
 
     public String getReferencedId() {
         return referencedId;

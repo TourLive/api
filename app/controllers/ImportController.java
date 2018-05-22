@@ -5,9 +5,14 @@ import controllers.importutilities.UrlLinks;
 import controllers.importutilities.comparators.LeaderComparator;
 import controllers.importutilities.comparators.MountainPointsComparator;
 import controllers.importutilities.comparators.PointsComparator;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import models.*;
 import models.enums.RaceGroupType;
 import models.enums.TypeState;
+import play.cache.AsyncCacheApi;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
 import play.mvc.Controller;
@@ -26,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @With(BasicAuthAction.class)
+@Api("Import")
 public class ImportController extends Controller {
     private final JudgmentRepository judgmentRepository;
     private final MaillotRepository maillotRepository;
@@ -37,13 +43,14 @@ public class ImportController extends Controller {
     private final StageRepository stageRepository;
     private final WSClient wsClient;
     private static final String SUCESSMESSAGE ="success";
+    private final AsyncCacheApi cache;
 
     @Inject
     public ImportController(JudgmentRepository judgmentRepository, MaillotRepository maillotRepository,
                             RaceGroupRepository raceGroupRepository, RaceRepository raceRepository,
                             RewardRepository rewardRepository, RiderRepository riderRepository,
                             RiderStageConnectionRepository riderStageConnectionRepository,
-                            StageRepository stageRepository, WSClient wsClient) {
+                            StageRepository stageRepository, WSClient wsClient, AsyncCacheApi cache) {
         this.judgmentRepository = judgmentRepository;
         this.maillotRepository = maillotRepository;
         this.raceGroupRepository = raceGroupRepository;
@@ -53,8 +60,12 @@ public class ImportController extends Controller {
         this.riderStageConnectionRepository = riderStageConnectionRepository;
         this.stageRepository = stageRepository;
         this.wsClient = wsClient;
+        this.cache = cache;
     }
 
+    @ApiOperation(value ="Import of race date from cnlab API", response = Result.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error on importing data from api") })
     public CompletionStage<Result> importAllStaticData() {
         deleteAllData();
         return importRace().thenApply(race -> {
@@ -84,6 +95,7 @@ public class ImportController extends Controller {
         riderStageConnectionRepository.deleteAllRiderStageConnections();
         stageRepository.deleteAllStages();
         raceRepository.deleteAllRaces();
+        cache.removeAll();
     }
 
     private CompletionStage<String> importRace(){
@@ -229,11 +241,11 @@ public class ImportController extends Controller {
         raceGroup.setHistoryGapTime(0);
         raceGroup.setPosition(1);
         raceGroup.setRaceGroupType(RaceGroupType.FELD);
-        raceGroupRepository.addRaceGroup(raceGroup).toCompletableFuture().join();
+        raceGroupRepository.addRaceGroup(raceGroup, System.currentTimeMillis()).toCompletableFuture().join();
         RaceGroup dbRaceGroup = CompletableFuture.completedFuture(raceGroupRepository.getRaceGroupById(raceGroup.getId())).join().toCompletableFuture().join();
         dbRaceGroup.setRiders(activeRiders);
         dbRaceGroup.setStage(dbStage);
-        raceGroupRepository.updateRaceGroup(dbRaceGroup).toCompletableFuture().join();
+        raceGroupRepository.updateRaceGroup(dbRaceGroup, System.currentTimeMillis()).toCompletableFuture().join();
         return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 

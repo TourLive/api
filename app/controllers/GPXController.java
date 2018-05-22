@@ -1,13 +1,17 @@
 package controllers;
 
 import controllers.importutilities.comparators.GPXComparatorComparator;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import javassist.NotFoundException;
 import models.GPXTrack;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import play.cache.AsyncCacheApi;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -32,10 +36,12 @@ public class GPXController extends Controller {
     private static final String LONGITUDE ="lon";
     private static final String HEIGHT = "ele";
     private static final short ALLOWED_TYPE = 1;
+    private final AsyncCacheApi cache;
 
     @Inject
-    public GPXController(GPXTrackRepository gpxTrackRepository) {
+    public GPXController(GPXTrackRepository gpxTrackRepository, AsyncCacheApi cache) {
         this.gpxTrackRepository = gpxTrackRepository;
+        this.cache = cache;
     }
 
     @With(BasicAuthAction.class)
@@ -95,11 +101,11 @@ public class GPXController extends Controller {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "No gpx tracks of specified stage id found") })
     public CompletionStage<Result> getGPSTracksByStageId(long stageId) {
-        return gpxTrackRepository.getGPXTracksByStageId(stageId).thenApplyAsync(gpsTracks -> {
-                List<GPXTrack> sortedGPXTracks = gpsTracks.collect(Collectors.toList());
-                sortedGPXTracks.sort(new GPXComparatorComparator());
-                return ok(toJson(sortedGPXTracks));
-        }).exceptionally(ex -> internalServerError(ex.getMessage()));
+        return cache.getOrElseUpdate("/gpxtracks/stages" + stageId, () -> gpxTrackRepository.getGPXTracksByStageId(stageId).thenApplyAsync(gpsTracks -> {
+            List<GPXTrack> sortedGPXTracks = gpsTracks.collect(Collectors.toList());
+            sortedGPXTracks.sort(new GPXComparatorComparator());
+            return ok(toJson(sortedGPXTracks));
+        }).exceptionally(ex -> internalServerError(ex.getMessage())), GlobalConstants.LONG_CACHE_DURATION);
     }
 
     @ApiResponses(value = {
@@ -107,6 +113,7 @@ public class GPXController extends Controller {
     @With(BasicAuthAction.class)
     @ApiOperation(value ="delete GPS-Coordinates for specific stage", response = Result.class)
     public CompletionStage<Result> deleteGPSTracksForStageById(long stageId) {
+        cache.remove("/gpxtracks/stages" + stageId);
         return gpxTrackRepository.deleteGPXTracksByStageId(stageId).thenApplyAsync(res -> ok("successfully deleted all GPX Tracks of specific stage")).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
 

@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import play.cache.Cached;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -31,6 +32,7 @@ public class SettingsController extends Controller {
     @ApiOperation(value ="Get the current settings for the tourlive applications", response = String.class)
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Error on getting the current settings") })
+    @Cached(key ="settings", duration = GlobalConstants.CACHE_DURATION)
     public CompletionStage<Result> getSettings() {
         return settingRepository.getSetting().thenApplyAsync(setting -> ok(toJson(setting))).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
