@@ -34,8 +34,8 @@ public class RaceGroupController extends Controller {
     private final RaceGroupRepository raceGroupRepository;
     private final StageRepository stageRepository;
     private final RiderRepository riderRepository;
-    private static final String ACTUAL_GAP_TIME = "ACTUAL_GAP_TIME";
-    private static final String HISTORY_GAP_TIME = "HISTORY_GAP_TIME";
+    private static final String ACTUAL_GAP_TIME = "actualGapTime";
+    private static final String HISTORY_GAP_TIME = "historyGapTime";
     private final AsyncCacheApi cache;
 
     @Inject
