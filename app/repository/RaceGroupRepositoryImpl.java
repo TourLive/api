@@ -105,7 +105,11 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
     private void generateAddRaceGroupLogs(RaceGroup raceGroup, long timestamp){
         // Means that some racegroup has been added -> Log RaceGroup for all Riders
         for(Rider r : raceGroup.getRiders()){
-            createLogAndPersist(raceGroup.getRaceGroupType().toString(), raceGroup.getStage().getId(), r.getRiderId(), raceGroup.getAppId(), NotificationType.RACEGROUP, timestamp);
+            if(raceGroup.getRaceGroupType() == RaceGroupType.NORMAL){
+                createLogAndPersist("Gruppe " + raceGroup.getPosition(), raceGroup.getStage().getId(), r.getRiderId(), raceGroup.getAppId(), NotificationType.RACEGROUP, timestamp);
+            } else {
+                createLogAndPersist(raceGroup.getRaceGroupType().toString(), raceGroup.getStage().getId(), r.getRiderId(), raceGroup.getAppId(), NotificationType.RACEGROUP, timestamp);
+            }
         }
     }
 
@@ -134,7 +138,11 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
                 continue;
             }
             // no log present yet or rider has changed racegroup -> create log
-            createLogAndPersist(raceGroup.getRaceGroupType().toString(), raceGroup.getStage().getId(), r.getRiderId(), raceGroup.getAppId(), NotificationType.RACEGROUP, timestamp);
+            if(raceGroup.getRaceGroupType() == RaceGroupType.NORMAL){
+                createLogAndPersist("Gruppe " + raceGroup.getPosition(), raceGroup.getStage().getId(), r.getRiderId(), raceGroup.getAppId(), NotificationType.RACEGROUP, timestamp);
+            } else {
+                createLogAndPersist(raceGroup.getRaceGroupType().toString(), raceGroup.getStage().getId(), r.getRiderId(), raceGroup.getAppId(), NotificationType.RACEGROUP, timestamp);
+            }
         }
     }
 
