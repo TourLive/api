@@ -20,4 +20,5 @@ public interface RiderStageConnectionRepository {
     void deleteAllRiderStageConnections();
     void deleteRiderStageConnection(long stageId, long riderId);
     CompletionStage<RiderStageConnection> logRiderState(RiderStageConnection riderStageConnection, long timestamp);
+    CompletionStage<Stream<RiderStageConnection>> deleteAllRiderStageConnectionsOfAStage(long stageId);
 }

@@ -69,43 +69,73 @@ public class ImportController extends Controller {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Error on importing data from api") })
     public CompletionStage<Result> importAllStaticData() {
-        deleteAllData();
-        return importRace().thenApply(race -> {
-            importStages().thenApply(stage -> {
-                importMaillots().thenApply(maillot -> {
-                    importRiders().thenApply(rider -> {
-                        importRewards().thenApply(judgment -> {
-                            importJudgments().thenApply(reward -> ok("successfully imported judgments")).exceptionally(ex -> internalServerError("importing judgments failed"));
-                            return ok("successfully imported rewards");
-                        }) .exceptionally(ex -> internalServerError("importing rewards failed"));
-                        return ok("successfully imported riders");
-                    }) .exceptionally(ex -> internalServerError("importing riders failed"));
-                    return ok("successfully imported maillots");
-                }).exceptionally(ex -> internalServerError("importing maillots failed"));
-               return ok("successfully imported stages");
-            }) .exceptionally(ex -> internalServerError("importing stages failed"));
-            return ok("successfully imported race");
-        }).exceptionally(ex -> internalServerError("importing race failed"));
+        try {
+            return importRace().thenApply(race -> {
+                importStages().thenApply(stage -> {
+                    importMaillots().thenApply(maillot -> {
+                        importRiders().thenApply(rider -> {
+                            importRewards().thenApply(judgment -> {
+                                importJudgments().thenApply(reward -> ok("successfully imported judgments")).exceptionally(ex -> internalServerError("importing judgments failed"));
+                                return ok("successfully imported rewards");
+                            }) .exceptionally(ex -> internalServerError("importing rewards failed"));
+                            return ok("successfully imported riders");
+                        }) .exceptionally(ex -> internalServerError("importing riders failed"));
+                        return ok("successfully imported maillots");
+                    }).exceptionally(ex -> internalServerError("importing maillots failed"));
+                    return ok("successfully imported stages");
+                }) .exceptionally(ex -> internalServerError("importing stages failed"));
+                return ok("successfully imported race");
+            }).exceptionally(ex -> internalServerError("importing race failed"));
+        } catch (Exception e) {
+            return  CompletableFuture.completedFuture(forbidden("race allready exists, delete it first"));
+        }
     }
 
-    private void deleteAllData(){
-        logRepository.deleteAllLogs();
-        judgmentRepository.deleteAllJudgment();
-        rewardRepository.deleteAllRewards();
-        maillotRepository.deleteAllMaillots();
-        raceGroupRepository.deleteAllRaceGroups();
-        riderRepository.deleteAllRiders();
-        riderStageConnectionRepository.deleteAllRiderStageConnections();
-        stageRepository.deleteAllStages();
-        raceRepository.deleteAllRaces();
-        cache.removeAll();
-    }
-
-    private CompletionStage<String> importRace(){
+    private long getRaceId(){
         WSRequest request = wsClient.url(UrlLinks.RACE);
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
         CompletionStage<String> promiseRaceId = request.get().thenApply(res -> Parser.setActualRaceId(res.asJson()));
         promiseRaceId.toCompletableFuture().join();
+        return UrlLinks.getRaceId();
+    }
+
+    @ApiOperation(value ="Delete actual race", response = Result.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error on deleting actual race data") })
+    public CompletionStage<Result> deleteActualRace(){
+        List<Race> races = raceRepository.getAllRaces().toCompletableFuture().join().collect(Collectors.toList());
+        long actualSetRaceId = getRaceId();
+        for(Race r : races){
+            if(r.getId() == actualSetRaceId){
+                for(Stage s : r.getStages()){
+                    long stageId = s.getId();
+                    logRepository.deleteAllLogsOfAStage(stageId).toCompletableFuture().join();
+                    judgmentRepository.deleteAllJudgmentsOfAStage(stageId).toCompletableFuture().join();
+                    rewardRepository.deleteAllRewards();
+                    maillotRepository.deleteAllMaillotsOfAStage(stageId).toCompletableFuture().join();
+                    raceGroupRepository.deleteAllRaceGroupsOfAStage(stageId).toCompletableFuture().join();
+                    riderRepository.deleteAllRiders();
+                    riderStageConnectionRepository.deleteAllRiderStageConnectionsOfAStage(stageId).toCompletableFuture().join();
+                    stageRepository.deleteStage(stageId);
+                }
+                cache.removeAll();
+                raceRepository.deleteRace(r.getId());
+            }
+        }
+        return CompletableFuture.completedFuture(ok("successfully deleted actual race"));
+    }
+
+    private CompletionStage<String> importRace() throws Exception {
+        WSRequest request = wsClient.url(UrlLinks.RACE);
+        request.setRequestTimeout(java.time.Duration.ofMillis(10000));
+        CompletionStage<String> promiseRaceId = request.get().thenApply(res -> Parser.setActualRaceId(res.asJson()));
+        promiseRaceId.toCompletableFuture().join();
+        List<Race> races = raceRepository.getAllRaces().toCompletableFuture().join().collect(Collectors.toList());
+        for(Race r : races){
+            if(r.getId() == UrlLinks.getRaceId()){
+                throw new Exception("error");
+            }
+        }
         request = wsClient.url(UrlLinks.STAGES + UrlLinks.getRaceId());
         CompletionStage<Race> promiseRace = request.get().thenApply(res -> Parser.parseRace(res.asJson()));
         Race race = promiseRace.toCompletableFuture().join();

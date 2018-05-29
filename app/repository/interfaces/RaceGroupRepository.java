@@ -19,4 +19,5 @@ public interface RaceGroupRepository {
     CompletionStage<RaceGroup> updateRaceGroup(RaceGroup raceGroup, long timestamp);
     void deleteAllRaceGroups();
     void deleteRaceGroupById(long id);
+    CompletionStage<Stream<RaceGroup>> deleteAllRaceGroupsOfAStage(long stageId);
 }

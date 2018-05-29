@@ -17,6 +17,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class JudgmentRepositoryImpl implements JudgmentRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
+    private static final String STAGE_ID ="stageId";
 
     @Inject
     public JudgmentRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
@@ -121,6 +122,21 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
             entityManager.remove(j);
         }
         return null;
+    }
+
+    @Override
+    public CompletionStage<Stream<Judgment>> deleteAllJudgmentsOfAStage(long stageId) {
+        return supplyAsync(() -> wrap(em -> deleteAllJudgmentsOfAStageAsync(em, stageId)), databaseExecutionContext);
+    }
+
+    private Stream<Judgment> deleteAllJudgmentsOfAStageAsync(EntityManager em, long stageId){
+        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j where j.stage.id =:stageId", Judgment.class);
+        query.setParameter(STAGE_ID, stageId);
+        List<Judgment> judgments = query.getResultList();
+        for(Judgment j : judgments){
+            em.remove(j);
+        }
+        return judgments.stream();
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

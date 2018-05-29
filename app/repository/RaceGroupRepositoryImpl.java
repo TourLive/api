@@ -178,6 +178,21 @@ public class RaceGroupRepositoryImpl implements RaceGroupRepository {
         }
         return null;
     }
+
+    @Override
+    public CompletionStage<Stream<RaceGroup>> deleteAllRaceGroupsOfAStage(long stageId) {
+        return supplyAsync(() -> wrap(em -> deleteAllRaceGroupsOfAStageAsync(em, stageId)), databaseExecutionContext);
+    }
+
+    private Stream<RaceGroup> deleteAllRaceGroupsOfAStageAsync(EntityManager em, long stageId){
+        TypedQuery<RaceGroup> query = em.createQuery("select rG from RaceGroup rG where rG.stage.id =:stageId", RaceGroup.class);
+        query.setParameter(STAGE_ID, stageId);
+        List<RaceGroup> raceGroups = query.getResultList();
+        for(RaceGroup rG : raceGroups){
+            em.remove(rG);
+        }
+        return raceGroups.stream();
+    }
     
     private <T> T wrap(Function<EntityManager, T> function) {
         return jpaApi.withTransaction(function);

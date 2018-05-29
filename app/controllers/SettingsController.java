@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import play.cache.AsyncCacheApi;
 import play.cache.Cached;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
@@ -23,16 +24,18 @@ import static play.libs.Json.toJson;
 @Api("Settings")
 public class SettingsController extends Controller {
     private final SettingRepository settingRepository;
+    private final AsyncCacheApi cache;
 
     @Inject
-    public SettingsController(SettingRepository settingRepository) {
+    public SettingsController(SettingRepository settingRepository, AsyncCacheApi cache) {
         this.settingRepository = settingRepository;
+        this.cache = cache;
     }
 
     @ApiOperation(value ="Get the current settings for the tourlive applications", response = String.class)
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Error on getting the current settings") })
-    @Cached(key ="settings", duration = GlobalConstants.CACHE_DURATION)
+    @Cached(key ="settings", duration = GlobalConstants.LONG_CACHE_DURATION)
     public CompletionStage<Result> getSettings() {
         return settingRepository.getSetting().thenApplyAsync(setting -> ok(toJson(setting))).exceptionally(ex -> internalServerError(ex.getMessage()));
     }
@@ -43,6 +46,7 @@ public class SettingsController extends Controller {
     @With(BasicAuthAction.class)
     @BodyParser.Of(BodyParser.Json.class)
     public CompletionStage<Result> updateSettings() {
+        cache.remove("settings");
         JsonNode json = request().body().asJson();
         return CompletableFuture.completedFuture(Parser.parseSettings(json)).thenApply(settingRepository::updateSetting).thenApply(setting -> ok("success")).exceptionally(ex -> {
             Result res;

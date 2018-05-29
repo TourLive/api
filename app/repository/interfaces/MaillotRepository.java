@@ -15,4 +15,5 @@ public interface MaillotRepository {
     void updateMaillot(Maillot maillot);
     void deleteAllMaillots();
     void deleteMaillot(long stageId, long maillotId);
+    CompletionStage<Stream<Maillot>> deleteAllMaillotsOfAStage(long stageId);
 }
