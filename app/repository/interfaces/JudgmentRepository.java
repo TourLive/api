@@ -18,4 +18,5 @@ public interface JudgmentRepository {
     void updateJudgment(Judgment judgment);
     void deleteAllJudgment();
     void deleteJudgmentById(long id);
+    CompletionStage<Stream<Judgment>> deleteAllJudgmentsOfAStage(long stageId);
 }

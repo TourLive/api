@@ -114,6 +114,21 @@ public class RiderRepositoryImpl implements RiderRepository {
         return null;
     }
 
+    @Override
+    public CompletionStage<Stream<Rider>> deleteAllRidersOfARace(long raceId) {
+        return supplyAsync(() -> wrap(em -> deleteAllRidersOfARaceAsync(em, raceId)), databaseExecutionContext);
+    }
+
+    private Stream<Rider> deleteAllRidersOfARaceAsync(EntityManager em, long raceId){
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.raceId =:raceId", Rider.class);
+        query.setParameter("raceId", raceId);
+        List<Rider> riders = query.getResultList();
+        for(Rider r : riders){
+            em.remove(r);
+        }
+        return riders.stream();
+    }
+
     private <T> T wrap(Function<EntityManager, T> function) {
         return jpaApi.withTransaction(function);
     }
