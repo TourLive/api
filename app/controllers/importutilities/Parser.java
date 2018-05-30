@@ -77,6 +77,7 @@ public final class Parser {
             rider.setTeamName(n.findPath("team").textValue());
             rider.setTeamShortName(n.findPath("teamShort").textValue());
             rider.setUnknown(false);
+            rider.setRaceId(UrlLinks.getRaceId());
             riders.add(rider);
         }
         return riders;

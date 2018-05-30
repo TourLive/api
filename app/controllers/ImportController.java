@@ -107,14 +107,17 @@ public class ImportController extends Controller {
         long actualSetRaceId = getRaceId();
         for(Race r : races){
             if(r.getId() == actualSetRaceId){
-                for(Stage s : r.getStages()){
+                for(Stage s : r.getStages()) {
                     long stageId = s.getId();
                     logRepository.deleteAllLogsOfAStage(stageId).toCompletableFuture().join();
                     judgmentRepository.deleteAllJudgmentsOfAStage(stageId).toCompletableFuture().join();
                     rewardRepository.deleteAllRewards();
                     maillotRepository.deleteAllMaillotsOfAStage(stageId).toCompletableFuture().join();
                     raceGroupRepository.deleteAllRaceGroupsOfAStage(stageId).toCompletableFuture().join();
-                    riderRepository.deleteAllRiders();
+                }
+                riderRepository.deleteAllRidersOfARace(r.getId()).toCompletableFuture().join();
+                for(Stage s : r.getStages()) {
+                    long stageId = s.getId();
                     riderStageConnectionRepository.deleteAllRiderStageConnectionsOfAStage(stageId).toCompletableFuture().join();
                     stageRepository.deleteStage(stageId);
                 }

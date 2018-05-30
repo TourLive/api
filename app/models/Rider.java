@@ -23,6 +23,7 @@ public class Rider {
     private String teamName;
     private String teamShortName;
     private boolean isUnknown;
+    private Long raceId;
 
     @OneToMany(mappedBy="rider", cascade= CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonBackReference
@@ -47,6 +48,14 @@ public class Rider {
 
     public void setRiderId(Long riderId) {
         this.riderId = riderId;
+    }
+
+    public Long getRaceId() {
+        return raceId;
+    }
+
+    public void setRaceId(Long raceId) {
+        this.raceId = raceId;
     }
 
     public int getStartNr() {
