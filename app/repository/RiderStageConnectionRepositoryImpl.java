@@ -170,6 +170,21 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
         return null;
     }
 
+    @Override
+    public CompletionStage<Stream<RiderStageConnection>> deleteAllRiderStageConnectionsOfAStage(long stageId) {
+        return supplyAsync(() -> wrap(em -> deleteAllRiderStageConnectionsOfAStageAsync(em, stageId)), databaseExecutionContext);
+    }
+
+    private Stream<RiderStageConnection> deleteAllRiderStageConnectionsOfAStageAsync(EntityManager em, long stageId){
+        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.stage.id =:stageId", RiderStageConnection.class);
+        query.setParameter(STAGE_ID, stageId);
+        List<RiderStageConnection> riderStageConnections = query.getResultList();
+        for(RiderStageConnection rSC : riderStageConnections){
+            em.remove(rSC);
+        }
+        return riderStageConnections.stream();
+    }
+
     private <T> T wrap(Function<EntityManager, T> function) {
         return jpaApi.withTransaction(function);
     }

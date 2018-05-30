@@ -18,4 +18,5 @@ public interface RiderRepository {
     void addRider(Rider rider);
     void deleteAllRiders();
     void deleteRider(long riderId);
+    CompletionStage<Stream<Rider>> deleteAllRidersOfARace(long raceId);
 }

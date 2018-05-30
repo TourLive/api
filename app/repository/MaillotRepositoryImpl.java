@@ -17,6 +17,7 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 public class MaillotRepositoryImpl implements MaillotRepository {
     private final JPAApi jpaApi;
     private final DatabaseExecutionContext databaseExecutionContext;
+    private static final String STAGE_ID ="stageId";
 
     @Inject
     public MaillotRepositoryImpl(JPAApi jpaApi, DatabaseExecutionContext databaseExecutionContext) {
@@ -91,6 +92,21 @@ public class MaillotRepositoryImpl implements MaillotRepository {
             entityManager.remove(m);
         }
         return null;
+    }
+
+    @Override
+    public CompletionStage<Stream<Maillot>> deleteAllMaillotsOfAStage(long stageId) {
+        return supplyAsync(() -> wrap(em -> deleteAllMaillotsOfAStageAsync(em, stageId)), databaseExecutionContext);
+    }
+
+    private Stream<Maillot> deleteAllMaillotsOfAStageAsync(EntityManager em, long stageId){
+        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.stage.id =:stageId", Maillot.class);
+        query.setParameter(STAGE_ID, stageId);
+        List<Maillot> maillots = query.getResultList();
+        for(Maillot m : maillots){
+            em.remove(m);
+        }
+        return maillots.stream();
     }
 
     private <T> T wrap(Function<EntityManager, T> function) {

@@ -100,7 +100,7 @@ public class LogRepositoryImpl implements LogRepository {
     }
 
     private Stream<Log> deleteAllLogsOfAStageAsync(EntityManager em, long stageId){
-        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =: stageId", Log.class);
+        TypedQuery<Log> query = em.createQuery("select l from Log l where l.stage.id =:stageId", Log.class);
         query.setParameter(STAGE_ID, stageId);
         List<Log> logs = query.getResultList();
         for(Log l : logs){
