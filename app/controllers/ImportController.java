@@ -45,13 +45,15 @@ public class ImportController extends Controller {
     private final WSClient wsClient;
     private static final String SUCESSMESSAGE ="success";
     private final AsyncCacheApi cache;
+    private final GPXTrackRepository gpxTrackRepository;
+    private final NotificationRepository notificationRepository;
 
     @Inject
     public ImportController(JudgmentRepository judgmentRepository, MaillotRepository maillotRepository,
                             RaceGroupRepository raceGroupRepository, RaceRepository raceRepository,
                             RewardRepository rewardRepository, RiderRepository riderRepository,
                             RiderStageConnectionRepository riderStageConnectionRepository,
-                            StageRepository stageRepository, LogRepository logRepository, WSClient wsClient, AsyncCacheApi cache) {
+                            StageRepository stageRepository, LogRepository logRepository, WSClient wsClient, AsyncCacheApi cache, GPXTrackRepository gpxTrackRepository, NotificationRepository notificationRepository) {
         this.judgmentRepository = judgmentRepository;
         this.maillotRepository = maillotRepository;
         this.raceGroupRepository = raceGroupRepository;
@@ -63,6 +65,8 @@ public class ImportController extends Controller {
         this.logRepository = logRepository;
         this.wsClient = wsClient;
         this.cache = cache;
+        this.gpxTrackRepository = gpxTrackRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     @ApiOperation(value ="Import of race date from cnlab API", response = Result.class)
@@ -120,6 +124,8 @@ public class ImportController extends Controller {
                 for(Stage s : r.getStages()) {
                     long stageId = s.getId();
                     riderStageConnectionRepository.deleteAllRiderStageConnectionsOfAStage(stageId).toCompletableFuture().join();
+                    gpxTrackRepository.deleteGPXTracksByStageId(stageId);
+                    notificationRepository.deleteAllNotification();
                     stageRepository.deleteStage(stageId);
                 }
                 cache.removeAll();

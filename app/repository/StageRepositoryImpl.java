@@ -41,7 +41,7 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     private Stage getStage(EntityManager em, long stageId){
-        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.id = :stageId" , Stage.class);
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.id =:stageId" , Stage.class);
         query.setParameter(STAGE_ID, stageId);
         return query.getSingleResult();
     }
@@ -52,7 +52,7 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     private Stage getStageByCnlabId(EntityManager em, long stageId){
-        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId = :stageId" , Stage.class);
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.stageId =:stageId" , Stage.class);
         query.setParameter(STAGE_ID, stageId);
         return query.getSingleResult();
     }
@@ -63,7 +63,7 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     private Stream<Stage> getAllStagesByRaceId(EntityManager em, long raceId){
-        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.race.id = :raceId" , Stage.class);
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.race.id =:raceId" , Stage.class);
         query.setParameter("raceId", raceId);
         return query.getResultList().stream();
     }
@@ -97,7 +97,7 @@ public class StageRepositoryImpl implements StageRepository{
     }
 
     private Stage deleteStage(EntityManager em, long stageId){
-        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.id = :stageId" , Stage.class);
+        TypedQuery<Stage> query = em.createQuery("select s from Stage s where s.id =:stageId" , Stage.class);
         query.setParameter(STAGE_ID, stageId);
         Stage stage = query.getSingleResult();
         if(stage != null){

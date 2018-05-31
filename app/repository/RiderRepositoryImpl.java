@@ -40,7 +40,7 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private Rider getRiderByCnlabId(EntityManager em, long riderId){
-        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId = :riderId" , Rider.class);
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.riderId =:riderId" , Rider.class);
         query.setParameter(RIDER_ID, riderId);
         return query.getSingleResult();
     }
@@ -51,7 +51,7 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private Rider getRider(EntityManager em, long riderId){
-        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id = :riderId" , Rider.class);
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id =:riderId" , Rider.class);
         query.setParameter(RIDER_ID, riderId);
         return query.getSingleResult();
     }
@@ -62,7 +62,7 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private Stream<Rider> getAllRiders(EntityManager entityManager, long stageid) {
-        TypedQuery<Rider> query = entityManager.createQuery("select r from Rider r inner join RiderStageConnection rc on r.id = rc.rider.id where rc.stage.id = :stageid" , Rider.class);
+        TypedQuery<Rider> query = entityManager.createQuery("select r from Rider r inner join RiderStageConnection rc on r.id = rc.rider.id where rc.stage.id =:stageid" , Rider.class);
         query.setParameter("stageid", stageid);
         return query.getResultList().stream();
     }
@@ -105,7 +105,7 @@ public class RiderRepositoryImpl implements RiderRepository {
     }
 
     private Rider deleteRider(EntityManager em, long riderId){
-        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id = :riderId" , Rider.class);
+        TypedQuery<Rider> query = em.createQuery("select r from Rider r where r.id =:riderId" , Rider.class);
         query.setParameter(RIDER_ID, riderId);
         Rider rider = query.getSingleResult();
         if(rider != null){

@@ -31,7 +31,7 @@ public class MaillotRepositoryImpl implements MaillotRepository {
     }
 
     private Stream<Maillot> getAllMaillots(EntityManager em, long stageId){
-        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.stage.id = :stageId" , Maillot.class);
+        TypedQuery<Maillot> query = em.createQuery("select m from Maillot m where m.stage.id =:stageId" , Maillot.class);
         query.setParameter("stageId", stageId);
         return query.getResultList().stream();
     }
@@ -84,7 +84,7 @@ public class MaillotRepositoryImpl implements MaillotRepository {
     }
 
     private Maillot deleteMaillot(EntityManager entityManager, long stageId, long maillotId) {
-        TypedQuery<Maillot> query = entityManager.createQuery("select m from Maillot m where m.stage.id = :stageId and m.id = :maillotId" , Maillot.class);
+        TypedQuery<Maillot> query = entityManager.createQuery("select m from Maillot m where m.stage.id =:stageId and m.id =:maillotId" , Maillot.class);
         query.setParameter("maillotId", maillotId);
         query.setParameter("stageId", stageId);
         Maillot m = query.getSingleResult();

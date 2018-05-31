@@ -26,7 +26,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private UserAccount getUser(EntityManager entityManager, String username, String password){
-        TypedQuery<UserAccount> query = entityManager.createQuery("select u from UserAccount u where u.username = :username and u.password = :password" , UserAccount.class);
+        TypedQuery<UserAccount> query = entityManager.createQuery("select u from UserAccount u where u.username =:username and u.password =:password" , UserAccount.class);
         query.setParameter("username", username);
         query.setParameter("password", password);
         return query.getSingleResult();

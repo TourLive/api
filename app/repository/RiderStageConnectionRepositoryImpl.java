@@ -37,7 +37,7 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     private Stream<RiderStageConnection> getAllRiderStageConnections(EntityManager em, long stageId){
-        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.stage.id = :stageId" , RiderStageConnection.class);
+        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.stage.id =:stageId" , RiderStageConnection.class);
         query.setParameter(STAGE_ID, stageId);
         return query.getResultList().stream();
     }
@@ -48,7 +48,7 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     private RiderStageConnection getRiderStageConnection(EntityManager em, long stageId, long riderId){
-        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.id = :riderId and rSC.stage.id = :stageId" , RiderStageConnection.class);
+        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.id =:riderId and rSC.stage.id =:stageId" , RiderStageConnection.class);
         query.setParameter("riderId", riderId);
         query.setParameter(STAGE_ID, stageId);
         return query.getSingleResult();
@@ -60,7 +60,7 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     private RiderStageConnection getRiderStageConnectionByRiderStartNrAndStage(EntityManager em, long stageId, int startNr){
-        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.startNr = :startNr and rSC.stage.id = :stageId" , RiderStageConnection.class);
+        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.startNr =:startNr and rSC.stage.id =:stageId" , RiderStageConnection.class);
         query.setParameter("startNr", startNr);
         query.setParameter(STAGE_ID, stageId);
         return query.getSingleResult();
@@ -81,7 +81,7 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     private Stream<RiderStageConnection> getRiderStageConnectionsByStageWithRiderMaillots(EntityManager em, long stageId){
-        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC left join fetch rSC.riderMaillots where rSC.stage.id = :stageId" , RiderStageConnection.class);
+        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC left join fetch rSC.riderMaillots where rSC.stage.id =stageId" , RiderStageConnection.class);
         query.setParameter(STAGE_ID, stageId);
         return query.getResultList().stream();
     }
@@ -92,7 +92,7 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     private RiderStageConnection getRiderStageConnectionByRiderStageConnectionWithRiderMaillots(EntityManager em, long rSCId){
-        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC left join fetch rSC.riderMaillots where rSC.id = :rSCId" , RiderStageConnection.class);
+        TypedQuery<RiderStageConnection> query = em.createQuery("select rSC from RiderStageConnection rSC left join fetch rSC.riderMaillots where rSC.id =:rSCId" , RiderStageConnection.class);
         query.setParameter("rSCId", rSCId);
         return query.getSingleResult();
     }
@@ -160,7 +160,7 @@ public class RiderStageConnectionRepositoryImpl implements RiderStageConnectionR
     }
 
     private RiderStageConnection deleteRiderStageConnection(EntityManager entityManager, long stageId, long riderId) {
-        TypedQuery<RiderStageConnection> query = entityManager.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.id = :riderId and rSC.stage.id = :stageId" , RiderStageConnection.class);
+        TypedQuery<RiderStageConnection> query = entityManager.createQuery("select rSC from RiderStageConnection rSC where rSC.rider.id =:riderId and rSC.stage.id =:stageId" , RiderStageConnection.class);
         query.setParameter("riderId", riderId);
         query.setParameter(STAGE_ID, stageId);
         RiderStageConnection rSC = query.getResultList().get(0);

@@ -40,7 +40,7 @@ public class RaceRepositoryImpl implements RaceRepository{
     }
 
     private Race getRace(EntityManager em, Long raceId) {
-        TypedQuery<Race> query = em.createQuery("select r from Race r where r.id = :raceId" , Race.class);
+        TypedQuery<Race> query = em.createQuery("select r from Race r where r.id =:raceId" , Race.class);
         query.setParameter("raceId", raceId);
         return query.getSingleResult();
     }
@@ -84,7 +84,7 @@ public class RaceRepositoryImpl implements RaceRepository{
     }
 
     private Race deleteRace(EntityManager em, Long id){
-        TypedQuery<Race> query = em.createQuery("select r from Race r where r.id = :id" , Race.class);
+        TypedQuery<Race> query = em.createQuery("select r from Race r where r.id =:id" , Race.class);
         query.setParameter("id", id);
         Race race = query.getSingleResult();
         if(race != null){
