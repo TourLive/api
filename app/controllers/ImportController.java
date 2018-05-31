@@ -69,6 +69,7 @@ public class ImportController extends Controller {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Error on importing data from api") })
     public CompletionStage<Result> importAllStaticData() {
+        cache.removeAll();
         try {
             return importRace().thenApply(race -> {
                 importStages().thenApply(stage -> {
@@ -182,6 +183,7 @@ public class ImportController extends Controller {
         List<Stage> stages = CompletableFuture.completedFuture(stageRepository.getAllStages()).join().toCompletableFuture().join().collect(Collectors.toList());
         boolean oneTimeImportRiders = false;
         List<Rider> riders = new ArrayList<>();
+        Long firstStageId = 0L;
         for(Stage stage : stages){
             if(!oneTimeImportRiders){
                 WSRequest request = wsClient.url(UrlLinks.RIDERS + stage.getStageId());
@@ -192,8 +194,9 @@ public class ImportController extends Controller {
                     riderRepository.addRider(r);
                 }
                 oneTimeImportRiders = true;
+                firstStageId = stage.getStageId();
             }
-            createRiderStageConnections(stage, riders).toCompletableFuture().join();
+            createRiderStageConnections(firstStageId, stage, riders).toCompletableFuture().join();
             createMaillotRiderConnections(stage).toCompletableFuture().join();
             createDefaultRaceGroup(stage).toCompletableFuture().join();
         }
@@ -201,8 +204,8 @@ public class ImportController extends Controller {
         return CompletableFuture.completedFuture(SUCESSMESSAGE);
     }
 
-    private CompletionStage<String>  createRiderStageConnections(Stage stage, List<Rider> riders){
-        WSRequest request = wsClient.url(UrlLinks.RIDERS + stage.getStageId());
+    private CompletionStage<String>  createRiderStageConnections(Long stageId, Stage stage, List<Rider> riders){
+        WSRequest request = wsClient.url(UrlLinks.RIDERS + stageId);
         request.setRequestTimeout(java.time.Duration.ofMillis(10000));
         CompletionStage<List<RiderStageConnection>> promiseRiderStageConnections = request.get().thenApply(res -> Parser.parseRiderStageConnections(res.asJson()));
         List<RiderStageConnection> riderStageConnections = promiseRiderStageConnections.toCompletableFuture().join();
