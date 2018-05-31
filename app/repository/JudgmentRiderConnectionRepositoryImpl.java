@@ -46,7 +46,7 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
     }
 
     private Stream<JudgmentRiderConnection> getJudgmentRiderConnectionsByRider(EntityManager em, long id){
-        TypedQuery<JudgmentRiderConnection> query = em.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.rider.id =:id" , JudgmentRiderConnection.class);
+        TypedQuery<JudgmentRiderConnection> query = em.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.rider.id = :id" , JudgmentRiderConnection.class);
         query.setParameter("id", id);
         return query.getResultList().stream();
     }
@@ -57,7 +57,7 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
     }
 
     private Stream<JudgmentRiderConnection> getJudgmentRiderConnectionsByStage(EntityManager em, long stageId){
-        TypedQuery<JudgmentRiderConnection> query = em.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.judgment.stage.id =:stageId" , JudgmentRiderConnection.class);
+        TypedQuery<JudgmentRiderConnection> query = em.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.judgment.stage.id = :stageId" , JudgmentRiderConnection.class);
         query.setParameter("stageId", stageId);
         return query.getResultList().stream();
     }
@@ -97,7 +97,7 @@ public class JudgmentRiderConnectionRepositoryImpl implements JudgmentRiderConne
     }
 
     private JudgmentRiderConnection deleteJudgmentRiderConnection(EntityManager entityManager, String judgmentId) {
-        TypedQuery<JudgmentRiderConnection> query = entityManager.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.appId =:judgmentId" , JudgmentRiderConnection.class);
+        TypedQuery<JudgmentRiderConnection> query = entityManager.createQuery("select rSC from JudgmentRiderConnection rSC where rSC.appId = :judgmentId" , JudgmentRiderConnection.class);
         query.setParameter("judgmentId", judgmentId);
         JudgmentRiderConnection jRC = query.getSingleResult();
         if(jRC != null){

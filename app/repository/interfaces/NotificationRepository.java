@@ -14,5 +14,4 @@ public interface NotificationRepository {
     CompletionStage<Stream<Notification>> getNotificationsByTimestamp(long stageId, Timestamp timestamp);
     CompletionStage<Notification> addNotification(long stageId, Notification notification);
     void deleteAllNotification();
-    CompletionStage<Stream<Notification>> deleteNotificationsByStageId(long stageId);
 }

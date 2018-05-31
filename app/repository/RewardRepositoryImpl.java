@@ -41,7 +41,7 @@ public class RewardRepositoryImpl implements RewardRepository {
     }
 
     private Reward getRewardById(EntityManager entityManager, long id) {
-        TypedQuery<Reward> query = entityManager.createQuery("select r from Reward r where r.id =:id" , Reward.class);
+        TypedQuery<Reward> query = entityManager.createQuery("select r from Reward r where r.id = :id" , Reward.class);
         query.setParameter("id", id);
         return query.getSingleResult();
     }

@@ -59,7 +59,7 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     private Stream<Judgment> getJudgmentsByRider(EntityManager em, long id){
-        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j left join JudgmentRiderConnection jRC on jRC.rider.id =:id where jRC.rider.id=:id" , Judgment.class);
+        TypedQuery<Judgment> query = em.createQuery("select j from Judgment j left join JudgmentRiderConnection jRC on jRC.rider.id = :id where jRC.rider.id=:id" , Judgment.class);
         query.setParameter("id", id);
         return query.getResultList().stream();
     }
@@ -70,7 +70,7 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     private Stream<Judgment> getJudgmentByStage(EntityManager entityManager, long stageId) {
-        TypedQuery<Judgment> query = entityManager.createQuery("select j from Judgment j where j.stage.id =:stageId" , Judgment.class);
+        TypedQuery<Judgment> query = entityManager.createQuery("select j from Judgment j where j.stage.id = :stageId" , Judgment.class);
         query.setParameter("stageId", stageId);
         return query.getResultList().stream();
     }
@@ -115,7 +115,7 @@ public class JudgmentRepositoryImpl implements JudgmentRepository {
     }
 
     private Judgment deleteJudgmentById(EntityManager entityManager, long id) {
-        TypedQuery<Judgment> query = entityManager.createQuery("select j from Judgment j where j.id =:id", Judgment.class);
+        TypedQuery<Judgment> query = entityManager.createQuery("select j from Judgment j where j.id = :id", Judgment.class);
         query.setParameter("id", id);
         Judgment j = query.getResultList().get(0);
         if (j != null) {

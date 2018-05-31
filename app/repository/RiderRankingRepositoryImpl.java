@@ -32,7 +32,7 @@ public class RiderRankingRepositoryImpl implements RiderRankingRepository {
     }
 
     private Stream<RiderRanking> getAllRiderRankings(EntityManager em, long riderStageConnectionId){
-        TypedQuery<RiderRanking> query = em.createQuery("select rR from RiderRanking rR where rR.riderStageConnection.id =:riderStageConnectionId" , RiderRanking.class);
+        TypedQuery<RiderRanking> query = em.createQuery("select rR from RiderRanking rR where rR.riderStageConnection.id = :riderStageConnectionId" , RiderRanking.class);
         query.setParameter("riderStageConnectionId", riderStageConnectionId);
         return query.getResultList().stream();
     }
@@ -43,7 +43,7 @@ public class RiderRankingRepositoryImpl implements RiderRankingRepository {
     }
 
     private Stream<RiderRanking> getAllRiderRankingsByRankingType(EntityManager em, long riderStageConnectionId, String rankingType){
-        TypedQuery<RiderRanking> query = em.createQuery("select rR from RiderRanking rR where rR.riderStageConnection.id =:riderStageConnectionId and rR.rankingType = :rankingType" , RiderRanking.class);
+        TypedQuery<RiderRanking> query = em.createQuery("select rR from RiderRanking rR where rR.riderStageConnection.id = :riderStageConnectionId and rR.rankingType = :rankingType" , RiderRanking.class);
         query.setParameter("riderStageConnectionId", riderStageConnectionId);
         query.setParameter(RANKING_TYPE, RankingType.valueOf(rankingType));
         return query.getResultList().stream();
@@ -55,7 +55,7 @@ public class RiderRankingRepositoryImpl implements RiderRankingRepository {
     }
 
     private RiderRanking getAllRiderRankingsByRiderIdAndRankingType(EntityManager em, long riderId, String rankingType){
-        TypedQuery<RiderRanking> query = em.createQuery("select rR from RiderRanking rR where rR.riderStageConnection.rider.id =:riderId and rR.rankingType =:rankingType" , RiderRanking.class);
+        TypedQuery<RiderRanking> query = em.createQuery("select rR from RiderRanking rR where rR.riderStageConnection.rider.id = :riderId and rR.rankingType = :rankingType" , RiderRanking.class);
         query.setParameter("riderId", riderId);
         query.setParameter(RANKING_TYPE, RankingType.valueOf(rankingType));
         return query.getSingleResult();
@@ -103,7 +103,7 @@ public class RiderRankingRepositoryImpl implements RiderRankingRepository {
     }
 
     private RiderRanking deleteRiderRankingByRiderAndType(EntityManager entityManager, long riderId, RankingType rankingType) {
-        TypedQuery<RiderRanking> query =  entityManager.createQuery("select rR from RiderRanking rR where rR.riderStageConnection.rider.id =:riderId and rR.rankingType =:rankingType" , RiderRanking.class);
+        TypedQuery<RiderRanking> query =  entityManager.createQuery("select rR from RiderRanking rR where rR.riderStageConnection.rider.id = :riderId and rR.rankingType = :rankingType" , RiderRanking.class);
         query.setParameter("riderId", riderId);
         query.setParameter(RANKING_TYPE, rankingType);
         RiderRanking riderRanking = query.getSingleResult();

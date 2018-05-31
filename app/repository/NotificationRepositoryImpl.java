@@ -1,6 +1,5 @@
 package repository;
 
-import models.GPXTrack;
 import models.Notification;
 import models.Stage;
 import play.db.jpa.JPAApi;
@@ -70,21 +69,6 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         List<Notification> notifications = em.createQuery("select n from Notification n", Notification.class).getResultList();
         for(Notification n : notifications){
             em.remove(n);
-        }
-        return notifications.stream();
-    }
-
-    @Override
-    public CompletionStage<Stream<Notification>> deleteNotificationsByStageId(long stageId) {
-        return supplyAsync(() -> wrap(em -> deleteNotifications(em, stageId)), databaseExecutionContext);
-    }
-
-    private Stream<Notification> deleteNotifications(EntityManager em, long stageId){
-        TypedQuery<Notification> query = em.createQuery("select gpx from Notification n where n.stage.id =:stageId" , Notification.class);
-        query.setParameter("stageId", stageId);
-        List<Notification> notifications = query.getResultList();
-        for(Notification notification : notifications){
-            em.remove(notification);
         }
         return notifications.stream();
     }

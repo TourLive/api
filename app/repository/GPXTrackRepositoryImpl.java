@@ -31,7 +31,7 @@ public class GPXTrackRepositoryImpl implements GPXTrackRepository {
     }
 
     private Stream<GPXTrack> getGPXTracks(EntityManager em, long stageId){
-        TypedQuery<GPXTrack> query = em.createQuery("select gpx from GPXTrack gpx where gpx.stage.id =:stageId" , GPXTrack.class);
+        TypedQuery<GPXTrack> query = em.createQuery("select gpx from GPXTrack gpx where gpx.stage.id = :stageId" , GPXTrack.class);
         query.setParameter("stageId", stageId);
         return query.getResultList().stream();
     }
@@ -56,7 +56,7 @@ public class GPXTrackRepositoryImpl implements GPXTrackRepository {
     }
 
     private Stream<GPXTrack> deleteGPXTracks(EntityManager em, long stageId){
-        TypedQuery<GPXTrack> query = em.createQuery("select gpx from GPXTrack gpx where gpx.stage.id =:stageId" , GPXTrack.class);
+        TypedQuery<GPXTrack> query = em.createQuery("select gpx from GPXTrack gpx where gpx.stage.id = :stageId" , GPXTrack.class);
         query.setParameter("stageId", stageId);
         List<GPXTrack> gpxTracks = query.getResultList();
         for(GPXTrack gpxTrack : gpxTracks){
