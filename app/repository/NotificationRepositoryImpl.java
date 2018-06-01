@@ -73,6 +73,21 @@ public class NotificationRepositoryImpl implements NotificationRepository {
         return notifications.stream();
     }
 
+    @Override
+    public CompletionStage<Stream<Notification>> deleteNotificationsByStageId(long stageId) {
+        return supplyAsync(() -> wrap(em -> deleteNotifications(em, stageId)), databaseExecutionContext);
+    }
+
+    private Stream<Notification> deleteNotifications(EntityManager em, long stageId){
+        TypedQuery<Notification> query = em.createQuery("select gpx from Notification n where n.stage.id =:stageId" , Notification.class);
+        query.setParameter("stageId", stageId);
+        List<Notification> notifications = query.getResultList();
+        for(Notification notification : notifications){
+            em.remove(notification);
+        }
+        return notifications.stream();
+    }
+
     private <T> T wrap(Function<EntityManager, T> function) {
         return jpaApi.withTransaction(function);
     }
