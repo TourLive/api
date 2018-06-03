@@ -79,7 +79,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     private Stream<Notification> deleteNotifications(EntityManager em, long stageId){
-        TypedQuery<Notification> query = em.createQuery("select gpx from Notification n where n.stage.id =:stageId" , Notification.class);
+        TypedQuery<Notification> query = em.createQuery("select n from Notification n where n.stage.id =:stageId" , Notification.class);
         query.setParameter("stageId", stageId);
         List<Notification> notifications = query.getResultList();
         for(Notification notification : notifications){
