@@ -124,8 +124,8 @@ public class ImportController extends Controller {
                 for(Stage s : r.getStages()) {
                     long stageId = s.getId();
                     riderStageConnectionRepository.deleteAllRiderStageConnectionsOfAStage(stageId).toCompletableFuture().join();
-                    gpxTrackRepository.deleteGPXTracksByStageId(stageId);
-                    notificationRepository.deleteNotificationsByStageId(stageId);
+                    gpxTrackRepository.deleteGPXTracksByStageId(stageId).toCompletableFuture().join();
+                    notificationRepository.deleteNotificationsByStageId(stageId).toCompletableFuture().join();
                     stageRepository.deleteStage(stageId);
                 }
                 cache.removeAll();
