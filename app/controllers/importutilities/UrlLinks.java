@@ -6,7 +6,7 @@ public final class UrlLinks {
     public static final String RACE = BASE_URL + "api/getAllGlobalSettings";
     public static final String RIDERS = BASE_URL + "api/masterdata/riders/stage/";
     public static final String STAGES = BASE_URL + "public/stages/";
-    public static final String JUDGEMENTS = BASE_URL + "api/masterdata/judgements/";
+    public static final String JUDGEMENTS = BASE_URL + "json_public/judgements.php?raceId=";
     public static final String STATES = BASE_URL + "json_public/status.php";
     public static final String GLOBALSETTINGS = BASE_URL + "api/getAllGlobalSettings";
     public static final String MAILLOTS = BASE_URL + "api/masterdata/jerseys/race/";
