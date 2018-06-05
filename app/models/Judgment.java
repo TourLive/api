@@ -21,6 +21,7 @@ public class Judgment {
     private Long cnlabStageId;
     private String name;
     private double distance;
+    private boolean skipForDisplay;
 
     @OneToMany(mappedBy="judgment", cascade= CascadeType.ALL)
     @JsonBackReference
@@ -88,5 +89,13 @@ public class Judgment {
 
     public void setcnlabStageId(Long cnlabStageId) {
         this.cnlabStageId = cnlabStageId;
+    }
+
+    public boolean isSkipForDisplay() {
+        return skipForDisplay;
+    }
+
+    public void setSkipForDisplay(boolean skipForDisplay) {
+        this.skipForDisplay = skipForDisplay;
     }
 }

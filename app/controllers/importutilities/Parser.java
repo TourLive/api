@@ -144,6 +144,7 @@ public final class Parser {
             judgment.setDistance(n.findPath("rennkm").asDouble());
             judgment.setName(n.findPath("name").asText());
             judgment.setcnlabStageId(n.findPath("etappe").asLong());
+            judgment.setSkipForDisplay(n.findPath("skipForDisplay").asInt() == 1 ? true : false);
             long rewardId = n.findPath("rewardId").asLong();
             if(judgmentHashMap.containsKey(rewardId)){
                 judgmentHashMap.get(rewardId).add(judgment);
