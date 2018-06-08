@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import models.RaceGroup;
 import models.Rider;
+import models.RiderStageConnection;
 import models.enums.RaceGroupType;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.cache.AsyncCacheApi;
@@ -16,6 +17,7 @@ import play.mvc.Result;
 import play.mvc.With;
 import repository.interfaces.RaceGroupRepository;
 import repository.interfaces.RiderRepository;
+import repository.interfaces.RiderStageConnectionRepository;
 import repository.interfaces.StageRepository;
 
 import javax.inject.Inject;
@@ -34,15 +36,18 @@ public class RaceGroupController extends Controller {
     private final RaceGroupRepository raceGroupRepository;
     private final StageRepository stageRepository;
     private final RiderRepository riderRepository;
+    private final RiderStageConnectionRepository riderStageConnectionRepository;
     private static final String ACTUAL_GAP_TIME = "actualGapTime";
     private static final String HISTORY_GAP_TIME = "historyGapTime";
     private final AsyncCacheApi cache;
 
     @Inject
-    public RaceGroupController(RaceGroupRepository raceGroupRepository, StageRepository stageRepository, RiderRepository riderRepository, AsyncCacheApi cache) {
+    public RaceGroupController(RaceGroupRepository raceGroupRepository, StageRepository stageRepository, RiderRepository riderRepository,
+                               RiderStageConnectionRepository riderStageConnectionRepository, AsyncCacheApi cache) {
         this.raceGroupRepository = raceGroupRepository;
         this.stageRepository = stageRepository;
         this.riderRepository = riderRepository;
+        this.riderStageConnectionRepository = riderStageConnectionRepository;
         this.cache = cache;
     }
 
@@ -150,12 +155,21 @@ public class RaceGroupController extends Controller {
         RaceGroup raceGroup = null;
         try{
             raceGroup = raceGroupRepository.getRaceGroupByAppId(raceGroupId).toCompletableFuture().join();
+            long time = raceGroup.getActualGapTime();
         } catch (Exception ex){
             raceGroup = raceGroupRepository.getRaceGroupField(stageId);
             raceGroup.setAppId(raceGroupId);
         }
         raceGroup = parseRaceGroup(request().body().asJson(), raceGroup).toCompletableFuture().join();
         raceGroupRepository.updateRaceGroup(raceGroup, System.currentTimeMillis());
+        for(Rider r : raceGroup.getRiders()){
+            RiderStageConnection rSC = r.getRiderStageConnections().get(0);
+            long virtualGap = rSC.getVirtualGap();
+            virtualGap -= raceGroup.getHistoryGapTime();
+            virtualGap += raceGroup.getActualGapTime();
+            rSC.setVirtualGap(virtualGap);
+            riderStageConnectionRepository.updateRiderStageConnection(rSC);
+        }
         return CompletableFuture.completedFuture(ok());
     }
 
