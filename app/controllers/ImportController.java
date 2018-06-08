@@ -191,6 +191,7 @@ public class ImportController extends Controller {
         List<Rider> riders = new ArrayList<>();
         Long firstStageId = 0L;
         for(Stage stage : stages){
+            if(stage.getRace().getId() != UrlLinks.getRaceId()) continue;
             if(!oneTimeImportRiders){
                 WSRequest request = wsClient.url(UrlLinks.RIDERS + stage.getStageId());
                 request.setRequestTimeout(java.time.Duration.ofMillis(10000));
