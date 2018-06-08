@@ -148,7 +148,7 @@ public class RaceGroupController extends Controller {
         return completableFuture;
     }
 
-    @ApiOperation(value ="update specific racegroups time", response = String.class)
+    @ApiOperation(value ="update specific racegroups time and the rider states", response = String.class)
     @BodyParser.Of(BodyParser.Json.class)
     @With(BasicAuthAction.class)
     public CompletionStage<Result> updateRaceGroup(String raceGroupId, long stageId) {
