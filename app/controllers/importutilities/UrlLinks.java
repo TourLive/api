@@ -9,7 +9,7 @@ public final class UrlLinks {
     public static final String JUDGEMENTS = BASE_URL + "json_public/judgements.php?raceId=";
     public static final String STATES = BASE_URL + "json_public/status.php";
     public static final String GLOBALSETTINGS = BASE_URL + "api/getAllGlobalSettings";
-    public static final String MAILLOTS = BASE_URL + "api/masterdata/jerseys/race/";
+    public static final String MAILLOTS = "https://tourlive.ch/json_public/jersey.php?raceId=";
     public static final String RIDERJERSEY = BASE_URL + "json_public/riderjerseystartstage.php?stage=";
     private UrlLinks() { throw new IllegalStateException("Static class"); }
     public static void setRaceId(long raceId){ RACEID = raceId;}
