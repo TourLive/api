@@ -14,11 +14,7 @@ public class MaillotDTO {
         this.name = maillot.getName();
         this.color = maillot.getColor();
         this.partner = maillot.getPartner();
-        if (maillot.getRiderStageConnections().isEmpty()) {
-            this.riderId = 0;
-        } else {
-            this.riderId = maillot.getRiderStageConnections().get(0).getRider().getId();
-        }
+        this.riderId = maillot.getRiderId();
     }
 
     public Long getId() {

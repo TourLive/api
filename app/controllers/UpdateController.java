@@ -3,6 +3,8 @@ package controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javassist.NotFoundException;
+import models.Maillot;
+import models.Rider;
 import models.RiderStageConnection;
 import models.Stage;
 import org.w3c.dom.Document;
@@ -13,6 +15,8 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
+import repository.interfaces.MaillotRepository;
+import repository.interfaces.RiderRepository;
 import repository.interfaces.RiderStageConnectionRepository;
 import repository.interfaces.StageRepository;
 
@@ -29,11 +33,21 @@ import java.util.stream.Collectors;
 public class UpdateController extends Controller {
     private final StageRepository stageRepository;
     private final RiderStageConnectionRepository riderStageConnectionRepository;
+    private final MaillotRepository maillotRepository;
+    private final RiderRepository riderRepository;
     private static final String ATTRIBUTE_CODE ="code";
+    private static final String ATTRIBUTE_STARTNR = "number";
     private static final String RANKING = "ranking";
     private static final String RESULTS = "results";
+    private static final String LEADERS = "leaders";
+    private static final String LEADER = "leader";
+    private static final String POINTS = "points";
+    private static final String MOUNTAIN = "mountain";
+    private static final String BEST_YOUNG = "bestYoung";
     private static final String CODE_ITG = "ITG";
     private static final String CODE_IPG = "IPG";
+    private static final String CODE_IMG = "IMG";
+    private static final String CODE_IJG = "IJG";
     private static final short ALLOWED_TYPE = 1;
     private static final String ATTRIBUTE_NUMBER = "number";
     private static final String ATTRIBUTE_CAPITAL = "capital";
@@ -41,9 +55,12 @@ public class UpdateController extends Controller {
     private boolean nextStageAvailable = false;
 
     @Inject
-    public UpdateController(StageRepository stageRepository, RiderStageConnectionRepository riderStageConnectionRepository) {
+    public UpdateController(StageRepository stageRepository, RiderStageConnectionRepository riderStageConnectionRepository,
+                            MaillotRepository maillotRepository, RiderRepository riderRepository) {
         this.stageRepository = stageRepository;
         this.riderStageConnectionRepository = riderStageConnectionRepository;
+        this.maillotRepository = maillotRepository;
+        this.riderRepository = riderRepository;
     }
 
     @ApiOperation(value ="update actual and next stage by specific matsport-xml", response = String.class)
@@ -87,6 +104,9 @@ public class UpdateController extends Controller {
                             break;
                     }
                 }
+                NodeList leaders = xml.getElementsByTagName(LEADERS).item(0).getChildNodes();
+                if(nextStageAvailable) setNewJerseys(leaders, stageId+1);
+
                 completableFuture.complete("success");
 
             } catch (Exception e) {
@@ -110,6 +130,67 @@ public class UpdateController extends Controller {
         }
         if(results == null) throw new NotFoundException("failed to find results");
         return results;
+    }
+
+    private void setNewJerseys(NodeList leaders, long stageId){
+        List<Maillot> maillots = maillotRepository.getAllMaillots(stageId).toCompletableFuture().join().collect(Collectors.toList());
+        for(int i = 0; i < leaders.getLength(); i++){
+            Node child = leaders.item(i);
+            if(child.getNodeType() != ALLOWED_TYPE) continue;
+            if(child.getLocalName().equals(LEADER)){
+                NamedNodeMap attributes = child.getAttributes();
+                Node code = attributes.getNamedItem(ATTRIBUTE_CODE);
+                int startNr = Integer.valueOf(attributes.getNamedItem(ATTRIBUTE_STARTNR).getNodeValue());
+                List<Rider> riders = riderRepository.getAllRiders(stageId).toCompletableFuture().join().collect(Collectors.toList());
+                long riderId = 0;
+                for(Rider r : riders){
+                    if(r.getStartNr() == startNr){
+                        riderId = r.getId();
+                        break;
+                    }
+                }
+                switch (code.getNodeValue()){
+                    case CODE_ITG:
+                        for(Maillot m : maillots){
+                            if(m.getType().equals(LEADER)){
+                                m.setRiderId(riderId);
+                                maillotRepository.updateMaillot(m);
+                                break;
+                            }
+                        }
+                        break;
+                    case CODE_IMG:
+                        for(Maillot m : maillots){
+                            if(m.getType().equals(MOUNTAIN)){
+                                m.setRiderId(riderId);
+                                maillotRepository.updateMaillot(m);
+                                break;
+                            }
+                        }
+                        break;
+                    case CODE_IPG:
+                        for(Maillot m : maillots){
+                            if(m.getType().equals(POINTS)){
+                                m.setRiderId(riderId);
+                                maillotRepository.updateMaillot(m);
+                                break;
+                            }
+                        }
+                        break;
+                    case CODE_IJG:
+                        for(Maillot m : maillots){
+                            if(m.getType().equals(BEST_YOUNG)){
+                                m.setRiderId(riderId);
+                                maillotRepository.updateMaillot(m);
+                                break;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
     private void updateTimes(long stageId, NodeList results) throws ParseException {
