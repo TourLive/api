@@ -17,6 +17,7 @@ public class Maillot {
     private String name;
     private String color;
     private String partner;
+    private long riderId;
     @ManyToMany(mappedBy="riderMaillots", cascade= CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RiderStageConnection> riderStageConnections = new ArrayList<>();
 
@@ -63,6 +64,14 @@ public class Maillot {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    public long getRiderId() {
+        return riderId;
+    }
+
+    public void setRiderId(long riderId) {
+        this.riderId = riderId;
     }
 
     public List<RiderStageConnection> getRiderStageConnections() {
