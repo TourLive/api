@@ -163,7 +163,13 @@ public class RaceGroupController extends Controller {
         raceGroup = parseRaceGroup(request().body().asJson(), raceGroup).toCompletableFuture().join();
         raceGroupRepository.updateRaceGroup(raceGroup, System.currentTimeMillis());
         for(Rider r : raceGroup.getRiders()){
-            RiderStageConnection rSC = r.getRiderStageConnections().get(0);
+            RiderStageConnection rSC = null;
+            for(RiderStageConnection rsCs : r.getRiderStageConnections()){
+                if(rsCs.getStage().getId() == stageId){
+                    rSC = rsCs;
+                    break;
+                }
+            }
             long virtualGap = rSC.getVirtualGap();
             virtualGap -= raceGroup.getHistoryGapTime();
             virtualGap += raceGroup.getActualGapTime();
