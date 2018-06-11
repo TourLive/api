@@ -100,6 +100,11 @@ public class UpdateController extends Controller {
                             updatePoints(stageId, results);
                             if(nextStageAvailable) updatePoints(stageId + 1, results);
                             break;
+                        case CODE_IMG:
+                            results = collectResultChildNodes(ranking);
+                            updateMountainPoints(stageId, results);
+                            if(nextStageAvailable) updateMountainPoints(stageId + 1, results);
+                            break;
                         default:
                             break;
                     }
@@ -222,6 +227,23 @@ public class UpdateController extends Controller {
                 int bonusPoints = Integer.parseInt(attributes.getNamedItem(ATTRIBUTE_CAPITAL).getNodeValue());
                 RiderStageConnection rSC = riderStageConnectionRepository.getRiderStageConnectionByRiderStartNrAndStage(stageId, startNr).toCompletableFuture().join();
                 rSC.setBonusPoints(bonusPoints);
+                riderStageConnectionRepository.updateRiderStageConnection(rSC).toCompletableFuture().join();
+            }
+        } catch (Exception ex){
+            throw new ParseException("Failed to parse the xml", 0);
+        }
+    }
+
+    private void updateMountainPoints(long stageId, NodeList results) throws ParseException {
+        try{
+            for(int i = 0; i < results.getLength(); i++){
+                Node result = results.item(i);
+                if(result.getNodeType() != ALLOWED_TYPE) continue;
+                NamedNodeMap attributes = result.getAttributes();
+                int startNr = Integer.parseInt(attributes.getNamedItem(ATTRIBUTE_NUMBER).getNodeValue());
+                int mountainBonusPoints = Integer.parseInt(attributes.getNamedItem(ATTRIBUTE_CAPITAL).getNodeValue());
+                RiderStageConnection rSC = riderStageConnectionRepository.getRiderStageConnectionByRiderStartNrAndStage(stageId, startNr).toCompletableFuture().join();
+                rSC.setMountainBonusPoints(mountainBonusPoints);
                 riderStageConnectionRepository.updateRiderStageConnection(rSC).toCompletableFuture().join();
             }
         } catch (Exception ex){
