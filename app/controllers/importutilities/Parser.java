@@ -61,7 +61,7 @@ public final class Parser {
             maillot.setPartner(n.findPath("partner").asText());
             maillot.setName(n.findPath("name").textValue());
             maillot.setType(n.findPath("type").textValue());
-            maillot.setRiderId(1);
+            maillot.setRiderId(0);
             maillots.add(maillot);
         }
         return maillots;
