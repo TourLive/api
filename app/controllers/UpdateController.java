@@ -7,6 +7,7 @@ import models.Maillot;
 import models.Rider;
 import models.RiderStageConnection;
 import models.Stage;
+import models.enums.TypeState;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -44,6 +45,7 @@ public class UpdateController extends Controller {
     private static final String POINTS = "points";
     private static final String MOUNTAIN = "mountain";
     private static final String BEST_YOUNG = "bestYoung";
+    private static final String CODE_ITE = "ITE";
     private static final String CODE_ITG = "ITG";
     private static final String CODE_IPG = "IPG";
     private static final String CODE_IMG = "IMG";
@@ -52,6 +54,7 @@ public class UpdateController extends Controller {
     private static final String ATTRIBUTE_NUMBER = "number";
     private static final String ATTRIBUTE_CAPITAL = "capital";
     private static final String ATTRIBUTE_GAP = "gap";
+    private static final String ATTRIBUTE_REASON = "reason";
     private boolean nextStageAvailable = false;
 
     @Inject
@@ -90,6 +93,10 @@ public class UpdateController extends Controller {
                     NamedNodeMap attributes = ranking.getAttributes();
                     Node code = attributes.getNamedItem(ATTRIBUTE_CODE);
                     switch (code.getNodeValue()){
+                        case CODE_ITE:
+                            results = collectResultChildNodes(ranking);
+                            updateStates(stageId, results);
+                            break;
                         case CODE_ITG:
                             results = collectResultChildNodes(ranking);
                             updateTimes(stageId, results);
@@ -196,6 +203,43 @@ public class UpdateController extends Controller {
                 }
             }
         }
+    }
+
+    private void updateStates(long stageId, NodeList results) throws ParseException {
+        try{
+            for(int i = 0; i < results.getLength(); i++){
+                Node result = results.item(i);
+                if(result.getNodeType() != ALLOWED_TYPE) continue;
+                NamedNodeMap attributes = result.getAttributes();
+                int startNr = Integer.parseInt(attributes.getNamedItem(ATTRIBUTE_NUMBER).getNodeValue());
+                try{
+                    String reason = attributes.getNamedItem(ATTRIBUTE_REASON).getNodeValue();
+                    RiderStageConnection rSC = riderStageConnectionRepository.getRiderStageConnectionByRiderStartNrAndStage(stageId, startNr).toCompletableFuture().join();
+                    rSC.setTypeState(getTypeStateOutOfReason(reason));
+                    riderStageConnectionRepository.updateRiderStageConnection(rSC).toCompletableFuture().join();
+                } catch (Exception ex){
+                    // do nothing, rider is still active
+                }
+            }
+        } catch (Exception ex){
+            throw new ParseException("Failed to parse the xml", 0);
+        }
+    }
+
+    private TypeState getTypeStateOutOfReason(String reason){
+        TypeState state = null;
+        switch(reason){
+            case "AB":
+                state = TypeState.QUIT;
+                break;
+            case "NP":
+                state = TypeState.DNC;
+                break;
+            default:
+                state = TypeState.ACTIVE;
+                break;
+        }
+        return state;
     }
 
     private void updateTimes(long stageId, NodeList results) throws ParseException {
