@@ -96,6 +96,7 @@ public class UpdateController extends Controller {
                         case CODE_ITE:
                             results = collectResultChildNodes(ranking);
                             updateStates(stageId, results);
+                            if(nextStageAvailable) updateStates(stageId + 1, results);
                             break;
                         case CODE_ITG:
                             results = collectResultChildNodes(ranking);
